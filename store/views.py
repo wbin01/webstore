@@ -179,3 +179,19 @@ def product(request, url_title, post_id):
     if not request.user.is_authenticated:
         return render(request, 'product.html', context)
     return render(request, 'index.html', context)
+
+
+def search(request):
+    search_text = request.GET['q']
+    posts = (ModelPost.objects.order_by(
+        '-publication_date').filter(is_published=True).filter(
+        title__icontains=search_text) if search_text else [])
+    store_profile = ModelStoreProfile.objects.all()[0]
+
+    context = {
+        'store_name': store_profile.brand_name,
+        'posts': [Post(x) for x in posts]}
+
+    if not request.user.is_authenticated:
+        return render(request, 'search.html', context)
+    return render(request, 'index.html', context)
