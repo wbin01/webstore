@@ -66,8 +66,12 @@ class ModelStoreProfile(models.Model):
         User, on_delete=models.CASCADE, blank=False, null=False)
     brand_name = models.CharField(
         max_length=200, blank=False, null=False)
+    show_brand_name_on_nav = models.BooleanField(
+        default=False, blank=False, null=False)
     brand_image = models.ImageField(
         upload_to='img_store/%d/%m/%Y/', blank=False, null=False)
+    show_brand_image_on_nav = models.BooleanField(
+        default=True, blank=False, null=False)
     social_media_facebook = models.CharField(
         max_length=200, blank=True, null=True)
     social_media_whatsapp = models.CharField(

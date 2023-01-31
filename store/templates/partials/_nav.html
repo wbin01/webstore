@@ -1,7 +1,19 @@
 {% load static %}
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
   <div class="container-fluid">
-    <a class="navbar-brand" href="{% url 'index' %}">{{ store_profile.brand_name }}</a>
+    <a class="navbar-brand" href="{% url 'index' %}">
+    {% if store_profile.show_brand_image_on_nav %}
+      {% if store_profile.brand_image %}
+      <img src="{{ store_profile.brand_image }}" style="height: 30px;" alt="Logo">
+      {% else %}
+      <img src="{% static 'store/brand.svg' %}" style="height: 30px;" alt="Logo">
+      {% endif %}
+    {% endif %}
+
+    {% if store_profile.show_brand_name_on_nav %}
+      {% if store_profile.brand_name %}{{ store_profile.brand_name }}{% endif %}
+    {% endif %}
+    </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>

@@ -5,6 +5,25 @@ from django.shortcuts import render
 from store.models import ModelPost, ModelHighlightPosts, ModelStoreProfile
 
 
+class StoreProfile(object):
+    def __init__(self) -> None:
+        self.owner = None
+        self.brand_name = 'Brand'
+        self.show_brand_name_on_nav = True
+        self.brand_image = None
+        self.show_brand_image_on_nav = True
+        self.social_media_facebook = None
+        self.social_media_whatsapp = None
+        self.social_media_twitter = None
+        self.social_media_youtube = None
+        self.social_media_instagram = None
+        self.social_media_twitch = None
+        self.social_media_discord = None
+        self.social_media_linkedin = None
+        self.social_media_github = None
+        self.social_media_other = None
+
+
 class Post(object):
     """..."""
     def __init__(self, post: ModelPost) -> None:
@@ -137,8 +156,9 @@ def index(request):
         .filter(is_published=True))
     highlight_posts = ModelHighlightPosts.objects.all()
 
+    store_profile = ModelStoreProfile.objects.all()
     context = {
-        'store_profile': ModelStoreProfile.objects.all()[0],
+        'store_profile': store_profile[0] if store_profile else StoreProfile(),
         'posts': [Post(x) for x in posts],
         'highlight_posts': highlight_posts}
 
@@ -170,8 +190,9 @@ def logout(request):
 
 def product(request, url_title, post_id):
     logging.info(url_title)
+    store_profile = ModelStoreProfile.objects.all()
     context = {
-        'store_profile': ModelStoreProfile.objects.all()[0],
+        'store_profile': store_profile[0] if store_profile else StoreProfile(),
         'post': Post(ModelPost.objects.get(pk=post_id))}
 
     if not request.user.is_authenticated:
@@ -185,8 +206,9 @@ def search(request):
         '-publication_date').filter(is_published=True).filter(
         title__icontains=search_text) if search_text else [])
 
+    store_profile = ModelStoreProfile.objects.all()
     context = {
-        'store_profile': ModelStoreProfile.objects.all()[0],
+        'store_profile': store_profile[0] if store_profile else StoreProfile(),
         'search_text': search_text,
         'posts': [Post(x) for x in posts]}
 
@@ -201,8 +223,9 @@ def search_tag(request):
         '-publication_date').filter(is_published=True).filter(
         tags__icontains=search_text) if search_text else [])
 
+    store_profile = ModelStoreProfile.objects.all()
     context = {
-        'store_profile': ModelStoreProfile.objects.all()[0],
+        'store_profile': store_profile[0] if store_profile else StoreProfile(),
         'search_text': search_text,
         'posts': [Post(x) for x in posts]}
 
