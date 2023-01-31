@@ -64,9 +64,30 @@ class ModelHighlightPosts(models.Model):
 class ModelStoreProfile(models.Model):
     owner = models.ForeignKey(
         User, on_delete=models.CASCADE, blank=False, null=False)
-    brand_name = models.CharField(max_length=200, blank=False, null=False)
+    brand_name = models.CharField(
+        max_length=200, blank=False, null=False)
     brand_image = models.ImageField(
         upload_to='img_store/%d/%m/%Y/', blank=False, null=False)
+    social_media_facebook = models.CharField(
+        max_length=200, blank=True, null=True)
+    social_media_whatsapp = models.CharField(
+        max_length=200, blank=True, null=True)
+    social_media_twitter = models.CharField(
+        max_length=200, blank=True, null=True)
+    social_media_youtube = models.CharField(
+        max_length=200, blank=True, null=True)
+    social_media_instagram = models.CharField(
+        max_length=200, blank=True, null=True)
+    social_media_twitch = models.CharField(
+        max_length=200, blank=True, null=True)
+    social_media_discord = models.CharField(
+        max_length=200, blank=True, null=True)
+    social_media_linkedin = models.CharField(
+        max_length=200, blank=True, null=True)
+    social_media_github = models.CharField(
+        max_length=200, blank=True, null=True)
+    social_media_other = models.CharField(
+        max_length=200, blank=True, null=True)
 
     def __str__(self):
         return self.brand_name

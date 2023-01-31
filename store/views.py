@@ -132,14 +132,13 @@ def store_context():
 
 
 def index(request):
-    store_profile = ModelStoreProfile.objects.all()[0]
     posts = (
         ModelPost.objects.order_by('-publication_date')
         .filter(is_published=True))
     highlight_posts = ModelHighlightPosts.objects.all()
 
     context = {
-        'store_name': store_profile.brand_name,
+        'store_profile': ModelStoreProfile.objects.all()[0],
         'posts': [Post(x) for x in posts],
         'highlight_posts': highlight_posts}
 
@@ -171,9 +170,8 @@ def logout(request):
 
 def product(request, url_title, post_id):
     logging.info(url_title)
-    store_profile = ModelStoreProfile.objects.all()[0]
     context = {
-        'store_name': store_profile.brand_name,
+        'store_profile': ModelStoreProfile.objects.all()[0],
         'post': Post(ModelPost.objects.get(pk=post_id))}
 
     if not request.user.is_authenticated:
@@ -186,10 +184,9 @@ def search(request):
     posts = (ModelPost.objects.order_by(
         '-publication_date').filter(is_published=True).filter(
         title__icontains=search_text) if search_text else [])
-    store_profile = ModelStoreProfile.objects.all()[0]
 
     context = {
-        'store_name': store_profile.brand_name,
+        'store_profile': ModelStoreProfile.objects.all()[0],
         'search_text': search_text,
         'posts': [Post(x) for x in posts]}
 
@@ -203,10 +200,9 @@ def search_tag(request):
     posts = (ModelPost.objects.order_by(
         '-publication_date').filter(is_published=True).filter(
         tags__icontains=search_text) if search_text else [])
-    store_profile = ModelStoreProfile.objects.all()[0]
 
     context = {
-        'store_name': store_profile.brand_name,
+        'store_profile': ModelStoreProfile.objects.all()[0],
         'search_text': search_text,
         'posts': [Post(x) for x in posts]}
 
