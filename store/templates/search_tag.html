@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+  <!-- CARD -->
+  {% if posts %}
+  <div class="container mt-4">
+    <div class="row row-cols-1 row-cols-md-4 g-4">
+      {% for post in posts %}
+      <div class="col">
+
+        <a href="{% url 'product' post.url_title post.id %}" class="text-decoration-none text-dark">
+          <div class="card h-100 border-0 shadow-sm">
+            <img src="{{ post.image_1.url }}" class="card-img-top" alt="...">
+
+            <div class="text-secondary"><hr class="my-0 py-0"></div>
+            <div class="card-body my-1 py-0">
+              {% if post.card_title %}
+              <p class="card-text text-secondary my-0 py-0 align-middle" style="display: table-cell; height: 50px; vertical-align: middle;">
+                <small>{{ post.card_title }}</small>
+              </p>
+              {% endif %}
+              {% if post.new_price %}
+              <p class="card-text my-0 py-0">
+                <strong>{{ post.new_price }}</strong>
+                {% if post.show_off_price %}
+                {% if post.off_price %}<small class="text-success"> {{ post.off_price }}</small>{% endif %}
+                {% endif %}
+              </p>
+              {% endif %}
+              {% if post.times_split_prices %}
+              <p class="card-text my-0 py-0">
+              <small>{{ post.times_split_prices }}</small>
+              {% if not post.times_split_interest %}
+              <span class="text-success fs-6"> sem juros</span>
+              {% endif %}
+              </p>
+              {% endif %}
+              {% if not post.shipping_price %}
+              <p class="card-text text-success my-0 py-0"><small><strong>Frete Grátis</strong></small></p>
+              {% endif %}
+            </div>
+          </div>
+        </a>
+
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  {% else %}
+  <div class="text-center text-muted mt-5 mb-5 pt-5 pb-5"><h1 class="mt-5 mb-5 pt-5 pb-5">Nada encontrado!</h1></div>
+  {% endif %}
+</div>
+{% endblock %}
