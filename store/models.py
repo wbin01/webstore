@@ -3,7 +3,13 @@ from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import User
 
-from django_resized import ResizedImageField
+# ImageField -> pip install Pillow
+
+# https://github.com/un1t/django-resized
+from django_resized import ResizedImageField  # pip: Pillow, django-resized
+
+# https://github.com/fabiocaccamo/django-colorfield
+from colorfield.fields import ColorField  # pip: django-colorfield
 
 
 class ModelPost(models.Model):
@@ -72,6 +78,10 @@ class ModelStoreProfile(models.Model):
         upload_to='img_store/%d/%m/%Y/', blank=False, null=False)
     show_brand_image_on_nav = models.BooleanField(
         default=True, blank=False, null=False)
+    theme_text_color = ColorField(
+        blank=True, null=True, default='#FFFFFF')
+    theme_background_color = ColorField(
+        blank=True, null=True, default='#39AA62')
     social_media_facebook = models.CharField(
         max_length=200, blank=True, null=True)
     social_media_whatsapp = models.CharField(

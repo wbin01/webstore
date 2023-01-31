@@ -12,6 +12,8 @@ class StoreProfile(object):
         self.show_brand_name_on_nav = True
         self.brand_image = None
         self.show_brand_image_on_nav = True
+        self.theme_text_color = '#FFFFFF'
+        self.theme_background_color = '#39AA62'
         self.social_media_facebook = None
         self.social_media_whatsapp = None
         self.social_media_twitter = None

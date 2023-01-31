@@ -2,14 +2,14 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="80"
-   height="40"
-   viewBox="0 0 21.166667 10.583333"
+   width="48"
+   height="48"
+   viewBox="0 0 12.7 12.7"
    version="1.1"
    id="svg5"
    xml:space="preserve"
    inkscape:version="1.2.2 (1:1.2.2+202212051552+b0a8486541)"
-   sodipodi:docname="brand.svg"
+   sodipodi:docname="profile.svg"
    inkscape:export-filename="reticle2.png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96"
@@ -27,9 +27,9 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="px"
      showgrid="true"
-     inkscape:zoom="4"
-     inkscape:cx="25"
-     inkscape:cy="21.625"
+     inkscape:zoom="8"
+     inkscape:cx="26.9375"
+     inkscape:cy="27.4375"
      inkscape:window-width="1366"
      inkscape:window-height="740"
      inkscape:window-x="0"
@@ -37,20 +37,18 @@
      inkscape:window-maximized="1"
      inkscape:current-layer="layer1"><inkscape:grid
        type="xygrid"
-       id="grid2570"
-       originx="0"
-       originy="0" /></sodipodi:namedview><defs
+       id="grid2570" /></sodipodi:namedview><defs
      id="defs2" /><g
      inkscape:label="Camada 1"
      inkscape:groupmode="layer"
-     id="layer1"><rect
-       style="fill:#000000;fill-opacity:0.1;stroke-width:1.00012;stroke-linecap:round;stroke-linejoin:round;paint-order:markers stroke fill"
-       id="rect342"
-       width="11.90625"
-       height="3.96875"
-       x="0"
-       y="0"
-       ry="1.984375" /><path
-       id="rect344"
-       style="fill:#000000;fill-opacity:0.1;stroke-width:1.00012;stroke-linecap:round;stroke-linejoin:round;paint-order:markers stroke fill"
-       d="M 1.984375 5.2916666 C 0.88503233 5.2916666 0 6.176699 0 7.2760416 L 0 7.9374999 L 0 8.5989583 L 0 10.583333 L 1.984375 10.583333 L 10.583333 10.583333 L 19.182292 10.583333 C 20.281634 10.583333 21.166666 9.6983009 21.166666 8.5989583 L 21.166666 7.9374999 L 21.166666 7.2760416 L 21.166666 5.2916666 L 19.182292 5.2916666 L 10.583333 5.2916666 L 1.984375 5.2916666 z " /></g></svg>
+     id="layer1"><path
+       id="rect409"
+       style="fill:#000000;fill-opacity:0.1;stroke-width:1.30187;stroke-linecap:round;stroke-linejoin:round;paint-order:markers stroke fill"
+       d="M 6.35 0 C 2.8321036 0 0 2.8321036 0 6.35 C 0 9.8678964 2.8321036 12.7 6.35 12.7 C 9.8678964 12.7 12.7 9.8678964 12.7 6.35 C 12.7 2.8321036 9.8678964 0 6.35 0 z M 6.35 1.3229167 C 9.1350014 1.3229167 11.377083 3.5649986 11.377083 6.35 C 11.377083 9.1350014 9.1350014 11.377083 6.35 11.377083 C 3.5649986 11.377083 1.3229167 9.1350014 1.3229167 6.35 C 1.3229167 3.5649986 3.5649986 1.3229167 6.35 1.3229167 z " /><rect
+       style="fill:#000000;fill-opacity:0.1;stroke-width:0.759426;stroke-linecap:round;stroke-linejoin:round;paint-order:markers stroke fill"
+       id="rect343"
+       width="7.4083333"
+       height="7.4083333"
+       x="2.6458333"
+       y="2.6458333"
+       ry="3.7041667" /></g></svg>

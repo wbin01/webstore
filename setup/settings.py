@@ -34,6 +34,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'users',
     'store',
+    'colorfield',  # pip: django-colorfield
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
