@@ -124,7 +124,7 @@ class Post(object):
 
     def __formatted_tags(self) -> list:
         """[tag1, tag2, tag3]"""
-        return self.post.tags.split(',')
+        return [x.strip() for x in self.post.tags.split(',')]
 
 
 def store_context():
@@ -190,6 +190,7 @@ def search(request):
 
     context = {
         'store_name': store_profile.brand_name,
+        'search_text': search_text,
         'posts': [Post(x) for x in posts]}
 
     if not request.user.is_authenticated:
@@ -206,6 +207,7 @@ def search_tag(request):
 
     context = {
         'store_name': store_profile.brand_name,
+        'search_text': search_text,
         'posts': [Post(x) for x in posts]}
 
     if not request.user.is_authenticated:
