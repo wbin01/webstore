@@ -1,4 +1,9 @@
 .idea/
+images/
+img_posts/
+img_profile/
+img_store/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
