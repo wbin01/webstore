@@ -59,7 +59,10 @@
             <!-- <a class="list-group-item list-group-item-action disabled">A disabled link item</a> -->
           </div>
           <div class="list-group mt-4">
-            <a href="{% url 'logout' %}" class="list-group-item list-group-item-action">Sair</a>
+            <form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <input type="submit" value="Sair" class="list-group-item list-group-item-action">
+            </form>
           </div>
 
         </div>
