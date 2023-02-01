@@ -7,7 +7,9 @@ from django.contrib import auth
 
 from store.models import (
     ModelPost, ModelHighlightPosts, ModelStoreProfile, ModelUserProfile)
-from store.forms import FormLogin
+from store.forms import FormLogin, FormSignup
+
+import store.validation as validation
 
 
 class StoreProfile(object):
@@ -176,17 +178,65 @@ def index(request):
 
 
 def signup(request):
-    store_profile = ModelStoreProfile.objects.all()
-    context = {
-        'store_profile': store_profile[0] if store_profile else StoreProfile(),
-        'user_profile': None}
-
     if request.user.is_authenticated:
         return redirect('index')
 
-    if not request.user.is_authenticated:
+    store_profile = ModelStoreProfile.objects.all()
+    context = {
+        'store_profile': store_profile[0] if store_profile else StoreProfile(),
+        'user_profile': None,
+        'form': FormSignup,
+        'signup_status': None}
 
-        return render(request, 'signup.html', context)
+    if not request.user.is_authenticated:
+        if request.method != 'POST':
+            return render(request, 'signup.html', context)
+
+        if request.method == 'POST':
+            name = request.POST['name']
+            username = request.POST['username']
+            email = request.POST['email']
+            password = request.POST['password']
+            password_confirm = request.POST['password_confirm']
+
+            space_err = validation.invalid_whitespace(
+                [name, username, email, password, password_confirm])
+            if space_err:
+                context['signup_status'] = space_err
+
+            username_err = validation.invalid_username(username)
+            if username_err:
+                context['signup_status'] = username_err
+
+            email_err = validation.invalid_email(email)
+            if email_err:
+                context['signup_status'] = email_err
+
+            pass_err = validation.invalid_password(password, password_confirm)
+            if pass_err:
+                context['signup_status'] = pass_err
+
+            if User.objects.filter(username=email).exists():
+                context['signup_status'] = 'Usuário já cadastrado'
+
+            if User.objects.filter(email=email).exists():
+                context['signup_status'] = 'Email já cadastrado'
+
+            if context['signup_status']:
+                return render(request, 'signup.html', context)
+
+            user = User.objects.create_user(
+                username=username, first_name=name,
+                email=email, password=password)
+            user.save()
+
+            profile = ModelUserProfile.objects.create(
+                user=get_object_or_404(User, pk=user.id),
+                is_admin=False,
+                is_superuser=False)
+            profile.save()
+
+            return redirect('login')
 
 
 def login(request):

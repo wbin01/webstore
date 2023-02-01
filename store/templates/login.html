@@ -17,7 +17,7 @@
         {% csrf_token %}
         {% for field in form.visible_fields %}
         <div class="form-group mb-2">
-          <label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}
+          <label for="{{ field.id_for_label }}">{{ field.label | safe }}</label>{{ field }}
         </div>
         {% endfor %}
         <input type="submit" value="Entrar" class="btn btn-dark mt-3 mb-5">
