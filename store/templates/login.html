@@ -3,6 +3,25 @@
 
 {% block content %}
 <div class="container-fluid">
-  <h2>Login</h2>
+  <section class="container col-8 pt-3" >
+    <h1>Acessar sua conta</h1>
+      <p class="mb-4 text-muted">Preencha os campos</p>
+
+      <div style="height: 30px;">
+      {% if login_status %}
+      <p>{{ login_status }}</p>
+      {% endif %}
+      </div>
+
+      <form action="{% url 'login' %}" method="post">
+        {% csrf_token %}
+        {% for field in form.visible_fields %}
+        <div class="form-group mb-2">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}
+        </div>
+        {% endfor %}
+        <input type="submit" value="Entrar" class="btn btn-dark mt-3 mb-5">
+      </form>
+    </section>
 </div>
 {% endblock %}

@@ -74,14 +74,15 @@ class ModelStoreProfile(models.Model):
         max_length=200, blank=False, null=False)
     show_brand_name_on_nav = models.BooleanField(
         default=False, blank=False, null=False)
-    brand_image = models.ImageField(
-        upload_to='img_store/%d/%m/%Y/', blank=False, null=False)
+    brand_image = ResizedImageField(
+        size=[80, 40], crop=['middle', 'center'],
+        upload_to='img_store/', blank=True, null=True)
     show_brand_image_on_nav = models.BooleanField(
         default=True, blank=False, null=False)
     theme_text_color = ColorField(
         blank=True, null=True, default='#FFFFFF')
     theme_background_color = ColorField(
-        blank=True, null=True, default='#39AA62')
+        blank=True, null=True, default='#8A42AA')
     social_media_facebook = models.CharField(
         max_length=200, blank=True, null=True)
     social_media_whatsapp = models.CharField(
@@ -105,3 +106,18 @@ class ModelStoreProfile(models.Model):
 
     def __str__(self):
         return self.brand_name
+
+
+class ModelUserProfile(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, blank=False, null=False)
+    profile_image = ResizedImageField(
+        size=[40, 40], crop=['middle', 'center'],
+        upload_to='img_profile/', blank=True, null=True)
+    is_admin = models.BooleanField(
+        blank=False, null=False, default=False)
+    is_superuser = models.BooleanField(
+        blank=False, null=False, default=False)
+
+    def __str__(self):
+        return self.user.first_name

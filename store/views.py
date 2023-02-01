@@ -1,8 +1,13 @@
 import logging
 import string
 
-from django.shortcuts import render
-from store.models import ModelPost, ModelHighlightPosts, ModelStoreProfile
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.models import User
+from django.contrib import auth
+
+from store.models import (
+    ModelPost, ModelHighlightPosts, ModelStoreProfile, ModelUserProfile)
+from store.forms import FormLogin
 
 
 class StoreProfile(object):
@@ -13,7 +18,7 @@ class StoreProfile(object):
         self.brand_image = None
         self.show_brand_image_on_nav = True
         self.theme_text_color = '#FFFFFF'
-        self.theme_background_color = '#39AA62'
+        self.theme_background_color = '#8A42AA'
         self.social_media_facebook = None
         self.social_media_whatsapp = None
         self.social_media_twitter = None
@@ -148,46 +153,82 @@ class Post(object):
         return [x.strip() for x in self.post.tags.split(',')]
 
 
-def store_context():
-    return {'store_name': 'lol'}
-
-
 def index(request):
+    highlight_posts = ModelHighlightPosts.objects.all()
+    store_profile = ModelStoreProfile.objects.all()
     posts = (
         ModelPost.objects.order_by('-publication_date')
         .filter(is_published=True))
-    highlight_posts = ModelHighlightPosts.objects.all()
-
-    store_profile = ModelStoreProfile.objects.all()
     context = {
         'store_profile': store_profile[0] if store_profile else StoreProfile(),
+        'user_profile': None,
         'posts': [Post(x) for x in posts],
         'highlight_posts': highlight_posts}
 
-    if not request.user.is_authenticated:
-        return render(request, 'index.html', context)
+    if request.user.is_authenticated:
+        try:
+            profile = get_object_or_404(ModelUserProfile, user=request.user.id)
+            context['user_profile'] = profile
+        except Exception as err:
+            logging.error(err)
+
     return render(request, 'index.html', context)
 
 
 def signup(request):
-    context = {}
+    store_profile = ModelStoreProfile.objects.all()
+    context = {
+        'store_profile': store_profile[0] if store_profile else StoreProfile(),
+        'user_profile': None}
+
+    if request.user.is_authenticated:
+        return redirect('index')
+
     if not request.user.is_authenticated:
+
         return render(request, 'signup.html', context)
-    return render(request, 'index.html', context)
 
 
 def login(request):
-    context = {}
+    store_profile = ModelStoreProfile.objects.all()
+    context = {
+        'store_profile': store_profile[0] if store_profile else StoreProfile(),
+        'user_profile': None,
+        'form': FormLogin,
+        'login_status': None}
+
+    if request.user.is_authenticated:
+        return redirect('index')
+
     if not request.user.is_authenticated:
-        return render(request, 'login.html', context)
-    return render(request, 'index.html', context)
+        if request.method != 'POST':
+            return render(request, 'login.html', context)
+
+        if request.method == 'POST':
+            username = request.POST['username']
+            password = request.POST['password']
+
+            if not User.objects.filter(username=username).exists():
+                context['login_status'] = 'Usuário ou senha incorreto'
+                return render(request, 'login.html', context)
+
+            if User.objects.filter(username=username).exists():
+                user = auth.authenticate(
+                    request, username=username, password=password)
+
+                if not user:
+                    context['login_status'] = 'Usuário ou senha incorreto'
+                    return render(request, 'login.html', context)
+
+                if user:
+                    auth.login(request, user)
+                    return redirect('index')
 
 
 def logout(request):
-    context = {}
     if request.user.is_authenticated:
-        return render(request, 'logout.html', context)
-    return render(request, 'index.html', context)
+        auth.logout(request)
+    return redirect('index')
 
 
 def product(request, url_title, post_id):
@@ -195,11 +236,18 @@ def product(request, url_title, post_id):
     store_profile = ModelStoreProfile.objects.all()
     context = {
         'store_profile': store_profile[0] if store_profile else StoreProfile(),
-        'post': Post(ModelPost.objects.get(pk=post_id))}
+        'post': Post(ModelPost.objects.get(pk=post_id)),
+        'user_profile': None}
 
-    if not request.user.is_authenticated:
-        return render(request, 'product.html', context)
-    return render(request, 'index.html', context)
+    if request.user.is_authenticated:
+        try:
+            profile = get_object_or_404(ModelUserProfile, user=request.user.id)
+            context['user_profile'] = profile
+            print('XXXXXXXX', profile.profile_image.url)
+        except Exception as err:
+            logging.error(err)
+
+    return render(request, 'product.html', context)
 
 
 def search(request):
@@ -211,12 +259,18 @@ def search(request):
     store_profile = ModelStoreProfile.objects.all()
     context = {
         'store_profile': store_profile[0] if store_profile else StoreProfile(),
+        'user_profile': None,
         'search_text': search_text,
         'posts': [Post(x) for x in posts]}
 
-    if not request.user.is_authenticated:
-        return render(request, 'search.html', context)
-    return render(request, 'index.html', context)
+    if request.user.is_authenticated:
+        try:
+            profile = get_object_or_404(ModelUserProfile, user=request.user.id)
+            context['user_profile'] = profile
+        except Exception as err:
+            logging.error(err)
+
+    return render(request, 'search.html', context)
 
 
 def search_tag(request):
@@ -228,9 +282,15 @@ def search_tag(request):
     store_profile = ModelStoreProfile.objects.all()
     context = {
         'store_profile': store_profile[0] if store_profile else StoreProfile(),
+        'user_profile': None,
         'search_text': search_text,
         'posts': [Post(x) for x in posts]}
 
-    if not request.user.is_authenticated:
-        return render(request, 'search_tag.html', context)
-    return render(request, 'index.html', context)
+    if request.user.is_authenticated:
+        try:
+            profile = get_object_or_404(ModelUserProfile, user=request.user.id)
+            context['user_profile'] = profile
+        except Exception as err:
+            logging.error(err)
+
+    return render(request, 'search_tag.html', context)
