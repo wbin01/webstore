@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from django.urls import path
 
 from .views import (
+    cart_request,
     favorite_request,
     index,
     login, logout,
@@ -15,6 +16,9 @@ load_dotenv()
 ADMIN_ROUTE = os.getenv('ADMIN_ROUTE')
 
 urlpatterns = [
+    path(
+        'cart_request/<int:product_id>/',
+        cart_request, name='cart_request'),
     path(
         'favorite_request/<int:product_id>/',
         favorite_request, name='favorite_request'),

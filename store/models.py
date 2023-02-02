@@ -125,7 +125,21 @@ class ModelUserProfile(models.Model):
         return self.user.first_name
 
 
-class ModelFavorites(models.Model):
+class ModelFavorite(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, blank=False, null=False)
+    product_id = models.IntegerField(
+        blank=False, null=False)
+    product_title = models.CharField(
+        max_length=200, blank=False, null=False)
+    publication_date = models.DateTimeField(
+        default=datetime.now, blank=True)
+
+    def __str__(self):
+        return f'{self.user.username}: {self.product_title}'
+
+
+class ModelCart(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, blank=False, null=False)
     product_id = models.IntegerField(

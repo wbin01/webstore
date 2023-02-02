@@ -6,19 +6,41 @@ from django.contrib.auth.models import User
 from django.contrib import auth
 
 from store.models import (
-    ModelProduct, ModelHighlightPosts, ModelStoreProfile, ModelUserProfile,
-    ModelBuy, ModelFavorites)
+    ModelBuy, ModelCart, ModelFavorite, ModelHighlightPosts, ModelProduct,
+    ModelStoreProfile, ModelUserProfile)
 from store.forms import FormLogin, FormSignup
 
 import store.validation as validation
 from store.model_support import StoreProfile, ProductProfile, UserProfile
 
 
+def cart_request(request, product_id):
+    product_ = ProductProfile(ModelProduct.objects.get(pk=product_id))
+
+    try:
+        cart = ModelCart.objects.filter(user=request.user.id).filter(
+            product_id=product_.id)
+    except Exception as err:
+        cart = None
+        logging.error(err)
+
+    if cart:
+        cart.delete()
+    else:
+        cart = ModelCart.objects.create(
+            user=get_object_or_404(User, pk=request.user.id),
+            product_id=int(product_.id),
+            product_title=product_.title)
+        cart.save()
+
+    return redirect('product', product_.url_title, product_.id)
+
+
 def favorite_request(request, product_id):
     product_ = ProductProfile(ModelProduct.objects.get(pk=product_id))
 
     try:
-        favorite = ModelFavorites.objects.filter(user=request.user.id).filter(
+        favorite = ModelFavorite.objects.filter(user=request.user.id).filter(
             product_id=product_.id)
     except Exception as err:
         favorite = None
@@ -27,7 +49,7 @@ def favorite_request(request, product_id):
     if favorite:
         favorite.delete()
     else:
-        favorite = ModelFavorites.objects.create(
+        favorite = ModelFavorite.objects.create(
             user=get_object_or_404(User, pk=request.user.id),
             product_id=int(product_.id),
             product_title=product_.title)
@@ -48,11 +70,18 @@ def index(request):
         'products': [ProductProfile(x) for x in posts],
         'highlight_posts': highlight_posts}
 
+    if not request.user.is_authenticated:
+        return render(request, 'index_for_visitors.html', context)
+
     if request.user.is_authenticated:
         profile = UserProfile(request)
         context['user_profile'] = profile if profile else UserProfile(request)
 
-    return render(request, 'index_for_visitors.html', context)
+        if not profile.is_admin:
+            return render(request, 'index_for_users.html', context)
+
+        if profile.is_admin:
+            return render(request, 'index_for_admins.html', context)
 
 
 def login(request):
@@ -108,6 +137,7 @@ def product(request, product_url_title, product_id):
         'store_profile': store_profile[0] if store_profile else StoreProfile(),
         'product': product_rofile,
         'favorite': None,
+        'cart': None,
         'user_profile': None}
 
     if not request.user.is_authenticated:
@@ -118,11 +148,18 @@ def product(request, product_url_title, product_id):
         context['user_profile'] = profile if profile else UserProfile(request)
 
         try:
-            context['favorite'] = ModelFavorites.objects.filter(
+            context['favorite'] = ModelFavorite.objects.filter(
                 user=request.user.id).filter(product_id=product_rofile.id)
         except Exception as err:
             logging.error(err)
             context['favorite'] = None
+
+        try:
+            context['cart'] = ModelCart.objects.filter(
+                user=request.user.id).filter(product_id=product_rofile.id)
+        except Exception as err:
+            logging.error(err)
+            context['cart'] = None
 
         if not profile.is_admin and not profile.is_superuser:
             return render(request, 'product_for_users.html', context)
