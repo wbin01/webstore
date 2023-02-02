@@ -132,6 +132,11 @@ class ModelFavorites(models.Model):
         blank=False, null=False)
     product_title = models.CharField(
         max_length=200, blank=False, null=False)
+    publication_date = models.DateTimeField(
+        default=datetime.now, blank=True)
+
+    def __str__(self):
+        return f'{self.user.username}: {self.product_title}'
 
 
 class ModelBuy(models.Model):
@@ -143,3 +148,8 @@ class ModelBuy(models.Model):
         max_length=200, blank=False, null=False)
     product_price = models.FloatField(
         blank=False, null=False)
+    publication_date = models.DateTimeField(
+        default=datetime.now, blank=True)
+
+    def __str__(self):
+        return self.product_title

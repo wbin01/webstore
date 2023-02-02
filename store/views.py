@@ -6,15 +6,34 @@ from django.contrib.auth.models import User
 from django.contrib import auth
 
 from store.models import (
-    ModelProduct, ModelHighlightPosts, ModelStoreProfile, ModelUserProfile)
+    ModelProduct, ModelHighlightPosts, ModelStoreProfile, ModelUserProfile,
+    ModelBuy, ModelFavorites)
 from store.forms import FormLogin, FormSignup
 
 import store.validation as validation
 from store.model_support import StoreProfile, ProductProfile, UserProfile
 
 
-def favorite_request(request, url_title, product_id):
-    return redirect('product', url_title, product_id)
+def favorite_request(request, product_id):
+    product_ = ProductProfile(ModelProduct.objects.get(pk=product_id))
+
+    try:
+        favorite = ModelFavorites.objects.filter(user=request.user.id).filter(
+            product_id=product_.id)
+    except Exception as err:
+        favorite = None
+        logging.error(err)
+
+    if favorite:
+        favorite.delete()
+    else:
+        favorite = ModelFavorites.objects.create(
+            user=get_object_or_404(User, pk=request.user.id),
+            product_id=int(product_.id),
+            product_title=product_.title)
+        favorite.save()
+
+    return redirect('product', product_.url_title, product_.id)
 
 
 def index(request):
@@ -33,7 +52,7 @@ def index(request):
         profile = UserProfile(request)
         context['user_profile'] = profile if profile else UserProfile(request)
 
-    return render(request, 'index.html', context)
+    return render(request, 'index_for_visitors.html', context)
 
 
 def login(request):
@@ -83,9 +102,12 @@ def logout(request):
 def product(request, product_url_title, product_id):
     logging.info(product_url_title)
     store_profile = ModelStoreProfile.objects.all()
+    product_rofile = ProductProfile(ModelProduct.objects.get(pk=product_id))
+
     context = {
         'store_profile': store_profile[0] if store_profile else StoreProfile(),
-        'product': ProductProfile(ModelProduct.objects.get(pk=product_id)),
+        'product': product_rofile,
+        'favorite': None,
         'user_profile': None}
 
     if not request.user.is_authenticated:
@@ -94,6 +116,13 @@ def product(request, product_url_title, product_id):
     if request.user.is_authenticated:
         profile = UserProfile(request)
         context['user_profile'] = profile if profile else UserProfile(request)
+
+        try:
+            context['favorite'] = ModelFavorites.objects.filter(
+                user=request.user.id).filter(product_id=product_rofile.id)
+        except Exception as err:
+            logging.error(err)
+            context['favorite'] = None
 
         if not profile.is_admin and not profile.is_superuser:
             return render(request, 'product_for_users.html', context)

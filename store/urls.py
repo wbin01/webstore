@@ -16,7 +16,7 @@ ADMIN_ROUTE = os.getenv('ADMIN_ROUTE')
 
 urlpatterns = [
     path(
-        'favorite_request/<str:url_title>:<int:product_id>/',
+        'favorite_request/<int:product_id>/',
         favorite_request, name='favorite_request'),
     path(
         '',
