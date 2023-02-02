@@ -3,71 +3,41 @@
 
 {% block content %}
 <div class="container-fluid">
-<!-- CAROUSEL -->
-  {% if highlight_posts|length > 2 %}
-  <div id="carouselExampleIndicators" class="carousel slide">
-    <div class="carousel-indicators">
-      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
-      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
-    </div>
-    <div class="carousel-inner">
-      <div class="carousel-item active">
-        <img src="{{ highlight_posts.0.post.image}}" class="img-fluid img-thumbnail" alt="...">
-      </div>
-      <div class="carousel-item">
-        <img src="..." class="d-block w-100" alt="...">
-      </div>
-      <div class="carousel-item">
-        <img src="..." class="d-block w-100" alt="...">
-      </div>
-    </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
-      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Previous</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
-      <span class="carousel-control-next-icon" aria-hidden="true"></span>
-      <span class="visually-hidden">Next</span>
-    </button>
-  </div>
-  {% endif %}
-
   <!-- CARD -->
-  {% if posts %}
+  {% if products %}
   <div class="container mt-4">
     <div class="row row-cols-1 row-cols-md-4 g-4">
-      {% for post in posts %}
+      {% for product in products %}
       <div class="col">
 
-        <a href="{% url 'product' post.url_title post.id %}" class="text-decoration-none text-dark">
+        <a href="{% url 'product' product.url_title product.id %}" class="text-decoration-none text-dark">
           <div class="card h-100 border-0 shadow-sm">
-            <img src="{{ post.image_1.url }}" class="card-img-top" alt="...">
+            <img src="{{ product.image_1.url }}" class="card-img-top" alt="...">
 
             <div class="text-secondary"><hr class="my-0 py-0"></div>
             <div class="card-body my-1 py-0">
-              {% if post.card_title %}
+              {% if product.card_title %}
               <p class="card-text text-secondary my-0 py-0 align-middle" style="display: table-cell; height: 50px; vertical-align: middle;">
-                <small>{{ post.card_title }}</small>
+                <small>{{ product.card_title }}</small>
               </p>
               {% endif %}
-              {% if post.new_price %}
+              {% if product.new_price %}
               <p class="card-text my-0 py-0">
-                <strong>{{ post.new_price }}</strong>
-                {% if post.show_off_price %}
-                {% if post.off_price %}<small class="text-success"> {{ post.off_price }}</small>{% endif %}
+                <strong>{{ product.new_price }}</strong>
+                {% if product.show_off_price %}
+                {% if product.off_price %}<small class="text-success"> {{ product.off_price }}</small>{% endif %}
                 {% endif %}
               </p>
               {% endif %}
-              {% if post.times_split_prices %}
+              {% if product.times_split_prices %}
               <p class="card-text my-0 py-0">
-              <small>{{ post.times_split_prices }}</small>
-              {% if not post.times_split_interest %}
+              <small>{{ product.times_split_prices }}</small>
+              {% if not product.times_split_interest %}
               <span class="text-success fs-6"> sem juros</span>
               {% endif %}
               </p>
               {% endif %}
-              {% if not post.shipping_price %}
+              {% if not product.shipping_price %}
               <p class="card-text text-success my-0 py-0"><small><strong>Frete Grátis</strong></small></p>
               {% endif %}
             </div>

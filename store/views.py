@@ -6,31 +6,27 @@ from django.contrib.auth.models import User
 from django.contrib import auth
 
 from store.models import (
-    ModelPost, ModelHighlightPosts, ModelStoreProfile, ModelUserProfile)
+    ModelProduct, ModelHighlightPosts, ModelStoreProfile, ModelUserProfile)
 from store.forms import FormLogin, FormSignup
 
 import store.validation as validation
-from store.model_support import StoreProfile, Post, UserProfile
+from store.model_support import StoreProfile, ProductProfile, UserProfile
 
 
-def buy(request, post_id):
-    pass
-
-
-def cart(request, post_id):
-    pass
+def favorite_request(request, url_title, product_id):
+    return redirect('product', url_title, product_id)
 
 
 def index(request):
     highlight_posts = ModelHighlightPosts.objects.all()
     store_profile = ModelStoreProfile.objects.all()
     posts = (
-        ModelPost.objects.order_by('-publication_date')
+        ModelProduct.objects.order_by('-publication_date')
         .filter(is_published=True))
     context = {
         'store_profile': store_profile[0] if store_profile else StoreProfile(),
         'user_profile': None,
-        'posts': [Post(x) for x in posts],
+        'products': [ProductProfile(x) for x in posts],
         'highlight_posts': highlight_posts}
 
     if request.user.is_authenticated:
@@ -84,12 +80,12 @@ def logout(request):
     return redirect('index')
 
 
-def product(request, url_title, post_id):
-    logging.info(url_title)
+def product(request, product_url_title, product_id):
+    logging.info(product_url_title)
     store_profile = ModelStoreProfile.objects.all()
     context = {
         'store_profile': store_profile[0] if store_profile else StoreProfile(),
-        'post': Post(ModelPost.objects.get(pk=post_id)),
+        'product': ProductProfile(ModelProduct.objects.get(pk=product_id)),
         'user_profile': None}
 
     if not request.user.is_authenticated:
@@ -98,8 +94,6 @@ def product(request, url_title, post_id):
     if request.user.is_authenticated:
         profile = UserProfile(request)
         context['user_profile'] = profile if profile else UserProfile(request)
-        # profile = get_object_or_404(ModelUserProfile, user=request.user.id)
-        # context['user_profile'] = profile
 
         if not profile.is_admin and not profile.is_superuser:
             return render(request, 'product_for_users.html', context)
@@ -110,7 +104,7 @@ def product(request, url_title, post_id):
 
 def search(request):
     search_text = request.GET['q']
-    posts = (ModelPost.objects.order_by(
+    posts = (ModelProduct.objects.order_by(
         '-publication_date').filter(is_published=True).filter(
         title__icontains=search_text) if search_text else [])
 
@@ -119,14 +113,9 @@ def search(request):
         'store_profile': store_profile[0] if store_profile else StoreProfile(),
         'user_profile': None,
         'search_text': search_text,
-        'posts': [Post(x) for x in posts]}
+        'posts': [ProductProfile(x) for x in posts]}
 
     if request.user.is_authenticated:
-        # try:
-        #   profile = get_object_or_404(ModelUserProfile, user=request.user.id)
-        #     context['user_profile'] = profile
-        # except Exception as err:
-        #     logging.error(err)
         profile = UserProfile(request)
         context['user_profile'] = profile if profile else UserProfile(request)
 
@@ -135,7 +124,7 @@ def search(request):
 
 def search_tag(request):
     search_text = request.GET['q']
-    posts = (ModelPost.objects.order_by(
+    posts = (ModelProduct.objects.order_by(
         '-publication_date').filter(is_published=True).filter(
         tags__icontains=search_text) if search_text else [])
 
@@ -144,16 +133,11 @@ def search_tag(request):
         'store_profile': store_profile[0] if store_profile else StoreProfile(),
         'user_profile': None,
         'search_text': search_text,
-        'posts': [Post(x) for x in posts]}
+        'posts': [ProductProfile(x) for x in posts]}
 
     if request.user.is_authenticated:
         profile = UserProfile(request)
         context['user_profile'] = profile if profile else UserProfile(request)
-        # try:
-        #   profile = get_object_or_404(ModelUserProfile, user=request.user.id)
-        #     context['user_profile'] = profile
-        # except Exception as err:
-        #     logging.error(err)
 
     return render(request, 'search_tag.html', context)
 

@@ -12,7 +12,7 @@ from django_resized import ResizedImageField  # pip: Pillow, django-resized
 from colorfield.fields import ColorField  # pip: django-colorfield
 
 
-class ModelPost(models.Model):
+class ModelProduct(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, blank=False, null=False)
     title = models.CharField(
@@ -61,7 +61,7 @@ class ModelPost(models.Model):
 
 class ModelHighlightPosts(models.Model):
     post = models.ForeignKey(
-        ModelPost, on_delete=models.CASCADE, blank=False, null=False)
+        ModelProduct, on_delete=models.CASCADE, blank=False, null=False)
 
     def __str__(self):
         return self.post.title
@@ -123,3 +123,23 @@ class ModelUserProfile(models.Model):
 
     def __str__(self):
         return self.user.first_name
+
+
+class ModelFavorites(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, blank=False, null=False)
+    product_id = models.IntegerField(
+        blank=False, null=False)
+    product_title = models.CharField(
+        max_length=200, blank=False, null=False)
+
+
+class ModelBuy(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, blank=False, null=False)
+    product_id = models.IntegerField(
+        blank=False, null=False)
+    product_title = models.CharField(
+        max_length=200, blank=False, null=False)
+    product_price = models.FloatField(
+        blank=False, null=False)

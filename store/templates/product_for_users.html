@@ -2,7 +2,6 @@
 {% load static %}
 
 {% block content %}
-<h3>Users</h3>
 <div class="container shadow-sm bg-white mt-4 rounded-2" xmlns="http://www.w3.org/1999/html">
   <div class="row">
     <div class="col position-relative">
@@ -18,7 +17,7 @@
       </button>&nbsp;
       </small>
 
-      {% for tag in post.tags %}
+      {% for tag in product.tags %}
         {% if forloop.counter == 1 %}
         <small>
         <button class="btn btn-link btn-sm text-primary text-decoration-none fw-light mx-0 my-0 px-0 py-0" type="submit" value="{{ tag }}" name="q">
@@ -38,54 +37,54 @@
 
       <!-- CAROUSEL IMAGE -->
       <div id="carouselExampleIndicators" class="carousel slide">
-        {% if post.image_2 %}
+        {% if product.image_2 %}
         <div class="carousel-indicators">
-          {% if post.image_1 %}
+          {% if product.image_1 %}
           <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active bg-secondary bg-opacity-50" aria-current="true" aria-label="Slide 1"></button>
           {% endif %}
-          {% if post.image_2 %}
+          {% if product.image_2 %}
           <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" class="bg-secondary bg-opacity-50" aria-label="Slide 2"></button>
           {% endif %}
-          {% if post.image_3 %}
+          {% if product.image_3 %}
           <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" class="bg-secondary bg-opacity-50" aria-label="Slide 3"></button>
           {% endif %}
-          {% if post.image_4 %}
+          {% if product.image_4 %}
           <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="3" class="bg-secondary bg-opacity-50" aria-label="Slide 4"></button>
           {% endif %}
-          {% if post.image_5 %}
+          {% if product.image_5 %}
           <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="4" class="bg-secondary bg-opacity-50" aria-label="Slide 5"></button>
           {% endif %}
         </div>
         {% endif %}
 
         <div class="carousel-inner">
-          {% if post.image_1 %}
+          {% if product.image_1 %}
           <div class="carousel-item active">
-            <img src="{{ post.image_1.url }}" class="h-100 mx-auto d-block" alt="...">
+            <img src="{{ product.image_1.url }}" class="h-100 mx-auto d-block" alt="...">
           </div>
           {% endif %}
-          {% if post.image_2 %}
+          {% if product.image_2 %}
           <div class="carousel-item">
-            <img src="{{ post.image_2.url }}" class="h-100 mx-auto d-block" alt="...">
+            <img src="{{ product.image_2.url }}" class="h-100 mx-auto d-block" alt="...">
           </div>
           {% endif %}
-          {% if post.image_3 %}
+          {% if product.image_3 %}
           <div class="carousel-item">
-            <img src="{{ post.image_3.url }}" class="h-100 mx-auto d-block" alt="...">
+            <img src="{{ product.image_3.url }}" class="h-100 mx-auto d-block" alt="...">
           </div>
           {% endif %}
-          {% if post.image_4 %}
+          {% if product.image_4 %}
           <div class="carousel-item">
-            <img src="{{ post.image_4.url }}" class="h-100 mx-auto d-block" alt="...">
+            <img src="{{ product.image_4.url }}" class="h-100 mx-auto d-block" alt="...">
           </div>
           {% endif %}
-          {% if post.image_5 %}
+          {% if product.image_5 %}
           <div class="carousel-item">
-            <img src="{{ post.image_5.url }}" class="h-100 mx-auto d-block" alt="...">
+            <img src="{{ product.image_5.url }}" class="h-100 mx-auto d-block" alt="...">
           </div>
           {% endif %}
         </div>
-        {% if post.image_2 %}
+        {% if product.image_2 %}
         <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
           <span class="carousel-control-prev-icon bg-secondary rounded-1 bg-opacity-50" aria-hidden="true"></span>
           <span class="visually-hidden">Previous</span>
@@ -101,11 +100,11 @@
     <!-- PRICE AREA-->
     <div class="col my-2 mx-2 position-relative">
 
-      <button class="btn btn-white py-0 px-0 mx-0 my-0 text-primary position-absolute top-0 end-0  border-0" type="button">
+      <a href="{% url 'favorite_request' product.url_title product.id %}" class="btn btn-white py-0 px-0 mx-0 my-0 text-primary position-absolute top-0 end-0  border-0" role="button">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
         <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
       </svg>
-      </button>
+      </a>
 
       <!--
       <button class="btn btn-white py-0 px-0 mx-0 my-0 text-primary position-absolute top-0 end-0  border-0" type="button">
@@ -115,42 +114,42 @@
       </button>
       -->
       <h5 class="me-3">
-        {{ post.title }}
+        {{ product.title }}
       </h5>
 
-      {% if post.show_off_price %}
-        {% if post.old_price %}
+      {% if product.show_off_price %}
+        {% if product.old_price %}
         <p class="my-0">
         <span class="text-decoration-line-through text-secondary">
-          {{ post.old_price }}
+          {{ product.old_price }}
         </span>
-          {% if post.off_price %}
-            {% if post.show_off_price %}
-            <span class="text-success fs-5 my-0">{{ post.off_price }}</span>
+          {% if product.off_price %}
+            {% if product.show_off_price %}
+            <span class="text-success fs-5 my-0">{{ product.off_price }}</span>
             {% endif %}
           {% endif %}
         </p>
         {% endif %}
       {% endif %}
 
-      <p class="fs-2 my-0">{{ post.new_price }}</p>
+      <p class="fs-2 my-0">{{ product.new_price }}</p>
 
-      {% if post.times_split_num %}
+      {% if product.times_split_num %}
       <p>
-      {{ post.times_split_prices }}
-      {% if not post.times_split_interest %}
+      {{ product.times_split_prices }}
+      {% if not product.times_split_interest %}
       <span class="text-success"> sem juros</span>
       {% endif %}
       </p>
       {% endif %}
 
-      {% if post.shipping_price %}
+      {% if product.shipping_price %}
       <p>
         <span class="text-primary">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-truck" viewBox="0 0 16 16">
           <path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h9A1.5 1.5 0 0 1 12 3.5V5h1.02a1.5 1.5 0 0 1 1.17.563l1.481 1.85a1.5 1.5 0 0 1 .329.938V10.5a1.5 1.5 0 0 1-1.5 1.5H14a2 2 0 1 1-4 0H5a2 2 0 1 1-3.998-.085A1.5 1.5 0 0 1 0 10.5v-7zm1.294 7.456A1.999 1.999 0 0 1 4.732 11h5.536a2.01 2.01 0 0 1 .732-.732V3.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .294.456zM12 10a2 2 0 0 1 1.732 1h.768a.5.5 0 0 0 .5-.5V8.35a.5.5 0 0 0-.11-.312l-1.48-1.85A.5.5 0 0 0 13.02 6H12v4zm-9 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm9 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
         </svg>
-        </span> Por {{ post.shipping_price }}
+        </span> Por {{ product.shipping_price }}
       </p>
       {% else %}
       <p class="text-success">
@@ -177,12 +176,12 @@
   <!-- DESCRIPTION -->
   <div class="text-secondary"><hr class="my-0 py-0"></div>
   <div>
-    {% if post.summary %}
-    <p class="mt-4">{{ post.summary }}</p>
+    {% if product.summary %}
+    <p class="mt-4">{{ product.summary }}</p>
     {% endif %}
 
-    {% if post.content %}
-    <p class="mt-4">{{ post.content }}</p>
+    {% if product.content %}
+    <p class="mt-4">{{ product.content }}</p>
     {% endif %}
   </div>
 

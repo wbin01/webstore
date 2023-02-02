@@ -2,7 +2,7 @@ import string
 
 from django.shortcuts import get_object_or_404
 
-from store.models import ModelPost, ModelStoreProfile, ModelUserProfile
+from store.models import ModelProduct, ModelStoreProfile, ModelUserProfile
 
 
 class StoreProfile(object):
@@ -41,9 +41,9 @@ class UserProfile(object):
         self.is_superuser = True if profile.is_superuser else False
 
 
-class Post(object):
+class ProductProfile(object):
     """..."""
-    def __init__(self, post: ModelPost) -> None:
+    def __init__(self, post: ModelProduct) -> None:
         """..."""
         self.post = post
         self.id = self.post.id
