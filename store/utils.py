@@ -2,7 +2,6 @@ import string
 import logging
 from django.shortcuts import get_object_or_404
 
-from store.models import *
 import store.models as models
 
 
