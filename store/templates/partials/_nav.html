@@ -1,4 +1,5 @@
 {% load static %}
+
 {% if user_profile.is_admin or user_profile.is_superuser %}
 <nav class="navbar" style="background-color: {{ store_profile.theme_admin_background_color }};">
 {% else %}

@@ -1,47 +1,11 @@
 import string
-
+import logging
 from django.shortcuts import get_object_or_404
 
 from store.models import ModelProduct, ModelStoreProfile, ModelUserProfile
 
 
-class StoreProfile(object):
-    def __init__(self) -> None:
-        self.owner = None
-        self.brand_name = 'Brand'
-        self.show_brand_name_on_nav = True
-        self.brand_image = None
-        self.show_brand_image_on_nav = True
-        self.theme_text_color = '#FFFFFF'
-        self.theme_background_color = '#8A42AA'
-        self.social_media_facebook = None
-        self.social_media_whatsapp = None
-        self.social_media_twitter = None
-        self.social_media_youtube = None
-        self.social_media_instagram = None
-        self.social_media_twitch = None
-        self.social_media_discord = None
-        self.social_media_linkedin = None
-        self.social_media_github = None
-        self.social_media_other = None
-
-
-class UserProfile(object):
-    def __init__(self, request):
-        self.user = request.user
-        try:
-            profile = get_object_or_404(
-                ModelUserProfile, user=request.user.id)
-        except Exception as err:
-            profile = None
-            logging.error(err)
-
-        self.profile_image = profile.profile_image if profile else None
-        self.is_admin = profile.is_admin if profile else False
-        self.is_superuser = True if profile.is_superuser else False
-
-
-class ProductProfile(object):
+class FullProduct(object):
     """..."""
     def __init__(self, post: ModelProduct) -> None:
         """..."""
@@ -161,3 +125,68 @@ class ProductProfile(object):
     def __formatted_tags(self) -> list:
         """[tag1, tag2, tag3]"""
         return [x.strip() for x in self.post.tags.split(',')]
+
+
+class GenericStoreProfile(object):
+    def __init__(self) -> None:
+        self.owner = None
+        self.brand_name = 'Brand'
+        self.show_brand_name_on_nav = True
+        self.brand_image = None
+        self.show_brand_image_on_nav = True
+        self.theme_text_color = '#FFFFFF'
+        self.theme_background_color = '#8A42AA'
+        self.theme_admin_background_color = '#ff5c33'
+        self.social_media_facebook = None
+        self.social_media_whatsapp = None
+        self.social_media_twitter = None
+        self.social_media_youtube = None
+        self.social_media_instagram = None
+        self.social_media_twitch = None
+        self.social_media_discord = None
+        self.social_media_linkedin = None
+        self.social_media_github = None
+        self.social_media_other = None
+
+
+class GenericUserProfile(object):
+    def __init__(self, request):
+        self.user = request.user
+        try:
+            profile = get_object_or_404(
+                ModelUserProfile, user=request.user.id)
+        except Exception as err:
+            profile = None
+            logging.error(err)
+
+        self.profile_image = profile.profile_image if profile else None
+        self.is_admin = profile.is_admin if profile else False
+        self.is_superuser = profile.is_superuser if profile else False
+
+
+def get_full_product(model: ModelProduct) -> FullProduct:
+    """..."""
+    return FullProduct(model)
+
+
+def get_store_profile() -> ModelUserProfile | GenericStoreProfile:
+    """..."""
+    try:
+        profile = ModelStoreProfile.objects.all()
+    except Exception as err:
+        logging.error(err)
+        profile = None
+
+    if profile:
+        return profile[0]
+    return GenericStoreProfile()
+
+
+def get_user_profile(request) -> ModelUserProfile | GenericUserProfile:
+    """..."""
+    try:
+        return get_object_or_404(
+            ModelUserProfile, user=request.user.id)
+    except Exception as err:
+        logging.error(err)
+        return GenericUserProfile(request)
