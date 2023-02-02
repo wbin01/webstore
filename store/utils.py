@@ -2,12 +2,13 @@ import string
 import logging
 from django.shortcuts import get_object_or_404
 
-from store.models import ModelProduct, ModelStoreProfile, ModelUserProfile
+from store.models import *
+import store.models as models
 
 
 class FullProduct(object):
     """..."""
-    def __init__(self, post: ModelProduct) -> None:
+    def __init__(self, post: models.ModelProduct) -> None:
         """..."""
         self.post = post
         self.id = self.post.id
@@ -154,7 +155,7 @@ class GenericUserProfile(object):
         self.user = request.user
         try:
             profile = get_object_or_404(
-                ModelUserProfile, user=request.user.id)
+                models.ModelUserProfile, user=request.user.id)
         except Exception as err:
             profile = None
             logging.error(err)
@@ -164,15 +165,34 @@ class GenericUserProfile(object):
         self.is_superuser = profile.is_superuser if profile else False
 
 
-def get_full_product(model: ModelProduct) -> FullProduct:
+def get_cart(request, product) -> models.ModelCart | None:
+    """..."""
+    try:
+        return models.ModelCart.objects.filter(user=request.user.id).filter(
+            product_id=product.id)
+    except Exception as err:
+        logging.error(err)
+        return None
+
+
+def get_favorite(request, product) -> models.ModelFavorite | None:
+    try:
+        return models.ModelFavorite.objects.filter(
+            user=request.user.id).filter(product_id=product.id)
+    except Exception as err:
+        logging.error(err)
+        return None
+
+
+def get_full_product(model: models.ModelProduct) -> FullProduct:
     """..."""
     return FullProduct(model)
 
 
-def get_store_profile() -> ModelUserProfile | GenericStoreProfile:
+def get_store_profile() -> models.ModelUserProfile | GenericStoreProfile:
     """..."""
     try:
-        profile = ModelStoreProfile.objects.all()
+        profile = models.ModelStoreProfile.objects.all()
     except Exception as err:
         logging.error(err)
         profile = None
@@ -182,11 +202,11 @@ def get_store_profile() -> ModelUserProfile | GenericStoreProfile:
     return GenericStoreProfile()
 
 
-def get_user_profile(request) -> ModelUserProfile | GenericUserProfile:
+def get_user_profile(request) -> models.ModelUserProfile | GenericUserProfile:
     """..."""
     try:
         return get_object_or_404(
-            ModelUserProfile, user=request.user.id)
+            models.ModelUserProfile, user=request.user.id)
     except Exception as err:
         logging.error(err)
         return GenericUserProfile(request)

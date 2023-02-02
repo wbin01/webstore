@@ -5,27 +5,22 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib import auth
 
-from store.models import *
-from store.forms import *
+import store.models as models
+import store.forms as forms
 
 import store.validation as validation
-from store.utils import get_store_profile, get_user_profile, get_full_product
+import store.utils as utilities
 
 
 def cart_request(request, product_id):
-    full_product = get_full_product(ModelProduct.objects.get(pk=product_id))
+    full_product = utilities.get_full_product(
+        models.ModelProduct.objects.get(pk=product_id))
 
-    try:
-        cart = ModelCart.objects.filter(user=request.user.id).filter(
-            product_id=full_product.id)
-    except Exception as err:
-        cart = None
-        logging.error(err)
-
+    cart = utilities.get_cart(request, full_product)
     if cart:
         cart.delete()
     else:
-        cart = ModelCart.objects.create(
+        cart = models.ModelCart.objects.create(
             user=get_object_or_404(User, pk=request.user.id),
             product_id=int(full_product.id),
             product_title=full_product.title)
@@ -35,19 +30,14 @@ def cart_request(request, product_id):
 
 
 def favorite_request(request, product_id):
-    full_product = get_full_product(ModelProduct.objects.get(pk=product_id))
+    full_product = utilities.get_full_product(
+        models.ModelProduct.objects.get(pk=product_id))
 
-    try:
-        favorite = ModelFavorite.objects.filter(user=request.user.id).filter(
-            product_id=full_product.id)
-    except Exception as err:
-        favorite = None
-        logging.error(err)
-
+    favorite = utilities.get_favorite(request, full_product)
     if favorite:
         favorite.delete()
     else:
-        favorite = ModelFavorite.objects.create(
+        favorite = models.ModelFavorite.objects.create(
             user=get_object_or_404(User, pk=request.user.id),
             product_id=int(full_product.id),
             product_title=full_product.title)
@@ -58,19 +48,19 @@ def favorite_request(request, product_id):
 
 def index(request):
     products = (
-        ModelProduct.objects.order_by('-publication_date')
+        models.ModelProduct.objects.order_by('-publication_date')
         .filter(is_published=True))
     context = {
-        'store_profile': get_store_profile(),
+        'store_profile': utilities.get_store_profile(),
         'user_profile': None,
-        'products': [get_full_product(x) for x in products],
-        'highlight_posts': ModelHighlightPosts.objects.all()}
+        'products': [utilities.get_full_product(x) for x in products],
+        'highlight_posts': models.ModelHighlightPosts.objects.all()}
 
     if not request.user.is_authenticated:
         return render(request, 'index_for_visitors.html', context)
 
     if request.user.is_authenticated:
-        profile = get_user_profile(request)
+        profile = utilities.get_user_profile(request)
         context['user_profile'] = profile
 
         if not profile:
@@ -85,9 +75,9 @@ def index(request):
 
 def login(request):
     context = {
-        'store_profile': get_store_profile(),
+        'store_profile': utilities.get_store_profile(),
         'user_profile': None,
-        'form': FormLogin,
+        'form': forms.FormLogin,
         'login_status': None}
 
     if request.user.is_authenticated:
@@ -128,11 +118,12 @@ def logout(request):
 
 def product(request, product_url_title, product_id):
     logging.info(product_url_title)
-    product_rofile = get_full_product(ModelProduct.objects.get(pk=product_id))
+    full_product = utilities.get_full_product(
+        models.ModelProduct.objects.get(pk=product_id))
 
     context = {
-        'store_profile': get_store_profile(),
-        'product': product_rofile,
+        'store_profile': utilities.get_store_profile(),
+        'product': full_product,
         'favorite': None,
         'cart': None,
         'user_profile': None}
@@ -141,22 +132,11 @@ def product(request, product_url_title, product_id):
         return render(request, 'product_for_visitors.html', context)
 
     if request.user.is_authenticated:
-        profile = get_user_profile(request)
+        profile = utilities.get_user_profile(request)
         context['user_profile'] = profile
 
-        try:
-            context['favorite'] = ModelFavorite.objects.filter(
-                user=request.user.id).filter(product_id=product_rofile.id)
-        except Exception as err:
-            logging.error(err)
-            context['favorite'] = None
-
-        try:
-            context['cart'] = ModelCart.objects.filter(
-                user=request.user.id).filter(product_id=product_rofile.id)
-        except Exception as err:
-            logging.error(err)
-            context['cart'] = None
+        context['favorite'] = utilities.get_favorite(request, full_product)
+        context['cart'] = utilities.get_cart(request, full_product)
 
         if not profile.is_admin and not profile.is_superuser:
             return render(request, 'product_for_users.html', context)
@@ -167,36 +147,36 @@ def product(request, product_url_title, product_id):
 
 def search(request):
     search_text = request.GET['q']
-    products = (ModelProduct.objects.order_by(
+    products = (models.ModelProduct.objects.order_by(
         '-publication_date').filter(is_published=True).filter(
         title__icontains=search_text) if search_text else [])
 
     context = {
-        'store_profile': get_store_profile(),
+        'store_profile': utilities.get_store_profile(),
         'user_profile': None,
         'search_text': search_text,
-        'products': [get_full_product(x) for x in products]}
+        'products': [utilities.get_full_product(x) for x in products]}
 
     if request.user.is_authenticated:
-        context['user_profile'] = get_user_profile(request)
+        context['user_profile'] = utilities.get_user_profile(request)
 
     return render(request, 'search.html', context)
 
 
 def search_tag(request):
     search_text = request.GET['q']
-    products = (ModelProduct.objects.order_by(
+    products = (models.ModelProduct.objects.order_by(
         '-publication_date').filter(is_published=True).filter(
         tags__icontains=search_text) if search_text else [])
 
     context = {
-        'store_profile': get_store_profile(),
+        'store_profile': utilities.get_store_profile(),
         'user_profile': None,
         'search_text': search_text,
-        'products': [get_full_product(x) for x in products]}
+        'products': [utilities.get_full_product(x) for x in products]}
 
     if request.user.is_authenticated:
-        context['user_profile'] = get_user_profile(request)
+        context['user_profile'] = utilities.get_user_profile(request)
 
     return render(request, 'search_tag.html', context)
 
@@ -206,9 +186,9 @@ def signup(request):
         return redirect('index')
 
     context = {
-        'store_profile': get_store_profile(),
+        'store_profile': utilities.get_store_profile(),
         'user_profile': None,
-        'form': FormSignup,
+        'form': forms.FormSignup,
         'signup_status': None}
 
     if not request.user.is_authenticated:
@@ -253,7 +233,7 @@ def signup(request):
                 email=email, password=password)
             user.save()
 
-            profile = ModelUserProfile.objects.create(
+            profile = models.ModelUserProfile.objects.create(
                 user=user,
                 is_admin=False,
                 is_superuser=False)
