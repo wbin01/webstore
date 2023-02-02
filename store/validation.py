@@ -15,7 +15,7 @@ def invalid_whitespace(items: list) -> str | None:
 
 def invalid_username(username: str) -> str | None:
     if len(username) < 2:
-        return 'Nome de usuário muito curto'
+        return 'Nome de usuário curto, precisa ter 3 ou mais caracteres'
 
     for char in username:
         if char not in string.ascii_lowercase + string.digits:
@@ -32,7 +32,7 @@ def invalid_email(email: str) -> str | None:
 
 def invalid_password(password: str, password_confirm: str) -> str | None:
     if len(password) < 8:
-        return 'Senha muito pequena'
+        return 'Senha muito pequena, precisa ter 8 ou mais caracteres'
 
     found_lowercase_in_password = False
     for char in string.ascii_lowercase:

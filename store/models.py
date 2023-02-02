@@ -83,6 +83,8 @@ class ModelStoreProfile(models.Model):
         blank=True, null=True, default='#FFFFFF')
     theme_background_color = ColorField(
         blank=True, null=True, default='#8A42AA')
+    theme_admin_background_color = ColorField(
+        blank=True, null=True, default='#DC3545')
     social_media_facebook = models.CharField(
         max_length=200, blank=True, null=True)
     social_media_whatsapp = models.CharField(
