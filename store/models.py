@@ -29,6 +29,12 @@ class ModelProduct(models.Model):
         blank=False, null=False, default=0)
     shipping_price = models.FloatField(
         blank=False, null=False, default=0.0)
+    available_quantity = models.IntegerField(
+        blank=False, null=False, default=1)
+    max_quantity_per_sale = models.IntegerField(
+        blank=False, null=False, default=1)
+    show_available_quantity = models.BooleanField(
+        default=True, blank=False, null=False)
     image_1 = ResizedImageField(
         size=[500, 500], crop=['middle', 'center'],
         upload_to='img_posts/%d/%m/%Y/', blank=False, null=False)
@@ -59,7 +65,7 @@ class ModelProduct(models.Model):
         return self.title
 
 
-class ModelHighlightPosts(models.Model):
+class ModelHighlightProducts(models.Model):
     post = models.ForeignKey(
         ModelProduct, on_delete=models.CASCADE, blank=False, null=False)
 
@@ -84,7 +90,7 @@ class ModelStoreProfile(models.Model):
     theme_background_color = ColorField(
         blank=True, null=True, default='#8A42AA')
     theme_admin_background_color = ColorField(
-        blank=True, null=True, default='#DC3545')
+        blank=True, null=True, default='#8F222D')
     social_media_facebook = models.CharField(
         max_length=200, blank=True, null=True)
     social_media_whatsapp = models.CharField(

@@ -7,37 +7,40 @@ import store.models as models
 
 class FullProduct(object):
     """..."""
-    def __init__(self, post: models.ModelProduct) -> None:
+    def __init__(self, product: models.ModelProduct) -> None:
         """..."""
-        self.post = post
-        self.id = self.post.id
-        self.user = self.post.user
-        self.title = self.post.title
+        self.product = product
+        self.id = self.product.id
+        self.user = self.product.user
+        self.title = self.product.title
         self.url_title = self.__formatted_url_title()
         self.card_title = self.__formatted_card_title()
         self.old_price = self.__formatted_old_price()
         self.new_price = self.__formatted_new_price()
         self.off_price = self.__formatted_off_price()
-        self.show_off_price = self.post.show_off_price
-        self.times_split_num = self.post.times_split_num
-        self.times_split_interest = self.post.times_split_interest
+        self.show_off_price = self.product.show_off_price
+        self.times_split_num = self.product.times_split_num
+        self.times_split_interest = self.product.times_split_interest
         self.times_split_value = self.__formatted_times_split_value()
         self.times_split_prices = self.__formatted_times_split_prices()
         self.shipping_price = self.__formatted_shipping_price()
-        self.image_1 = self.post.image_1
-        self.image_2 = self.post.image_2
-        self.image_3 = self.post.image_3
-        self.image_4 = self.post.image_4
-        self.image_5 = self.post.image_5
-        self.summary = self.post.summary
-        self.content = self.post.content
+        self.available_quantity = self.product.available_quantity
+        self.show_available_quantity = self.product.show_available_quantity
+        self.max_quantity_per_sale = self.__formatted_max_quantity_per_sale()
+        self.image_1 = self.product.image_1
+        self.image_2 = self.product.image_2
+        self.image_3 = self.product.image_3
+        self.image_4 = self.product.image_4
+        self.image_5 = self.product.image_5
+        self.summary = self.product.summary
+        self.content = self.product.content
         self.tags = self.__formatted_tags()
-        self.publication_date = self.post.publication_date
-        self.is_published = self.post.is_published
+        self.publication_date = self.product.publication_date
+        self.is_published = self.product.is_published
 
     def __formatted_url_title(self) -> str:
         title = ''
-        for char in self.post.title:
+        for char in self.product.title:
             char = char.lower()
             if char == ' ' or char in string.ascii_lowercase:
                 title += char.replace(' ', '-')
@@ -45,14 +48,14 @@ class FullProduct(object):
 
     def __formatted_card_title(self) -> str:
         """Product name"""
-        if len(self.post.title) > 50:
-            return self.post.title[:50] + '...'
-        return self.post.title
+        if len(self.product.title) > 50:
+            return self.product.title[:50] + '...'
+        return self.product.title
 
     def __formatted_old_price(self) -> str:
         """R$ 0,00"""
 
-        reais, cents = str(self.post.old_price).split('.')
+        reais, cents = str(self.product.old_price).split('.')
         if len(cents) == 1:
             cents = f'{cents}0'
 
@@ -61,7 +64,7 @@ class FullProduct(object):
     def __formatted_new_price(self) -> str:
         """R$ 0,00"""
 
-        reais, cents = str(self.post.new_price).split('.')
+        reais, cents = str(self.product.new_price).split('.')
         if len(cents) == 1:
             cents = f'{cents}0'
 
@@ -70,9 +73,9 @@ class FullProduct(object):
     def __formatted_off_price(self) -> str | None:
         """10% OFF"""
         off = 0
-        if self.post.old_price > self.post.new_price:
-            delta_1 = self.post.old_price - self.post.new_price
-            delta_2 = self.post.old_price / 100
+        if self.product.old_price > self.product.new_price:
+            delta_1 = self.product.old_price - self.product.new_price
+            delta_2 = self.product.old_price / 100
             off = round(delta_1 / delta_2)
 
         if off > 4:
@@ -84,11 +87,11 @@ class FullProduct(object):
 
         One unit extracted. If it is 10 times of 5.0, then it returns 5.0
         """
-        if self.post.new_price:
-            if self.post.times_split_num and self.post.times_split_num > 1:
-                preco = self.post.new_price
-                vezes = self.post.times_split_num
-                juros = self.post.times_split_interest
+        if self.product.new_price:
+            if self.product.times_split_num and self.product.times_split_num > 1:
+                preco = self.product.new_price
+                vezes = self.product.times_split_num
+                juros = self.product.times_split_interest
 
                 preco_real_com_juros = (preco / 100) * juros + preco
                 preco = round((preco_real_com_juros / vezes), 2)
@@ -99,8 +102,8 @@ class FullProduct(object):
 
     def __formatted_times_split_prices(self) -> str | None:
         """1x R$ 0,00"""
-        if self.post.new_price:
-            if self.post.times_split_num and self.post.times_split_num > 1:
+        if self.product.new_price:
+            if self.product.times_split_num and self.product.times_split_num > 1:
                 preco = self.__formatted_times_split_value()
                 reais, centavos = str(preco).split('.')
 
@@ -108,23 +111,29 @@ class FullProduct(object):
                     centavos = f'{centavos}0'
 
                 return '{}x R$ {},{}'.format(
-                    self.post.times_split_num, reais, centavos)
+                    self.product.times_split_num, reais, centavos)
 
         return None
 
     def __formatted_shipping_price(self) -> str | None:
         """Frete grátis"""
-        if not self.post.shipping_price:
+        if not self.product.shipping_price:
             return None
-        reais, centavos = str(self.post.shipping_price).split('.')
+        reais, centavos = str(self.product.shipping_price).split('.')
         if len(centavos) == 1:
             centavos = f'{centavos}0'
 
         return 'R$ {},{}'.format(reais, centavos)
 
+    def __formatted_max_quantity_per_sale(self) -> int:
+        if (self.product.available_quantity <
+                self.product.max_quantity_per_sale):
+            return self.product.available_quantity
+        return self.product.max_quantity_per_sale
+
     def __formatted_tags(self) -> list:
         """[tag1, tag2, tag3]"""
-        return [x.strip() for x in self.post.tags.split(',')]
+        return [x.strip() for x in self.product.tags.split(',')]
 
 
 class GenericStoreProfile(object):
@@ -136,7 +145,7 @@ class GenericStoreProfile(object):
         self.show_brand_image_on_nav = True
         self.theme_text_color = '#FFFFFF'
         self.theme_background_color = '#8A42AA'
-        self.theme_admin_background_color = '#ff5c33'
+        self.theme_admin_background_color = '#8F222D'
         self.social_media_facebook = None
         self.social_media_whatsapp = None
         self.social_media_twitter = None
@@ -172,6 +181,15 @@ def get_cart(request, product) -> models.ModelCart | None:
     except Exception as err:
         logging.error(err)
         return None
+
+
+def get_cart_item_list(request):
+    """..."""
+    try:
+        return models.ModelCart.objects.filter(user=request.user)
+    except Exception as err:
+        logging.error(err)
+        return []
 
 
 def get_favorite(request, product) -> models.ModelFavorite | None:

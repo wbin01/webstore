@@ -161,6 +161,16 @@
 
 
       <div class="d-grid gap-2 gap-2 col-8 position-absolute bottom-0">
+
+        <p class="text-muted">
+        {% if product.show_available_quantity %}
+        {{ product.available_quantity }} {% if product.available_quantity == 1 %}disponível{% else %}disponíveis{% endif %}
+        {% endif %}
+        </p>
+        {% if product.available_quantity > 1 %}
+        <p class="text-muted my-0"><small>Escolha a quantidade na compra</small></p>
+        {% endif %}
+
         {% if cart %}
         <a href="{% url 'cart_request' product.id %}" class="btn btn-outline-danger" role="button">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart3" viewBox="0 0 16 16">
@@ -187,11 +197,11 @@
   <div class="text-secondary"><hr class="my-0 py-0"></div>
   <div>
     {% if product.summary %}
-    <p class="mt-4">{{ product.summary }}</p>
+    <p class="mt-4">{{ product.summary | safe }}</p>
     {% endif %}
 
     {% if product.content %}
-    <p class="mt-4">{{ product.content }}</p>
+    <p class="mt-4">{{ product.content | safe }}</p>
     {% endif %}
   </div>
 

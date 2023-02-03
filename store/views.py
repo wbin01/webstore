@@ -16,6 +16,9 @@ def cart_request(request, product_id):
     full_product = utilities.get_full_product(
         models.ModelProduct.objects.get(pk=product_id))
 
+    if not request.user.is_authenticated:
+        return redirect('index')
+
     cart = utilities.get_cart(request, full_product)
     if cart:
         cart.delete()
@@ -54,7 +57,8 @@ def index(request):
         'store_profile': utilities.get_store_profile(),
         'user_profile': None,
         'products': [utilities.get_full_product(x) for x in products],
-        'highlight_posts': models.ModelHighlightPosts.objects.all()}
+        'highlight_posts': models.ModelHighlightProducts.objects.all(),
+        'cart_item_list': utilities.get_cart_item_list(request)}
 
     if not request.user.is_authenticated:
         return render(request, 'index_for_visitors.html', context)
@@ -126,7 +130,8 @@ def product(request, product_url_title, product_id):
         'product': full_product,
         'favorite': None,
         'cart': None,
-        'user_profile': None}
+        'user_profile': None,
+        'cart_item_list': utilities.get_cart_item_list(request)}
 
     if not request.user.is_authenticated:
         return render(request, 'product_for_visitors.html', context)
@@ -155,7 +160,8 @@ def search(request):
         'store_profile': utilities.get_store_profile(),
         'user_profile': None,
         'search_text': search_text,
-        'products': [utilities.get_full_product(x) for x in products]}
+        'products': [utilities.get_full_product(x) for x in products],
+        'cart_item_list': utilities.get_cart_item_list(request)}
 
     if request.user.is_authenticated:
         context['user_profile'] = utilities.get_user_profile(request)
@@ -173,7 +179,8 @@ def search_tag(request):
         'store_profile': utilities.get_store_profile(),
         'user_profile': None,
         'search_text': search_text,
-        'products': [utilities.get_full_product(x) for x in products]}
+        'products': [utilities.get_full_product(x) for x in products],
+        'cart_item_list': utilities.get_cart_item_list(request)}
 
     if request.user.is_authenticated:
         context['user_profile'] = utilities.get_user_profile(request)
