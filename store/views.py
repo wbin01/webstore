@@ -12,6 +12,27 @@ import store.validation as validation
 import store.utils as utilities
 
 
+def cart(request):
+    if not request.user.is_authenticated:
+        return redirect('index')
+
+    profile = utilities.get_user_profile(request)
+    context = {
+        'store_profile': utilities.get_store_profile(),
+        'user_profile': profile,
+        'cart_item_list': utilities.get_cart_item_list(request)}
+
+    if not profile:
+        return redirect('index')
+
+    if profile:
+        if profile.is_admin:
+            return redirect('index')
+
+        if not profile.is_admin:
+            return render(request, 'cart.html', context)
+
+
 def cart_request(request, product_id):
     full_product = utilities.get_full_product(
         models.ModelProduct.objects.get(pk=product_id))
@@ -19,15 +40,15 @@ def cart_request(request, product_id):
     if not request.user.is_authenticated:
         return redirect('index')
 
-    cart = utilities.get_cart(request, full_product)
-    if cart:
-        cart.delete()
+    cart_item = utilities.get_cart(request, full_product)
+    if cart_item:
+        cart_item.delete()
     else:
-        cart = models.ModelCart.objects.create(
+        cart_item = models.ModelCart.objects.create(
             user=get_object_or_404(User, pk=request.user.id),
             product_id=int(full_product.id),
             product_title=full_product.title)
-        cart.save()
+        cart_item.save()
 
     return redirect('product', full_product.url_title, full_product.id)
 

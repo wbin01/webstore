@@ -88,7 +88,8 @@ class FullProduct(object):
         One unit extracted. If it is 10 times of 5.0, then it returns 5.0
         """
         if self.product.new_price:
-            if self.product.times_split_num and self.product.times_split_num > 1:
+            if (self.product.times_split_num and
+                    self.product.times_split_num > 1):
                 preco = self.product.new_price
                 vezes = self.product.times_split_num
                 juros = self.product.times_split_interest
@@ -103,7 +104,8 @@ class FullProduct(object):
     def __formatted_times_split_prices(self) -> str | None:
         """1x R$ 0,00"""
         if self.product.new_price:
-            if self.product.times_split_num and self.product.times_split_num > 1:
+            if (self.product.times_split_num and
+                    self.product.times_split_num > 1):
                 preco = self.__formatted_times_split_value()
                 reais, centavos = str(preco).split('.')
 
