@@ -12,10 +12,42 @@ from django_resized import ResizedImageField  # pip: Pillow, django-resized
 from colorfield.fields import ColorField  # pip: django-colorfield
 
 
+class ModelBuy(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, blank=False, null=False)
+    product_id = models.IntegerField(
+        blank=False, null=False)
+    product_title = models.CharField(
+        max_length=200, blank=False, null=False)
+    product_price = models.FloatField(
+        blank=False, null=False)
+    publication_date = models.DateTimeField(
+        default=datetime.now, blank=True)
+
+    def __str__(self):
+        return self.product_title
+
+
+class ModelFavorite(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, blank=False, null=False)
+    product_id = models.IntegerField(
+        blank=False, null=False)
+    product_title = models.CharField(
+        max_length=200, blank=False, null=False)
+    publication_date = models.DateTimeField(
+        default=datetime.now, blank=True)
+
+    def __str__(self):
+        return f'{self.user.username}: {self.product_title}'
+
+
 class ModelProduct(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, blank=False, null=False)
     title = models.CharField(
+        max_length=200, blank=False, null=False, default='Título')
+    url_title = models.CharField(
         max_length=200, blank=False, null=False, default='Título')
     old_price = models.FloatField(
         blank=False, null=False, default=0.0)
@@ -65,7 +97,21 @@ class ModelProduct(models.Model):
         return self.title
 
 
-class ModelHighlightProducts(models.Model):
+class ModelProductCart(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, blank=False, null=False)
+    product = models.ForeignKey(
+        ModelProduct, on_delete=models.CASCADE, blank=False, null=False)
+    quantity = models.IntegerField(
+        blank=False, null=False, default=1)
+    publication_date = models.DateTimeField(
+        default=datetime.now, blank=True)
+
+    def __str__(self):
+        return f'{self.user.username}: {self.product.title}'
+
+
+class ModelProductHighlight(models.Model):
     post = models.ForeignKey(
         ModelProduct, on_delete=models.CASCADE, blank=False, null=False)
 
@@ -129,47 +175,3 @@ class ModelUserProfile(models.Model):
 
     def __str__(self):
         return self.user.first_name
-
-
-class ModelFavorite(models.Model):
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, blank=False, null=False)
-    product_id = models.IntegerField(
-        blank=False, null=False)
-    product_title = models.CharField(
-        max_length=200, blank=False, null=False)
-    publication_date = models.DateTimeField(
-        default=datetime.now, blank=True)
-
-    def __str__(self):
-        return f'{self.user.username}: {self.product_title}'
-
-
-class ModelCart(models.Model):
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, blank=False, null=False)
-    product_id = models.IntegerField(
-        blank=False, null=False)
-    product_title = models.CharField(
-        max_length=200, blank=False, null=False)
-    publication_date = models.DateTimeField(
-        default=datetime.now, blank=True)
-
-    def __str__(self):
-        return f'{self.user.username}: {self.product_title}'
-
-
-class ModelBuy(models.Model):
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, blank=False, null=False)
-    product_id = models.IntegerField(
-        blank=False, null=False)
-    product_title = models.CharField(
-        max_length=200, blank=False, null=False)
-    product_price = models.FloatField(
-        blank=False, null=False)
-    publication_date = models.DateTimeField(
-        default=datetime.now, blank=True)
-
-    def __str__(self):
-        return self.product_title

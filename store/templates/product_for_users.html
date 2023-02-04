@@ -158,36 +158,49 @@
         </svg> Frete grátis
       </p>
       {% endif %}
+      <div style="height: 200px;"></div>
 
 
-      <div class="d-grid gap-2 gap-2 col-8 position-absolute bottom-0">
-
-        <p class="text-muted">
-        {% if product.show_available_quantity %}
-        {{ product.available_quantity }} {% if product.available_quantity == 1 %}disponível{% else %}disponíveis{% endif %}
-        {% endif %}
-        </p>
-        {% if product.available_quantity > 1 %}
-        <p class="text-muted my-0"><small>Escolha a quantidade na compra</small></p>
-        {% endif %}
+      <form  action="{% url 'cart_request' product.id %}" method="post" class="position-absolute bottom-0">
+        {% csrf_token %}
+        <p class="text-muted my-0 py-0 ms-1 fw-light">
+          {% if product.show_available_quantity %}
+          {{ product.available_quantity }} {% if product.available_quantity == 1 %}disponível{% else %}disponíveis{% endif %}
+          {% endif %}
+          </p>
 
         {% if cart %}
-        <a href="{% url 'cart_request' product.id %}" class="btn btn-outline-danger" role="button">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart3" viewBox="0 0 16 16">
-          <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l.84 4.479 9.144-.459L13.89 4H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
-        </svg> Remover do carrinho
-        </a>
-
+        <div class="input-group mb-3" style="width: 300px;">
+          <span class="input-group-text fw-light">Quantidade</span>
+          <input type="number" id="quantity" name="quantity" class="form-control text-center" step="1" value="{{ cart.0.quantity }}" min="1" max="{{ product.max_quantity_per_sale }}">
+          <label class="text-muted mt-2 ms-2 fw-light"><small>Máximo {{ product.max_quantity_per_sale }}</small></label>
+        </div>
         {% else %}
-        <a href="{% url 'cart_request' product.id %}" class="btn btn-outline-primary" role="button">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart3" viewBox="0 0 16 16">
-          <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l.84 4.479 9.144-.459L13.89 4H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
-        </svg> Adicionar ao carrinho
-        </a>
+        <div class="input-group mb-3" style="width: 300px;">
+          <span class="input-group-text fw-light">Quantidade</span>
+          <input type="number" id="quantity" name="quantity" class="form-control text-center" step="1" value="1" min="1" max="{{ product.max_quantity_per_sale }}">
+          <label class="text-muted mt-2 ms-2 fw-light"><small>Máximo {{ product.max_quantity_per_sale }}</small></label>
+        </div>
         {% endif %}
 
-        <button class="btn btn-primary" type="button">Comprar</button>
-      </div>
+        <div class="d-grid gap-2 gap-2 col-12" style="width: 400px;">
+          {% if cart %}
+          <button type="submit" class="btn btn-outline-danger" role="button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart3" viewBox="0 0 16 16">
+            <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l.84 4.479 9.144-.459L13.89 4H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+          </svg> Remover do carrinho
+          </button>
+          {% else %}
+          <button type="submit" class="btn btn-outline-primary" role="button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart3" viewBox="0 0 16 16">
+            <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l.84 4.479 9.144-.459L13.89 4H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+          </svg> Adicionar ao carrinho
+          </button>
+          {% endif %}
+
+          <button class="btn btn-primary" type="button">Comprar</button>
+        </div>
+      </form>
 
     </div>
 

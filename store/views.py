@@ -20,7 +20,8 @@ def cart(request):
     context = {
         'store_profile': utilities.get_store_profile(),
         'user_profile': profile,
-        'cart_item_list': utilities.get_cart_item_list(request)}
+        'cart_item_list': utilities.get_cart_item_list(request),
+        'cart_url': True}
 
     if not profile:
         return redirect('index')
@@ -34,21 +35,24 @@ def cart(request):
 
 
 def cart_request(request, product_id):
-    full_product = utilities.get_full_product(
-        models.ModelProduct.objects.get(pk=product_id))
-
     if not request.user.is_authenticated:
         return redirect('index')
 
-    cart_item = utilities.get_cart(request, full_product)
-    if cart_item:
-        cart_item.delete()
-    else:
-        cart_item = models.ModelCart.objects.create(
-            user=get_object_or_404(User, pk=request.user.id),
-            product_id=int(full_product.id),
-            product_title=full_product.title)
-        cart_item.save()
+    full_product = utilities.get_full_product(
+        models.ModelProduct.objects.get(pk=product_id))
+
+    if request.method == 'POST':
+        cart_item = utilities.get_cart(request, full_product)
+        if cart_item:
+            cart_item.delete()
+        else:
+            quantity = request.POST['quantity']
+            new_product = models.ModelProduct.objects.get(pk=product_id)
+            cart_item = models.ModelProductCart.objects.create(
+                user=get_object_or_404(User, pk=request.user.id),
+                product=new_product,
+                quantity=int(quantity))
+            cart_item.save()
 
     return redirect('product', full_product.url_title, full_product.id)
 
@@ -78,7 +82,7 @@ def index(request):
         'store_profile': utilities.get_store_profile(),
         'user_profile': None,
         'products': [utilities.get_full_product(x) for x in products],
-        'highlight_posts': models.ModelHighlightProducts.objects.all(),
+        'highlight_posts': models.ModelProductHighlight.objects.all(),
         'cart_item_list': utilities.get_cart_item_list(request)}
 
     if not request.user.is_authenticated:

@@ -1,3 +1,4 @@
+import datetime
 import string
 import logging
 from django.shortcuts import get_object_or_404
@@ -5,7 +6,7 @@ from django.shortcuts import get_object_or_404
 import store.models as models
 
 
-class FullProduct(object):
+class FormattedProduct(object):
     """..."""
     def __init__(self, product: models.ModelProduct) -> None:
         """..."""
@@ -13,7 +14,7 @@ class FullProduct(object):
         self.id = self.product.id
         self.user = self.product.user
         self.title = self.product.title
-        self.url_title = self.__formatted_url_title()
+        self.url_title = self.product.url_title
         self.card_title = self.__formatted_card_title()
         self.old_price = self.__formatted_old_price()
         self.new_price = self.__formatted_new_price()
@@ -37,14 +38,6 @@ class FullProduct(object):
         self.tags = self.__formatted_tags()
         self.publication_date = self.product.publication_date
         self.is_published = self.product.is_published
-
-    def __formatted_url_title(self) -> str:
-        title = ''
-        for char in self.product.title:
-            char = char.lower()
-            if char == ' ' or char in string.ascii_lowercase:
-                title += char.replace(' ', '-')
-        return title.replace('--', '-')
 
     def __formatted_card_title(self) -> str:
         """Product name"""
@@ -128,6 +121,7 @@ class FullProduct(object):
         return 'R$ {},{}'.format(reais, centavos)
 
     def __formatted_max_quantity_per_sale(self) -> int:
+        """..."""
         if (self.product.available_quantity <
                 self.product.max_quantity_per_sale):
             return self.product.available_quantity
@@ -175,23 +169,30 @@ class GenericUserProfile(object):
         self.is_superuser = profile.is_superuser if profile else False
 
 
-def get_cart(request, product) -> models.ModelCart | None:
+def get_cart(request, product) -> models.ModelProductCart | None:
     """..."""
     try:
-        return models.ModelCart.objects.filter(user=request.user.id).filter(
-            product_id=product.id)
+        cart = models.ModelProductCart.objects.filter(
+            user=request.user.id).filter(product_id=product.id)
+        for item in cart:
+            setattr(item, 'full_product', FormattedProduct(item.product))
     except Exception as err:
         logging.error(err)
-        return None
+        cart = None
+
+    return cart
 
 
 def get_cart_item_list(request):
     """..."""
     try:
-        return models.ModelCart.objects.filter(user=request.user)
+        cart = models.ModelProductCart.objects.filter(user=request.user)
+        for item in cart:
+            setattr(item, 'full_product', FormattedProduct(item.product))
     except Exception as err:
         logging.error(err)
-        return []
+        cart = []
+    return cart
 
 
 def get_favorite(request, product) -> models.ModelFavorite | None:
@@ -203,9 +204,19 @@ def get_favorite(request, product) -> models.ModelFavorite | None:
         return None
 
 
-def get_full_product(model: models.ModelProduct) -> FullProduct:
+def get_formatted_url_title(title: str) -> str:
+    new_title = ''
+    for char in title:
+        char = char.lower()
+        if char == ' ' or char in string.ascii_lowercase:
+            new_title += char.replace(' ', '-')
+    new_title = new_title.replace('--', '-')
+    return new_title + datetime.datetime.now().strftime("%d-%m-%Y--%I-%M%p")
+
+
+def get_full_product(model: models.ModelProduct) -> FormattedProduct:
     """..."""
-    return FullProduct(model)
+    return FormattedProduct(model)
 
 
 def get_store_profile() -> models.ModelUserProfile | GenericStoreProfile:

@@ -27,6 +27,7 @@
         </svg>
       </button>
 
+      {% if not cart_url %}
       {% if cart_item_list %}
       <a href="{% url 'cart' %}" class="text-decoration-none" role="button" style="color: {{ store_profile.theme_text_color }};">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart3" viewBox="0 0 16 16">
@@ -34,6 +35,7 @@
       </svg>
       <span class="badge bg-primary rounded-pill">{{ cart_item_list | length }}</span>
       </a>
+      {% endif %}
       {% endif %}
 
       {% if user_profile.is_admin or user_profile.is_superuser %}
