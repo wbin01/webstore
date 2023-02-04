@@ -12,7 +12,34 @@ import store.validation as validation
 import store.utils as utilities
 
 
+def buy_request(request, product_id, quantity):
+    if not request.user.is_authenticated:
+        return redirect('index')
+
+    full_product = utilities.get_full_product(
+        models.ModelProduct.objects.get(pk=product_id))
+
+    cart_item = utilities.get_cart(request, full_product)
+    if not cart_item:
+        new_product = models.ModelProduct.objects.get(pk=product_id)
+        cart_item = models.ModelProductCart.objects.create(
+            user=get_object_or_404(User, pk=request.user.id),
+            product=new_product,
+            quantity=int(quantity))
+        cart_item.save()
+
+    return redirect('cart')
+
+
 def cart(request):
+    """
+    if request.method == 'POST':
+    form = PriceAssessmentSection1(request.POST)
+    if request.POST.get("save_home"):
+        return HttpResponseRedirect(reverse('portal_home'))
+    elif request.POST.get("save_next"):  # You can use else in here too if there is only 2 submit types.
+        return HttpResponseRedirect(reverse('portal_sec2'))
+    """
     if not request.user.is_authenticated:
         return redirect('index')
 
@@ -42,11 +69,15 @@ def cart_request(request, product_id):
         models.ModelProduct.objects.get(pk=product_id))
 
     if request.method == 'POST':
+        quantity = request.POST['quantity']
+
+        if 'buy' in request.POST:
+            return redirect('buy_request', product_id, quantity)
+
         cart_item = utilities.get_cart(request, full_product)
         if cart_item:
             cart_item.delete()
         else:
-            quantity = request.POST['quantity']
             new_product = models.ModelProduct.objects.get(pk=product_id)
             cart_item = models.ModelProductCart.objects.create(
                 user=get_object_or_404(User, pk=request.user.id),
