@@ -161,7 +161,7 @@
       <div style="height: 200px;"></div>
 
 
-      <form  action="{% url 'cart_request' product.id %}" method="post" class="position-absolute bottom-0">
+      <form action="{% url 'cart_request' product.id %}" method="post" class="position-absolute bottom-0">
         {% csrf_token %}
         <p class="text-muted my-0 py-0 ms-1 fw-light">
           {% if product.show_available_quantity %}

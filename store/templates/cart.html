@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block content %}
-<div class="container shadow-sm bg-white mt-4 py-4 rounded-2" xmlns="http://www.w3.org/1999/html">
+<div class="container shadow-sm bg-white mt-4 py-2 px-0 rounded-2" xmlns="http://www.w3.org/1999/html">
 
   <h3 class="text-center">
     <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-cart3" viewBox="0 0 16 16">
@@ -10,28 +10,110 @@
     </svg>
   </h3>
   {% for cart in cart_item_list %}
-  {% if forloop.counter > 1 %}<div class="text-muted"><hr></div>{% endif %}
-  <h6 class="text-truncate py-1">{{ cart.product.title}}</h6>
+<!--  {% if forloop.counter > 1 %}<div class="text-muted"><hr></div>{% endif %}-->
+  <div class="m-2 p-2 rounded-2 bg-white bg-opacity-100" style="box-shadow: 0px 0px 10px #ddd;">
+    <h6 class="text-truncate py-1">{{ cart.product.title}}</h6>
 
-  <a href="{% url 'product' cart.product.url_title cart.product.id %}" class="text-decoration-none text-dark">
-  <img src="{{ cart.product.image_1.url }}" class="img-thumbnail" style="width:85px;">
-  <span>{{ cart.full_product.new_price }}</span>
-  </a>
+    <div class="row">
+      <div class="col mx-0" style="min-width: 210px;">
+      <a href="{% url 'product' cart.product.url_title cart.product.id %}" class="text-decoration-none text-dark">
+        <img src="{{ cart.product.image_1.url }}" class="img-thumbnail" style="width:85px;">
+        <span class="fs-4">{{ cart.full_product.new_price }}</span>
+      </a>
+      </div>
 
-  <p class="fw-light">
-    Quantidade: {{ cart.quantity }}
-    <button class="btn btn-outline-primary border-0 mx-4">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
-      <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/>
-      </svg>
-    </button>
+      <div class="col mx-0 position-relative">
+        <div class="position-absolute bottom-0 start-50 translate-middle">
+        <p class="fw-light text-center my-0 py-0">Quantidade</p>
+        <p class="fw-bold text-center my-0 py-0">{{ cart.quantity }}</p>
+        </div>
+      </div>
 
-    <button class="btn btn-outline-danger border-0">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
-      <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>
-      </svg>
-    </button>
-  </p>
+      <div class="col mx-0 gap-2 gap-2 position-relative">
+        <p class="fw-light position-absolute start-50 top-50 translate-middle text-center my-0 py-0">
+          <!-- EDIT BUTTON -->
+          {% if cart.full_product.max_quantity_per_sale > 1 %}
+          <button class="btn btn-outline-primary border-0 mx-0" data-bs-toggle="modal" data-bs-target="#edit{{ cart.product.id }}Modal">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
+            <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/>
+            </svg>
+          </button>
+          {% else %}
+          <button disabled class="btn opacity-0 border-0 mx-0" data-bs-toggle="modal" data-bs-target="#edit{{ cart.product.id }}Modal">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
+            <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/>
+            </svg>
+          </button>
+          {% endif %}
+          <!-- REMOVE BUTTON -->
+          <button class="btn btn-outline-danger border-0 mx-0" data-bs-toggle="modal" data-bs-target="#remove{{ cart.product.id }}Modal">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+            <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>
+            </svg>
+          </button>
+        </p>
+      </div>
+
+      <!-- EDIT MODAL -->
+      <div class="modal fade" id="edit{{ cart.product.id }}Modal" tabindex="-1" aria-labelledby="edit{{ cart.product.id }}ModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+
+            <div class="modal-header">
+              <h5 class="text-center">Alterar quantidade</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+              <h6 class="text-truncate py-1">{{ cart.product.title}}</h6>
+              <img src="{{ cart.product.image_1.url }}" class="img-thumbnail" style="width:85px;">
+              <span class="fs-4">{{ cart.full_product.new_price }}</span>
+
+              <form action="{% url 'cart_request_edit' cart.product.id %}" method="post">
+                {% csrf_token %}
+                <div class="input-group my-3" style="width: 300px;">
+                  <span class="input-group-text fw-light">Quantidade</span>
+                  <input type="number" id="quantity" name="quantity" class="form-control text-center" step="1" value="{{ cart.quantity }}" min="1" max="{{ cart.product.max_quantity_per_sale }}">
+                  <label class="text-muted mt-2 ms-2 fw-light"><small>Máximo {{ cart.full_product.max_quantity_per_sale }}</small></label>
+                </div>
+                <div class="d-grid gap-2">
+                  <button type="submit" class="btn btn-primary">Alterar</button>
+                </div>
+              </form>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- REMOVE MODAL -->
+      <div class="modal fade" id="remove{{ cart.product.id }}Modal" tabindex="-1" aria-labelledby="remove{{ cart.product.id }}ModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="text-center">Remover do carrinho</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <h6 class="text-truncate py-1">{{ cart.product.title}}</h6>
+              <img src="{{ cart.product.image_1.url }}" class="img-thumbnail" style="width:85px;">
+              <span class="fs-4">{{ cart.full_product.new_price }}</span>
+
+              <form action="{% url 'cart_request_remove' cart.product.id %}" method="post">
+                {% csrf_token %}
+                <div class="d-grid gap-2">
+                  <button type="submit" class="btn btn-danger">Remover</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
 <!--      <div class="input-group my-2" style="width: 300px;">-->
 <!--        <span class="input-group-text fw-light">Quantidade</span>-->
 <!--        <input type="number" class="form-control text-center" step="1" value="{{ cart.quantity }}" min="1" max="{{ cart.product.max_quantity_per_sale }}">-->

@@ -57,6 +57,42 @@ def cart_request(request, product_id):
     return redirect('product', full_product.url_title, full_product.id)
 
 
+def cart_request_edit(request, product_id):
+    if not request.user.is_authenticated:
+        return redirect('index')
+
+    full_product = utilities.get_full_product(
+        models.ModelProduct.objects.get(pk=product_id))
+
+    if request.method == 'POST':
+        cart_item = utilities.get_cart(request, full_product)
+        cart_item.delete()
+
+        quantity = request.POST['quantity']
+        new_product = models.ModelProduct.objects.get(pk=product_id)
+        cart_item = models.ModelProductCart.objects.create(
+            user=get_object_or_404(User, pk=request.user.id),
+            product=new_product,
+            quantity=int(quantity))
+        cart_item.save()
+
+    return redirect('cart')
+
+
+def cart_request_remove(request, product_id):
+    if not request.user.is_authenticated:
+        return redirect('index')
+
+    full_product = utilities.get_full_product(
+        models.ModelProduct.objects.get(pk=product_id))
+
+    if request.method == 'POST':
+        cart_item = utilities.get_cart(request, full_product)
+        cart_item.delete()
+
+    return redirect('cart')
+
+
 def favorite_request(request, product_id):
     full_product = utilities.get_full_product(
         models.ModelProduct.objects.get(pk=product_id))
