@@ -147,12 +147,14 @@ class ModelStoreProfile(models.Model):
         upload_to='img_store/', blank=True, null=True)
     show_brand_image_on_nav = models.BooleanField(
         default=True, blank=False, null=False)
-    theme_text_color = ColorField(
-        blank=True, null=True, default='#FFFFFF')
-    theme_background_color = ColorField(
+    background_color = ColorField(
+        blank=True, null=True, default='#ECECEC')
+    theme_color = ColorField(
         blank=True, null=True, default='#8A42AA')
-    theme_admin_background_color = ColorField(
+    theme_color_admin = ColorField(
         blank=True, null=True, default='#8F222D')
+    theme_color_text = ColorField(
+        blank=True, null=True, default='#FFFFFF')
     social_media_facebook = models.CharField(
         max_length=200, blank=True, null=True)
     social_media_whatsapp = models.CharField(

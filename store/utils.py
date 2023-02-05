@@ -13,9 +13,10 @@ class GenericStoreProfile(object):
         self.show_brand_name_on_nav = True
         self.brand_image = None
         self.show_brand_image_on_nav = True
-        self.theme_text_color = '#FFFFFF'
-        self.theme_background_color = '#8A42AA'
-        self.theme_admin_background_color = '#8F222D'
+        self.background_color = '#ECECEC'
+        self.theme_color = '#8A42AA'
+        self.theme_color_admin = '#8F222D'
+        self.theme_color_text = '#FFFFFF'
         self.social_media_facebook = None
         self.social_media_whatsapp = None
         self.social_media_twitter = None
