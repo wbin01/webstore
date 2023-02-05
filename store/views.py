@@ -114,6 +114,7 @@ def index(request):
     context = {
         'store_profile': utilities.get_store_profile(),
         'user_profile': None,
+        'cart_list': utilities.get_cart_list(request),  # nav
         'products': [x for x in products],
         'highlight_posts': models.ModelProductHighlight.objects.all()}
 
@@ -187,6 +188,7 @@ def product(request, product_url_title, product_id):
         'tags': model_product.tags.split(','),
         'favorite': None,
         'cart': None,
+        'cart_list': utilities.get_cart_list(request),  # nav
         'user_profile': None}
 
     if not request.user.is_authenticated:
@@ -260,6 +262,7 @@ def search(request):
     context = {
         'store_profile': utilities.get_store_profile(),
         'user_profile': None,
+        'cart_list': utilities.get_cart_list(request),  # nav
         'search_text': search_text,
         'products': [x for x in products]}
 
@@ -278,6 +281,7 @@ def search_tag(request):
     context = {
         'store_profile': utilities.get_store_profile(),
         'user_profile': None,
+        'cart_list': utilities.get_cart_list(request),  # nav
         'search_text': search_text,
         'products': [x for x in products]}
 
