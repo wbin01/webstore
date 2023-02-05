@@ -9,13 +9,13 @@
       <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l.84 4.479 9.144-.459L13.89 4H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
     </svg>
   </h3>
-  {% if not cart_item_list %}
+  {% if not cart_list %}
   <div class="text-center text-muted py-4 my-4" style="min-height: 300px;">
     <h1>Carrinho vazio</h1>
   </div>
 
   {% else %}
-  {% for cart in cart_item_list %}
+  {% for cart in cart_list %}
 <!--  {% if forloop.counter > 1 %}<div class="text-muted"><hr></div>{% endif %}-->
   <div class="m-2 p-2 rounded-2 bg-white bg-opacity-100" style="box-shadow: 0px 0px 10px #ddd;">
     <h6 class="text-truncate py-1">{{ cart.product.title}}</h6>
@@ -24,7 +24,7 @@
       <div class="col mx-0" style="min-width: 210px;">
       <a href="{% url 'product' cart.product.title_for_url cart.product.id %}" class="text-decoration-none text-dark">
         <img src="{{ cart.product.image_1.url }}" class="img-thumbnail" style="width:85px;">
-        <span class="fs-4">{{ cart.full_product.new_price }}</span>
+        <span class="fs-4">{{ cart.product.new_price }}</span>
       </a>
       </div>
 
@@ -37,6 +37,20 @@
 
       <div class="col mx-0 gap-2 gap-2 position-relative">
         <p class="fw-light position-absolute start-50 top-50 translate-middle text-center my-0 py-0">
+          <!-- FAVORITE BUTTON -->
+          {% if cart.product.id in favorite_product_id_list %}
+          <a href="{% url 'cart_favorite' cart.product.id %}" class="btn btn-outline-primary border-0 mx-0" role="button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+          </svg>
+          </a>
+          {% else %}
+          <a href="{% url 'cart_favorite' cart.product.id %}" class="btn btn-outline-primary border-0 mx-0" role="button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+            <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+          </svg>
+          </a>
+          {% endif %}
           <!-- EDIT BUTTON -->
           {% if cart.product.max_quantity_per_sale > 1 %}
           <button class="btn btn-outline-primary border-0 mx-0" data-bs-toggle="modal" data-bs-target="#edit{{ cart.product.id }}Modal">
@@ -75,7 +89,7 @@
               <img src="{{ cart.product.image_1.url }}" class="img-thumbnail" style="width:85px;">
               <span class="fs-4">{{ cart.product.price_pprint }}</span>
 
-              <form action="{% url 'cart_request_edit' cart.product.id %}" method="post">
+              <form action="{% url 'cart_edit' cart.product.id %}" method="post">
                 {% csrf_token %}
                 <div class="input-group my-3" style="width: 300px;">
                   <span class="input-group-text fw-light">Quantidade</span>
@@ -105,7 +119,7 @@
               <img src="{{ cart.product.image_1.url }}" class="img-thumbnail" style="width:85px;">
               <span class="fs-4">{{ cart.product.price_pprint }}</span>
 
-              <form action="{% url 'cart_request_remove' cart.product.id %}" method="post">
+              <form action="{% url 'cart_remove' cart.product.id %}" method="post">
                 {% csrf_token %}
                 <div class="d-grid gap-2">
                   <button type="submit" class="btn btn-danger">Remover</button>

@@ -38,7 +38,9 @@ def cart(request):
     context = {
         'store_profile': utilities.get_store_profile(),
         'user_profile': profile,
-        'cart_item_list': utilities.get_cart_item_list(request),
+        'cart_list': utilities.get_cart_list(request),
+        'favorite_product_id_list': [
+            x.product_id for x in utilities.get_favorite_list(request)],
         'cart_url': True}
 
     if not profile:
@@ -52,33 +54,7 @@ def cart(request):
             return render(request, 'cart.html', context)
 
 
-def cart_request(request, product_id):
-    if not request.user.is_authenticated:
-        return redirect('index')
-
-    model_product = models.ModelProduct.objects.get(pk=product_id)
-
-    if request.method == 'POST':
-        quantity = request.POST['quantity']
-
-        if 'buy' in request.POST:
-            return redirect('buy_request', product_id, quantity)
-
-        cart_item = utilities.get_cart(request, model_product)
-        if cart_item:
-            cart_item.delete()
-        else:
-            new_product = models.ModelProduct.objects.get(pk=product_id)
-            cart_item = models.ModelProductCart.objects.create(
-                user=get_object_or_404(User, pk=request.user.id),
-                product=new_product,
-                quantity=int(quantity))
-            cart_item.save()
-
-    return redirect('product', model_product.title_for_url, model_product.id)
-
-
-def cart_request_edit(request, product_id):
+def cart_edit(request, product_id):
     if not request.user.is_authenticated:
         return redirect('index')
 
@@ -99,20 +75,10 @@ def cart_request_edit(request, product_id):
     return redirect('cart')
 
 
-def cart_request_remove(request, product_id):
+def cart_favorite(request, product_id):
     if not request.user.is_authenticated:
         return redirect('index')
 
-    model_product = models.ModelProduct.objects.get(pk=product_id)
-
-    if request.method == 'POST':
-        cart_item = utilities.get_cart(request, model_product)
-        cart_item.delete()
-
-    return redirect('cart')
-
-
-def favorite_request(request, product_id):
     model_product = models.ModelProduct.objects.get(pk=product_id)
 
     favorite = utilities.get_favorite(request, model_product)
@@ -125,7 +91,20 @@ def favorite_request(request, product_id):
             product_title=model_product.title)
         favorite.save()
 
-    return redirect('product', model_product.title_for_url, model_product.id)
+    return redirect('cart')
+
+
+def cart_remove(request, product_id):
+    if not request.user.is_authenticated:
+        return redirect('index')
+
+    model_product = models.ModelProduct.objects.get(pk=product_id)
+
+    if request.method == 'POST':
+        cart_item = utilities.get_cart(request, model_product)
+        cart_item.delete()
+
+    return redirect('cart')
 
 
 def index(request):
@@ -136,8 +115,7 @@ def index(request):
         'store_profile': utilities.get_store_profile(),
         'user_profile': None,
         'products': [x for x in products],
-        'highlight_posts': models.ModelProductHighlight.objects.all(),
-        'cart_item_list': utilities.get_cart_item_list(request)}
+        'highlight_posts': models.ModelProductHighlight.objects.all()}
 
     if not request.user.is_authenticated:
         return render(request, 'index_for_visitors.html', context)
@@ -209,8 +187,7 @@ def product(request, product_url_title, product_id):
         'tags': model_product.tags.split(','),
         'favorite': None,
         'cart': None,
-        'user_profile': None,
-        'cart_item_list': utilities.get_cart_item_list(request)}
+        'user_profile': None}
 
     if not request.user.is_authenticated:
         return render(request, 'product_for_visitors.html', context)
@@ -229,6 +206,51 @@ def product(request, product_url_title, product_id):
             return render(request, 'product_for_admins.html', context)
 
 
+def product_cart(request, product_id):
+    if not request.user.is_authenticated:
+        return redirect('index')
+
+    model_product = models.ModelProduct.objects.get(pk=product_id)
+
+    if request.method == 'POST':
+        quantity = request.POST['quantity']
+
+        if 'buy' in request.POST:
+            return redirect('buy_request', product_id, quantity)
+
+        cart_item = utilities.get_cart(request, model_product)
+        if cart_item:
+            cart_item.delete()
+        else:
+            new_product = models.ModelProduct.objects.get(pk=product_id)
+            cart_item = models.ModelProductCart.objects.create(
+                user=get_object_or_404(User, pk=request.user.id),
+                product=new_product,
+                quantity=int(quantity))
+            cart_item.save()
+
+    return redirect('product', model_product.title_for_url, model_product.id)
+
+
+def product_favorite(request, product_id):
+    if not request.user.is_authenticated:
+        return redirect('index')
+
+    model_product = models.ModelProduct.objects.get(pk=product_id)
+
+    favorite = utilities.get_favorite(request, model_product)
+    if favorite:
+        favorite.delete()
+    else:
+        favorite = models.ModelFavorite.objects.create(
+            user=get_object_or_404(User, pk=request.user.id),
+            product_id=int(model_product.id),
+            product_title=model_product.title)
+        favorite.save()
+
+    return redirect('product', model_product.title_for_url, model_product.id)
+
+
 def search(request):
     search_text = request.GET['q']
     products = (models.ModelProduct.objects.order_by(
@@ -239,8 +261,7 @@ def search(request):
         'store_profile': utilities.get_store_profile(),
         'user_profile': None,
         'search_text': search_text,
-        'products': [x for x in products],
-        'cart_item_list': utilities.get_cart_item_list(request)}
+        'products': [x for x in products]}
 
     if request.user.is_authenticated:
         context['user_profile'] = utilities.get_user_profile(request)
@@ -258,8 +279,7 @@ def search_tag(request):
         'store_profile': utilities.get_store_profile(),
         'user_profile': None,
         'search_text': search_text,
-        'products': [x for x in products],
-        'cart_item_list': utilities.get_cart_item_list(request)}
+        'products': [x for x in products]}
 
     if request.user.is_authenticated:
         context['user_profile'] = utilities.get_user_profile(request)

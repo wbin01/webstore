@@ -57,7 +57,7 @@ def get_cart(request, product) -> models.ModelProductCart | None:
     return cart
 
 
-def get_cart_item_list(request):
+def get_cart_list(request):
     """..."""
     try:
         cart = models.ModelProductCart.objects.filter(user=request.user)
@@ -74,6 +74,16 @@ def get_favorite(request, product) -> models.ModelFavorite | None:
     except Exception as err:
         logging.error(err)
         return None
+
+
+def get_favorite_list(request):
+    """..."""
+    try:
+        favs = models.ModelFavorite.objects.filter(user=request.user)
+    except Exception as err:
+        logging.error(err)
+        favs = []
+    return favs
 
 
 def get_formatted_url_title(title: str) -> str:
