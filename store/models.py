@@ -47,25 +47,41 @@ class ModelProduct(models.Model):
         User, on_delete=models.CASCADE, blank=False, null=False)
     title = models.CharField(
         max_length=200, blank=False, null=False, default='Título')
-    url_title = models.CharField(
+    title_for_card = models.CharField(
         max_length=200, blank=False, null=False, default='Título')
-    old_price = models.FloatField(
+    title_for_url = models.CharField(
+        max_length=200, blank=False, null=False, default='Título')
+    price = models.FloatField(
         blank=False, null=False, default=0.0)
-    new_price = models.FloatField(
+    price_pprint = models.CharField(
+        max_length=50, blank=False, null=False, default='R$ 0,00')
+    price_old = models.FloatField(
         blank=False, null=False, default=0.0)
-    show_off_price = models.BooleanField(
+    price_old_pprint = models.CharField(
+        max_length=50, blank=False, null=False, default='R$ 0,00')
+    price_off = models.FloatField(
+        blank=False, null=False, default=0.0)
+    price_off_pprint = models.CharField(
+        max_length=50, blank=False, null=False, default='10% OFF')
+    price_off_display = models.BooleanField(
         default=True, blank=False, null=False)
     times_split_num = models.IntegerField(
         blank=False, null=False, default=0)
     times_split_interest = models.IntegerField(
         blank=False, null=False, default=0)
+    times_split_unit = models.FloatField(
+        blank=False, null=False, default=0.0)
+    times_split_pprint = models.CharField(
+        max_length=50, blank=False, null=False, default='1x R$ 0,00')
     shipping_price = models.FloatField(
         blank=False, null=False, default=0.0)
+    shipping_price_pprint = models.CharField(
+        max_length=50, blank=False, null=False, default='Frete grátis')
     available_quantity = models.IntegerField(
         blank=False, null=False, default=1)
     max_quantity_per_sale = models.IntegerField(
         blank=False, null=False, default=1)
-    show_available_quantity = models.BooleanField(
+    available_quantity_display = models.BooleanField(
         default=True, blank=False, null=False)
     image_1 = ResizedImageField(
         size=[500, 500], crop=['middle', 'center'],

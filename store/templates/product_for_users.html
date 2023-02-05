@@ -17,7 +17,7 @@
       </button>&nbsp;
       </small>
 
-      {% for tag in product.tags %}
+      {% for tag in tags %}
         {% if forloop.counter == 1 %}
         <small>
         <button class="btn btn-link btn-sm text-primary text-decoration-none fw-light mx-0 my-0 px-0 py-0" type="submit" value="{{ tag }}" name="q">
@@ -117,15 +117,15 @@
         {{ product.title }}
       </h5>
 
-      {% if product.show_off_price %}
-        {% if product.old_price %}
+      {% if product.price_off_display %}
+        {% if product.price_old %}
         <p class="my-0">
         <span class="text-decoration-line-through text-secondary">
-          {{ product.old_price }}
+          {{ product.price_old_pprint }}
         </span>
-          {% if product.off_price %}
-            {% if product.show_off_price %}
-            <span class="text-success fs-5 my-0">{{ product.off_price }}</span>
+          {% if product.price_off %}
+            {% if product.price_off_display %}
+            <span class="text-success fs-5 my-0">{{ product.price_off_pprint }}</span>
             {% endif %}
           {% endif %}
         </p>
@@ -136,7 +136,7 @@
 
       {% if product.times_split_num %}
       <p>
-      {{ product.times_split_prices }}
+      {{ product.times_split_pprint }}
       {% if not product.times_split_interest %}
       <span class="text-success"> sem juros</span>
       {% endif %}
@@ -149,7 +149,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-truck" viewBox="0 0 16 16">
           <path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h9A1.5 1.5 0 0 1 12 3.5V5h1.02a1.5 1.5 0 0 1 1.17.563l1.481 1.85a1.5 1.5 0 0 1 .329.938V10.5a1.5 1.5 0 0 1-1.5 1.5H14a2 2 0 1 1-4 0H5a2 2 0 1 1-3.998-.085A1.5 1.5 0 0 1 0 10.5v-7zm1.294 7.456A1.999 1.999 0 0 1 4.732 11h5.536a2.01 2.01 0 0 1 .732-.732V3.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .294.456zM12 10a2 2 0 0 1 1.732 1h.768a.5.5 0 0 0 .5-.5V8.35a.5.5 0 0 0-.11-.312l-1.48-1.85A.5.5 0 0 0 13.02 6H12v4zm-9 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm9 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/>
         </svg>
-        </span> Por {{ product.shipping_price }}
+        </span> Por {{ product.shipping_price_pprint }}
       </p>
       {% else %}
       <p class="text-success">
@@ -164,7 +164,7 @@
       <form action="{% url 'cart_request' product.id %}" method="post" class="position-absolute bottom-0">
         {% csrf_token %}
         <p class="text-muted my-0 py-0 ms-1 fw-light">
-          {% if product.show_available_quantity %}
+          {% if product.available_quantity_display %}
           {{ product.available_quantity }} {% if product.available_quantity == 1 %}disponível{% else %}disponíveis{% endif %}
           {% endif %}
           </p>

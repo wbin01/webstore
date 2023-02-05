@@ -10,28 +10,28 @@
       {% for product in products %}
       <div class="col">
 
-        <a href="{% url 'product' product.url_title product.id %}" class="text-decoration-none text-dark">
+        <a href="{% url 'product' product.title_for_url product.id %}" class="text-decoration-none text-dark">
           <div class="card h-100 border-0 shadow-sm">
             <img src="{{ product.image_1.url }}" class="card-img-top" alt="...">
 
             <div class="text-secondary"><hr class="my-0 py-0"></div>
             <div class="card-body my-1 py-0">
-              {% if product.card_title %}
+              {% if product.title_for_card %}
               <p class="card-text text-secondary my-0 py-0 align-middle" style="display: table-cell; height: 50px; vertical-align: middle;">
-                <small>{{ product.card_title }}</small>
+                <small>{{ product.title_for_card }}</small>
               </p>
               {% endif %}
-              {% if product.new_price %}
+              {% if product.price_pprint %}
               <p class="card-text my-0 py-0">
-                <strong>{{ product.new_price }}</strong>
-                {% if product.show_off_price %}
-                {% if product.off_price %}<small class="text-success"> {{ product.off_price }}</small>{% endif %}
+                <strong>{{ product.price_pprint }}</strong>
+                {% if product.price_off_display %}
+                {% if product.price_off %}<small class="text-success"> {{ product.price_off_pprint }}</small>{% endif %}
                 {% endif %}
               </p>
               {% endif %}
-              {% if product.times_split_prices %}
+              {% if product.times_split_pprint %}
               <p class="card-text my-0 py-0">
-              <small>{{ product.times_split_prices }}</small>
+              <small>{{ product.times_split_pprint }}</small>
               {% if not product.times_split_interest %}
               <span class="text-success fs-6"> sem juros</span>
               {% endif %}

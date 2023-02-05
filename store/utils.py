@@ -6,132 +6,6 @@ from django.shortcuts import get_object_or_404
 import store.models as models
 
 
-class FormattedProduct(object):
-    """..."""
-    def __init__(self, product: models.ModelProduct) -> None:
-        """..."""
-        self.product = product
-        self.id = self.product.id
-        self.user = self.product.user
-        self.title = self.product.title
-        self.url_title = self.product.url_title
-        self.card_title = self.__formatted_card_title()
-        self.old_price = self.__formatted_old_price()
-        self.new_price = self.__formatted_new_price()
-        self.off_price = self.__formatted_off_price()
-        self.show_off_price = self.product.show_off_price
-        self.times_split_num = self.product.times_split_num
-        self.times_split_interest = self.product.times_split_interest
-        self.times_split_value = self.__formatted_times_split_value()
-        self.times_split_prices = self.__formatted_times_split_prices()
-        self.shipping_price = self.__formatted_shipping_price()
-        self.available_quantity = self.product.available_quantity
-        self.show_available_quantity = self.product.show_available_quantity
-        self.max_quantity_per_sale = self.__formatted_max_quantity_per_sale()
-        self.image_1 = self.product.image_1
-        self.image_2 = self.product.image_2
-        self.image_3 = self.product.image_3
-        self.image_4 = self.product.image_4
-        self.image_5 = self.product.image_5
-        self.summary = self.product.summary
-        self.content = self.product.content
-        self.tags = self.__formatted_tags()
-        self.publication_date = self.product.publication_date
-        self.is_published = self.product.is_published
-
-    def __formatted_card_title(self) -> str:
-        """Product name"""
-        if len(self.product.title) > 50:
-            return self.product.title[:50] + '...'
-        return self.product.title
-
-    def __formatted_old_price(self) -> str:
-        """R$ 0,00"""
-
-        reais, cents = str(self.product.old_price).split('.')
-        if len(cents) == 1:
-            cents = f'{cents}0'
-
-        return f'R$ {reais},{cents}'
-
-    def __formatted_new_price(self) -> str:
-        """R$ 0,00"""
-
-        reais, cents = str(self.product.new_price).split('.')
-        if len(cents) == 1:
-            cents = f'{cents}0'
-
-        return f'R$ {reais},{cents}'
-
-    def __formatted_off_price(self) -> str | None:
-        """10% OFF"""
-        off = 0
-        if self.product.old_price > self.product.new_price:
-            delta_1 = self.product.old_price - self.product.new_price
-            delta_2 = self.product.old_price / 100
-            off = round(delta_1 / delta_2)
-
-        if off > 4:
-            return f'{off}% OFF'
-        return None
-
-    def __formatted_times_split_value(self) -> float | None:
-        """5.00
-
-        One unit extracted. If it is 10 times of 5.0, then it returns 5.0
-        """
-        if self.product.new_price:
-            if (self.product.times_split_num and
-                    self.product.times_split_num > 1):
-                preco = self.product.new_price
-                vezes = self.product.times_split_num
-                juros = self.product.times_split_interest
-
-                preco_real_com_juros = (preco / 100) * juros + preco
-                preco = round((preco_real_com_juros / vezes), 2)
-
-                return preco
-
-        return None
-
-    def __formatted_times_split_prices(self) -> str | None:
-        """1x R$ 0,00"""
-        if self.product.new_price:
-            if (self.product.times_split_num and
-                    self.product.times_split_num > 1):
-                preco = self.__formatted_times_split_value()
-                reais, centavos = str(preco).split('.')
-
-                if len(centavos) == 1:
-                    centavos = f'{centavos}0'
-
-                return '{}x R$ {},{}'.format(
-                    self.product.times_split_num, reais, centavos)
-
-        return None
-
-    def __formatted_shipping_price(self) -> str | None:
-        """Frete grátis"""
-        if not self.product.shipping_price:
-            return None
-        reais, centavos = str(self.product.shipping_price).split('.')
-        if len(centavos) == 1:
-            centavos = f'{centavos}0'
-
-        return 'R$ {},{}'.format(reais, centavos)
-
-    def __formatted_max_quantity_per_sale(self) -> int:
-        """..."""
-        if (self.product.available_quantity <
-                self.product.max_quantity_per_sale):
-            return self.product.available_quantity
-        return self.product.max_quantity_per_sale
-
-    def __formatted_tags(self) -> list:
-        """[tag1, tag2, tag3]"""
-        return [x.strip() for x in self.product.tags.split(',')]
-
-
 class GenericStoreProfile(object):
     def __init__(self) -> None:
         self.owner = None
@@ -175,7 +49,7 @@ def get_cart(request, product) -> models.ModelProductCart | None:
         cart = models.ModelProductCart.objects.filter(
             user=request.user.id).filter(product_id=product.id)
         for item in cart:
-            setattr(item, 'full_product', FormattedProduct(item.product))
+            setattr(item, 'full_product', item.product)
     except Exception as err:
         logging.error(err)
         cart = None
@@ -187,8 +61,6 @@ def get_cart_item_list(request):
     """..."""
     try:
         cart = models.ModelProductCart.objects.filter(user=request.user)
-        for item in cart:
-            setattr(item, 'full_product', FormattedProduct(item.product))
     except Exception as err:
         logging.error(err)
         cart = []
@@ -214,11 +86,6 @@ def get_formatted_url_title(title: str) -> str:
     return new_title + datetime.datetime.now().strftime("%d-%m-%Y--%I-%M%p")
 
 
-def get_full_product(model: models.ModelProduct) -> FormattedProduct:
-    """..."""
-    return FormattedProduct(model)
-
-
 def get_store_profile() -> models.ModelUserProfile | GenericStoreProfile:
     """..."""
     try:
@@ -240,3 +107,105 @@ def get_user_profile(request) -> models.ModelUserProfile | GenericUserProfile:
     except Exception as err:
         logging.error(err)
         return GenericUserProfile(request)
+
+
+def format_card_title(title) -> str:
+    """Product name"""
+    if len(title) > 50:
+        return title[:50] + '...'
+    return title
+
+
+def format_old_price(price_old) -> str:
+    """R$ 0,00"""
+
+    reais, cents = str(price_old).split('.')
+    if len(cents) == 1:
+        cents = f'{cents}0'
+
+    return f'R$ {reais},{cents}'
+
+
+def format_new_price(price) -> str:
+    """R$ 0,00"""
+
+    reais, cents = str(price).split('.')
+    if len(cents) == 1:
+        cents = f'{cents}0'
+
+    return f'R$ {reais},{cents}'
+
+
+def format_off_price(price, price_old) -> str | None:
+    """10% OFF"""
+    off = 0
+    if price_old > price:
+        delta_1 = price_old - price
+        delta_2 = price_old / 100
+        off = round(delta_1 / delta_2)
+
+    if off > 4:
+        return f'{off}% OFF'
+    return None
+
+
+def format_times_split_unit(
+        price, times_split_num, times_split_interest) -> float | None:
+    """5.00
+
+    One unit extracted. If it is 10 times of 5.0, then it returns 5.0
+    """
+    if price:
+        if times_split_num and times_split_num > 1:
+            preco = price
+            vezes = times_split_num
+            juros = times_split_interest
+
+            preco_real_com_juros = (preco / 100) * juros + preco
+            preco = round((preco_real_com_juros / vezes), 2)
+
+            return preco
+
+    return None
+
+
+def format_times_split_prices(    # times_split_pprint
+        price, times_split_num, times_split_interest) -> str | None:
+    """1x R$ 0,00"""
+    if price:
+        if times_split_num and times_split_num > 1:
+            preco = format_times_split_unit(
+                price, times_split_num, times_split_interest)
+            reais, centavos = str(preco).split('.')
+
+            if len(centavos) == 1:
+                centavos = f'{centavos}0'
+
+            return '{}x R$ {},{}'.format(
+                times_split_num, reais, centavos)
+
+    return None
+
+
+def format_shipping_price(shipping_price) -> str | None:
+    """Frete grátis"""
+    if not shipping_price:
+        return None
+    reais, centavos = str(shipping_price).split('.')
+    if len(centavos) == 1:
+        centavos = f'{centavos}0'
+
+    return 'R$ {},{}'.format(reais, centavos)
+
+
+def format_max_quantity_per_sale(
+        available_quantity, max_quantity_per_sale) -> int:
+    """..."""
+    if available_quantity < max_quantity_per_sale:
+        return available_quantity
+    return max_quantity_per_sale
+
+
+def format_tags(tags) -> list:
+    """[tag1, tag2, tag3]"""
+    return [x.strip() for x in tags.split(',')]
