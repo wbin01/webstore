@@ -6,6 +6,7 @@ from django.urls import path
 from .views import (
     buy_request,
     cart, cart_edit, cart_remove, cart_favorite,
+    favorite, favorite_remove,
     index,
     login, logout,
     product, product_cart, product_favorite,
@@ -26,6 +27,10 @@ urlpatterns = [
          cart_remove, name='cart_remove'),
     path('cart_favorite/<int:product_id>/',
          cart_favorite, name='cart_favorite'),
+    path('favorite/',
+         favorite, name='favorite'),
+    path('favorite_remove/<int:product_id>/',
+         favorite_remove, name='favorite_remove'),
     path('',
          index, name='index'),
     path('login/',

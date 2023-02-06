@@ -44,10 +44,10 @@ class GenericUserProfile(object):
         self.is_superuser = profile.is_superuser if profile else False
 
 
-def get_cart(request, product) -> models.ModelProductCart | None:
+def get_cart(request, product) -> models.ModelCart | None:
     """..."""
     try:
-        cart = models.ModelProductCart.objects.filter(
+        cart = models.ModelCart.objects.filter(
             user=request.user.id).filter(product_id=product.id)
         for item in cart:
             setattr(item, 'full_product', item.product)
@@ -61,7 +61,7 @@ def get_cart(request, product) -> models.ModelProductCart | None:
 def get_cart_list(request):
     """..."""
     try:
-        cart = models.ModelProductCart.objects.filter(user=request.user)
+        cart = models.ModelCart.objects.filter(user=request.user)
     except Exception as err:
         logging.error(err)
         cart = []
@@ -220,3 +220,42 @@ def format_max_quantity_per_sale(
 def format_tags(tags) -> list:
     """[tag1, tag2, tag3]"""
     return [x.strip() for x in tags.split(',')]
+
+
+def total_shipping_price(cart_list):
+    if not cart_list:
+        return 0.0
+
+    shipping = 0.0
+    for item in cart_list:
+        if item.product.shipping_price > shipping:
+            shipping = item.product.shipping_price
+    return shipping
+
+
+def total_shipping_price_pprint(price):
+    reais, centavos = str(price).split('.')
+
+    if len(centavos) == 1:
+        centavos = f'{centavos}0'
+
+    return 'R$ {},{}'.format(reais, centavos)
+
+
+def total_price(cart_list):
+    if not cart_list:
+        return 0.0
+
+    total = 0.0
+    for cart in cart_list:
+        total += cart.product.price
+    return round(total + total_shipping_price(cart_list), 2)
+
+
+def total_price_pprint(total):
+    reais, centavos = str(total).split('.')
+
+    if len(centavos) == 1:
+        centavos = f'{centavos}0'
+
+    return 'R$ {},{}'.format(reais, centavos)

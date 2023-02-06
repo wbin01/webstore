@@ -21,7 +21,7 @@ def buy_request(request, product_id, quantity):
     cart_item = utilities.get_cart(request, model_product)
     if not cart_item:
         new_product = models.ModelProduct.objects.get(pk=product_id)
-        cart_item = models.ModelProductCart.objects.create(
+        cart_item = models.ModelCart.objects.create(
             user=get_object_or_404(User, pk=request.user.id),
             product=new_product,
             quantity=int(quantity))
@@ -35,13 +35,23 @@ def cart(request):
         return redirect('index')
 
     profile = utilities.get_user_profile(request)
+    cart_list = utilities.get_cart_list(request)
+    total_price = utilities.total_price(cart_list)
+    total_price_pprint = utilities.total_price_pprint(total_price)
+    shipping = utilities.total_shipping_price(cart_list)
+    shipping_pprint = utilities.total_shipping_price_pprint(shipping)
+
     context = {
         'store_profile': utilities.get_store_profile(),
         'user_profile': profile,
-        'cart_list': utilities.get_cart_list(request),
+        'cart_list': cart_list,
         'favorite_product_id_list': [
             x.product_id for x in utilities.get_favorite_list(request)],
-        'cart_url': True}
+        'cart_url': True,
+        'shipping_price': shipping,
+        'shipping_price_pprint': shipping_pprint,
+        'total_price': total_price,
+        'total_price_pprint': total_price_pprint}
 
     if not profile:
         return redirect('index')
@@ -66,7 +76,7 @@ def cart_edit(request, product_id):
 
         quantity = request.POST['quantity']
         new_product = models.ModelProduct.objects.get(pk=product_id)
-        cart_item = models.ModelProductCart.objects.create(
+        cart_item = models.ModelCart.objects.create(
             user=get_object_or_404(User, pk=request.user.id),
             product=new_product,
             quantity=int(quantity))
@@ -80,16 +90,14 @@ def cart_favorite(request, product_id):
         return redirect('index')
 
     model_product = models.ModelProduct.objects.get(pk=product_id)
-
-    favorite = utilities.get_favorite(request, model_product)
-    if favorite:
-        favorite.delete()
+    fav = utilities.get_favorite(request, model_product)
+    if fav:
+        fav.delete()
     else:
-        favorite = models.ModelFavorite.objects.create(
+        fav = models.ModelFavorite.objects.create(
             user=get_object_or_404(User, pk=request.user.id),
-            product_id=int(model_product.id),
-            product_title=model_product.title)
-        favorite.save()
+            product=model_product)
+        fav.save()
 
     return redirect('cart')
 
@@ -105,6 +113,40 @@ def cart_remove(request, product_id):
         cart_item.delete()
 
     return redirect('cart')
+
+
+def favorite(request):
+    if not request.user.is_authenticated:
+        return redirect('index')
+
+    profile = utilities.get_user_profile(request)
+    context = {
+        'store_profile': utilities.get_store_profile(),
+        'user_profile': profile,
+        'cart_list': utilities.get_cart_list(request),  # nav
+        'favorite_list': utilities.get_favorite_list(request)}
+
+    if not profile:
+        return redirect('index')
+
+    if profile:
+        if profile.is_admin:
+            return redirect('index')
+
+        if not profile.is_admin:
+            return render(request, 'favorite.html', context)
+
+
+def favorite_remove(request, product_id):
+    if not request.user.is_authenticated:
+        return redirect('index')
+
+    model_product = models.ModelProduct.objects.get(pk=product_id)
+    fav = utilities.get_favorite(request, model_product)
+    if fav:
+        fav.delete()
+
+    return redirect('favorite')
 
 
 def index(request):
@@ -225,7 +267,7 @@ def product_cart(request, product_id):
             cart_item.delete()
         else:
             new_product = models.ModelProduct.objects.get(pk=product_id)
-            cart_item = models.ModelProductCart.objects.create(
+            cart_item = models.ModelCart.objects.create(
                 user=get_object_or_404(User, pk=request.user.id),
                 product=new_product,
                 quantity=int(quantity))
@@ -240,15 +282,14 @@ def product_favorite(request, product_id):
 
     model_product = models.ModelProduct.objects.get(pk=product_id)
 
-    favorite = utilities.get_favorite(request, model_product)
-    if favorite:
-        favorite.delete()
+    fav = utilities.get_favorite(request, model_product)
+    if fav:
+        fav.delete()
     else:
-        favorite = models.ModelFavorite.objects.create(
+        fav = models.ModelFavorite.objects.create(
             user=get_object_or_404(User, pk=request.user.id),
-            product_id=int(model_product.id),
-            product_title=model_product.title)
-        favorite.save()
+            product=model_product)
+        fav.save()
 
     return redirect('product', model_product.title_for_url, model_product.id)
 

@@ -28,20 +28,6 @@ class ModelBuy(models.Model):
         return self.product_title
 
 
-class ModelFavorite(models.Model):
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, blank=False, null=False)
-    product_id = models.IntegerField(
-        blank=False, null=False)
-    product_title = models.CharField(
-        max_length=200, blank=False, null=False)
-    publication_date = models.DateTimeField(
-        default=datetime.now, blank=True)
-
-    def __str__(self):
-        return f'{self.user.username}: {self.product_title}'
-
-
 class ModelProduct(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, blank=False, null=False)
@@ -113,13 +99,25 @@ class ModelProduct(models.Model):
         return self.title
 
 
-class ModelProductCart(models.Model):
+class ModelCart(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, blank=False, null=False)
     product = models.ForeignKey(
         ModelProduct, on_delete=models.CASCADE, blank=False, null=False)
     quantity = models.IntegerField(
         blank=False, null=False, default=1)
+    publication_date = models.DateTimeField(
+        default=datetime.now, blank=True)
+
+    def __str__(self):
+        return f'{self.user.username}: {self.product.title}'
+
+
+class ModelFavorite(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, blank=False, null=False)
+    product = models.ForeignKey(
+        ModelProduct, on_delete=models.CASCADE, blank=False, null=False)
     publication_date = models.DateTimeField(
         default=datetime.now, blank=True)
 
