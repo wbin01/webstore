@@ -220,6 +220,25 @@ def logout(request):
     return redirect('index')
 
 
+def manage_products(request):
+    if not request.user.is_authenticated:
+        return redirect('index')
+
+    profile = utilities.get_user_profile(request)
+    if profile.is_admin:
+        products = (
+            models.ModelProduct.objects.order_by('-publication_date')
+            .filter(is_published=True))
+        context = {
+            'store_profile': utilities.get_store_profile(),
+            'user_profile': profile,
+            'products': products[:4]}
+
+        return render(request, 'manage_products.html', context)
+
+    return redirect('index')
+
+
 def product(request, product_url_title, product_id):
     logging.info(product_url_title)
     model_product = models.ModelProduct.objects.get(pk=product_id)

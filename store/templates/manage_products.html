@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row my-2">
+    <div class="col">
+      <span> </span>
+    </div>
+    <div class="col">
+      <form action="#">
+        <input type="text" class="form-control" placeholder="Procurar">
+      </form>
+    </div>
+
+    <div class="col">
+      <button class="btn btn-outline-success">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
+        </svg>
+        <span class="align-middle">Adicionar</span>
+      </button>
+  </div>
+  </div>
+
+  <div class="text-center text-muted">
+    {% if search_text %}
+    <h3>
+      "{{ search_text }}"
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+      <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+      </svg>
+    </h3>
+    {% else %}
+    <h3>Últimos</h3>
+    {% endif %}
+  </div>
+
+  <!-- CARD -->
+  {% if products %}
+  <div class="container mt-4">
+    <div class="row row-cols-1 row-cols-md-4 g-4">
+      {% for product in products %}
+      <div class="col">
+
+        <a href="{% url 'product' product.title_for_url product.id %}" class="text-decoration-none text-dark">
+          <div class="card h-100 border-0 shadow-sm">
+            <img src="{{ product.image_1.url }}" class="card-img-top" alt="...">
+
+            <div class="text-secondary"><hr class="my-0 py-0"></div>
+            <div class="card-body my-1 py-0">
+              {% if product.title_for_card %}
+              <p class="card-text text-secondary my-0 py-0 align-middle" style="display: table-cell; height: 50px; vertical-align: middle;">
+                <small>{{ product.title_for_card }}</small>
+              </p>
+              {% endif %}
+              {% if product.price_pprint %}
+              <p class="card-text my-0 py-0">
+                <strong>{{ product.price_pprint }}</strong>
+                {% if product.price_off_display %}
+                {% if product.price_off %}<small class="text-success"> {{ product.price_off_pprint }}</small>{% endif %}
+                {% endif %}
+              </p>
+              {% endif %}
+              {% if product.times_split_pprint %}
+              <p class="card-text my-0 py-0">
+              <small>{{ product.times_split_pprint }}</small>
+              {% if not product.times_split_interest %}
+              <span class="text-success fs-6"> sem juros</span>
+              {% endif %}
+              </p>
+              {% endif %}
+              {% if not product.shipping_price %}
+              <p class="card-text text-success my-0 py-0"><small><strong>Frete Grátis</strong></small></p>
+              {% endif %}
+            </div>
+          </div>
+        </a>
+
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="text-center mt-4">
+    <button class="btn btn-outline-success">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+        <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+        <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
+      </svg>
+      Todos
+    </button>
+  </div>
+
+  {% else %}
+  <div class="text-center text-muted mb-5 pt-5 pb-5"><h1 class="mt-5 mb-5 pt-5 pb-5">Nada encontrado!</h1></div>
+  {% endif %}
+</div>
+{% endblock %}
