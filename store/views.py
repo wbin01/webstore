@@ -220,6 +220,23 @@ def logout(request):
     return redirect('index')
 
 
+def manage_products_new(request):
+    if not request.user.is_authenticated:
+        return redirect('index')
+
+    profile = utilities.get_user_profile(request)
+    if profile.is_admin:
+        context = {
+            'store_profile': utilities.get_store_profile(),
+            'user_profile': profile,
+            'form': forms.FormProductNew,
+            'new_product_status': None}
+
+        return render(request, 'manage_new.html', context)
+
+    return redirect('index')
+
+
 def manage_products(request):
     if not request.user.is_authenticated:
         return redirect('index')

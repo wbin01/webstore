@@ -65,10 +65,10 @@ class ModelProduct(models.Model):
         max_length=50, blank=False, null=False, default='Frete grátis')
     available_quantity = models.IntegerField(
         blank=False, null=False, default=1)
-    max_quantity_per_sale = models.IntegerField(
-        blank=False, null=False, default=1)
     available_quantity_display = models.BooleanField(
         default=True, blank=False, null=False)
+    max_quantity_per_sale = models.IntegerField(
+        blank=False, null=False, default=1)
     image_1 = ResizedImageField(
         size=[500, 500], crop=['middle', 'center'],
         upload_to='img_posts/%d/%m/%Y/', blank=False, null=False)
