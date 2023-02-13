@@ -45,8 +45,8 @@ class ModelProduct(models.Model):
         blank=False, null=False, default=0.0)
     price_old_pprint = models.CharField(
         max_length=50, blank=False, null=False, default='R$ 0,00')
-    price_off = models.FloatField(
-        blank=False, null=False, default=0.0)
+    price_off = models.IntegerField(
+        blank=True, null=True, default=0)
     price_off_pprint = models.CharField(
         max_length=50, blank=False, null=False, default='10% OFF')
     price_off_display = models.BooleanField(
@@ -71,19 +71,19 @@ class ModelProduct(models.Model):
         blank=False, null=False, default=1)
     image_1 = ResizedImageField(
         size=[500, 500], crop=['middle', 'center'],
-        upload_to='img_posts/%d/%m/%Y/', blank=False, null=False)
+        upload_to='img_posts/', blank=False, null=False)
     image_2 = ResizedImageField(
         size=[500, 500], crop=['middle', 'center'],
-        upload_to='img_posts/%d/%m/%Y/', blank=True, null=True)
+        upload_to='img_posts/', blank=True, null=True)
     image_3 = ResizedImageField(
         size=[500, 500], crop=['middle', 'center'],
-        upload_to='img_posts/%d/%m/%Y/', blank=True, null=True)
+        upload_to='img_posts/', blank=True, null=True)
     image_4 = ResizedImageField(
         size=[500, 500], crop=['middle', 'center'],
-        upload_to='img_posts/%d/%m/%Y/', blank=True, null=True)
+        upload_to='img_posts/', blank=True, null=True)
     image_5 = ResizedImageField(
         size=[500, 500], crop=['middle', 'center'],
-        upload_to='img_posts/%d/%m/%Y/', blank=True, null=True)
+        upload_to='img_posts/', blank=True, null=True)
     summary = models.CharField(
         max_length=100, default='...', blank=True, null=True)
     content = models.TextField(

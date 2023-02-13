@@ -118,7 +118,7 @@
       </h5>
 
       {% if product.price_off_display %}
-        {% if product.price_old %}
+        {% if product.price_old and product.price_off %}
         <p class="my-0">
         <span class="text-decoration-line-through text-secondary">
           {{ product.price_old_pprint }}

@@ -12,7 +12,7 @@
       {% endif %}
       </div>
 
-      <form action="{% url 'manage_products_new' %}" method="post">
+      <form action="{% url 'manage_products_new' %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {% for field in form.visible_fields %}
 

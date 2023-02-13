@@ -87,16 +87,6 @@ def get_favorite_list(request):
     return favs
 
 
-def get_formatted_url_title(title: str) -> str:
-    new_title = ''
-    for char in title:
-        char = char.lower()
-        if char == ' ' or char in string.ascii_lowercase:
-            new_title += char.replace(' ', '-')
-    new_title = new_title.replace('--', '-')
-    return new_title + datetime.datetime.now().strftime("%d-%m-%Y--%I-%M%p")
-
-
 def get_store_profile() -> models.ModelUserProfile | GenericStoreProfile:
     """..."""
     try:
@@ -120,35 +110,51 @@ def get_user_profile(request) -> models.ModelUserProfile | GenericUserProfile:
         return GenericUserProfile(request)
 
 
-def format_card_title(title) -> str:
-    """Product name"""
+def product_title_for_url(title: str) -> str:
+    """the-title"""
+    new_title = ''
+    for char in title:
+        char = char.lower()
+        if char == ' ' or char in string.ascii_lowercase:
+            new_title += char.replace(' ', '-')
+    new_title = new_title.replace('--', '-')
+    return new_title + datetime.datetime.now().strftime("%d-%m-%Y--%I-%M%p")
+
+
+def product_title_for_card(title: str) -> str:
+    """Short product title"""
     if len(title) > 50:
         return title[:50] + '...'
     return title
 
 
-def format_old_price(price_old) -> str:
+def product_price_pprint(price: str) -> str:
     """R$ 0,00"""
 
-    reais, cents = str(price_old).split('.')
+    reais, cents = str(float(price)).split('.')
     if len(cents) == 1:
         cents = f'{cents}0'
 
     return f'R$ {reais},{cents}'
 
 
-def format_new_price(price) -> str:
-    """R$ 0,00"""
-
-    reais, cents = str(price).split('.')
-    if len(cents) == 1:
-        cents = f'{cents}0'
-
-    return f'R$ {reais},{cents}'
-
-
-def format_off_price(price, price_old) -> str | None:
+def product_price_off(price: str, price_old: str) -> float:
     """10% OFF"""
+    price, price_old = float(price), float(price_old)
+    off = 0
+    if price_old > price:
+        delta_1 = price_old - price
+        delta_2 = price_old / 100
+        off = round(delta_1 / delta_2)
+
+    if off > 4:
+        return off
+    return 0.0
+
+
+def product_price_off_pprint(price: str, price_old: str) -> str:
+    """10% OFF"""
+    price, price_old = float(price), float(price_old)
     off = 0
     if price_old > price:
         delta_1 = price_old - price
@@ -157,37 +163,35 @@ def format_off_price(price, price_old) -> str | None:
 
     if off > 4:
         return f'{off}% OFF'
-    return None
+    return 'R$ 0.00% OFF'
 
 
-def format_times_split_unit(
-        price, times_split_num, times_split_interest) -> float | None:
+def product_times_split_unit(
+        price, times_split_num, times_split_interest) -> float:
     """5.00
 
     One unit extracted. If it is 10 times of 5.0, then it returns 5.0
     """
-    if price:
-        if times_split_num and times_split_num > 1:
-            preco = price
-            vezes = times_split_num
-            juros = times_split_interest
-
+    preco = float(price)
+    vezes = int(times_split_num)
+    juros = int(times_split_interest)
+    if preco > 0.0:
+        if vezes and juros > 1:
             preco_real_com_juros = (preco / 100) * juros + preco
             preco = round((preco_real_com_juros / vezes), 2)
-
             return preco
+    return 0.0
 
-    return None
 
-
-def format_times_split_prices(    # times_split_pprint
-        price, times_split_num, times_split_interest) -> str | None:
+def product_times_split_pprint(
+        price, times_split_num, times_split_interest) -> str:
     """1x R$ 0,00"""
-    if price:
-        if times_split_num and times_split_num > 1:
-            preco = format_times_split_unit(
+
+    if float(price) > 0.0:
+        if int(times_split_num) and int(times_split_num) > 1:
+            preco = product_times_split_unit(
                 price, times_split_num, times_split_interest)
-            reais, centavos = str(preco).split('.')
+            reais, centavos = str(float(preco)).split('.')
 
             if len(centavos) == 1:
                 centavos = f'{centavos}0'
@@ -195,29 +199,31 @@ def format_times_split_prices(    # times_split_pprint
             return '{}x R$ {},{}'.format(
                 times_split_num, reais, centavos)
 
-    return None
+    return ''
 
 
-def format_shipping_price(shipping_price) -> str | None:
+def product_shipping_price_pprint(shipping_price) -> str:
     """Frete grátis"""
     if not shipping_price:
-        return None
-    reais, centavos = str(shipping_price).split('.')
+        return ''
+    reais, centavos = str(float(shipping_price)).split('.')
     if len(centavos) == 1:
         centavos = f'{centavos}0'
 
     return 'R$ {},{}'.format(reais, centavos)
 
 
-def format_max_quantity_per_sale(
-        available_quantity, max_quantity_per_sale) -> int:
+def product_max_quantity_per_sale(
+        available_quantity: str, max_quantity_per_sale: str) -> int:
     """..."""
+    available_quantity = int(available_quantity)
+    max_quantity_per_sale = int(max_quantity_per_sale)
     if available_quantity < max_quantity_per_sale:
         return available_quantity
     return max_quantity_per_sale
 
 
-def format_tags(tags) -> list:
+def product_tags(tags: str) -> list:
     """[tag1, tag2, tag3]"""
     return [x.strip() for x in tags.split(',')]
 
