@@ -10,6 +10,7 @@ from .views import (
     index,
     login, logout,
     manage_products, manage_products_new,
+    manage_products_edit, manage_products_edit_save,
     product, product_cart, product_favorite,
     signup,
     search, search_tag)
@@ -40,6 +41,10 @@ urlpatterns = [
          logout, name='logout'),
     path('manage/products/new/',
          manage_products_new, name='manage_products_new'),
+    path('manage/products/edit/<str:product_url_title>:<int:product_id>/',
+         manage_products_edit, name='manage_products_edit'),
+    path('manage/products/edit/save/<int:product_id>/',
+         manage_products_edit_save, name='manage_products_edit_save'),
     path('manage/products/',
          manage_products, name='manage_products'),
     path('product/<str:product_url_title>:<int:product_id>/',

@@ -55,19 +55,19 @@ class FormProductNew(forms.ModelForm):
             'available_quantity_display':
                 '<h6>Mostrar a quantidade disponível</h6>',
             'max_quantity_per_sale': '<h6>Máximo de itens por cada venda</h6>',
-            'image_1': '<h6>Imagem principal</h6>',
+            'image_1': '<h6>Imagem principal&nbsp;</h6>',
             'image_2': (
                 '<h6>Imagem 2'
-                '<small class="text-muted"> (Opcional)</small></h6>'),
+                '<small class="text-muted"> (Opcional)&nbsp;</small></h6>'),
             'image_3': (
                 '<h6>Imagem 3'
-                '<small class="text-muted"> (Opcional)</small></h6>'),
+                '<small class="text-muted"> (Opcional)&nbsp;</small></h6>'),
             'image_4': (
                 '<h6>Imagem 4'
-                '<small class="text-muted"> (Opcional)</small></h6>'),
+                '<small class="text-muted"> (Opcional)&nbsp;</small></h6>'),
             'image_5': (
                 '<h6>Imagem 5'
-                '<small class="text-muted"> (Opcional)</small></h6>'),
+                '<small class="text-muted"> (Opcional)&nbsp;</small></h6>'),
             'summary': '<h6>Resumo</h6>',
             'content': '<h6>Decrição</h6>',
             'tags': '<h6>Tags</h6>',
