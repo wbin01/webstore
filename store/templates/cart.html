@@ -22,48 +22,72 @@
 
     <div class="row">
       <div class="col mx-0" style="min-width: 210px;">
-      <a href="{% url 'product' cart.product.title_for_url cart.product.id %}" class="text-decoration-none text-dark">
-        <img src="{{ cart.product.image_1.url }}" class="img-thumbnail" style="width:85px;">
-        <span class="fs-4">{{ cart.product.price_pprint }}</span>
-      </a>
-      </div>
 
-      <div class="col mx-0 position-relative">
-        <div class="position-absolute bottom-0 start-50 translate-middle">
-        <p class="fw-light text-center my-0 py-0">Quantidade</p>
-        <p class="fw-bold text-center my-0 py-0">{{ cart.quantity }}</p>
+        <div class="row">
+          <div class="col" style="max-width: 100px;">
+            <a href="{% url 'product' cart.product.title_for_url cart.product.id %}" class="text-decoration-none text-dark">
+              <img src="{{ cart.product.image_1.url }}" class="img-thumbnail">
+            </a>
+          </div>
+
+          <div class="col" style="max-width: 200px;">
+            <p class="my-0 py-0">
+              <a href="{% url 'product' cart.product.title_for_url cart.product.id %}" class="text-decoration-none text-dark">
+                <span class="fs-4">{{ cart.product.price_pprint }}</span>
+              </a>
+            </p>
+            <p class="fw-light my-0 py-0">
+              <!-- FAVORITE BUTTON -->
+              {% if cart.product.id in favorite_product_id_list %}
+              <a href="{% url 'cart_favorite' cart.product.id %}" class="btn btn-white border-0 text-danger text-decoration-none" role="button">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+              </svg>
+              </a>
+              {% else %}
+              <a href="{% url 'cart_favorite' cart.product.id %}" class="btn btn-white border-0 text-decoration-none" role="button">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+                <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+              </svg>
+              </a>
+              {% endif %}
+              <!-- REMOVE BUTTON -->
+              <button class="btn btn-white border-0 text-danger text-decoration-none" data-bs-toggle="modal" data-bs-target="#remove{{ cart.product.id }}Modal">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>
+                </svg>
+              </button>
+            </p>
+          </div>
+
         </div>
+
       </div>
 
-      <div class="col mx-0 gap-2 gap-2 position-relative">
-        <p class="fw-light position-absolute start-50 top-50 translate-middle text-center my-0 py-0">
-          <!-- EDIT BUTTON -->
+
+      <div class="col" style="min-width: 300px;">
+
+        <p class="my-0 py-0">
           <button class="btn btn-white border-0 text-decoration-none" data-bs-toggle="modal" data-bs-target="#edit{{ cart.product.id }}Modal">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
             <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/>
             </svg>
           </button>
-          <!-- FAVORITE BUTTON -->
-          {% if cart.product.id in favorite_product_id_list %}
-          <a href="{% url 'cart_favorite' cart.product.id %}" class="btn btn-white border-0 text-danger text-decoration-none" role="button">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
-          </svg>
-          </a>
-          {% else %}
-          <a href="{% url 'cart_favorite' cart.product.id %}" class="btn btn-white border-0 text-decoration-none" role="button">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
-            <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
-          </svg>
-          </a>
-          {% endif %}
-          <!-- REMOVE BUTTON -->
-          <button class="btn btn-white border-0 text-danger text-decoration-none" data-bs-toggle="modal" data-bs-target="#remove{{ cart.product.id }}Modal">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
-            <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>
+          Quantidade:
+          <span class="fw-light"> {{ cart.quantity }}</span>
+          <span class="fw-light"> ({{ cart.total_price_pprint }})</span>
+        </p>
+
+        <p class="my-0 py-0">
+          <button class="btn btn-white border-0 text-decoration-none" data-bs-toggle="modal" data-bs-target="#edit{{ cart.product.id }}Modal">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
+            <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/>
             </svg>
           </button>
+          Divido em:
+          <span class="fw-light">{{ cart.times_split_pprint }}</span>
         </p>
+
       </div>
 
       <!-- EDIT MODAL -->

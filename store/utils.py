@@ -176,7 +176,12 @@ def product_times_split_unit(
     vezes = int(times_split_num)
     juros = int(times_split_interest)
     if preco > 0.0:
-        if vezes and juros > 1:
+        if vezes == 1:
+            return preco
+        if vezes > 1 and juros == 0:
+            preco = round((preco / vezes), 2)
+            return preco
+        if vezes > 1 and juros > 1:
             preco_real_com_juros = (preco / 100) * juros + preco
             preco = round((preco_real_com_juros / vezes), 2)
             return preco

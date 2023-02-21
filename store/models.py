@@ -104,8 +104,18 @@ class ModelCart(models.Model):
         User, on_delete=models.CASCADE, blank=False, null=False)
     product = models.ForeignKey(
         ModelProduct, on_delete=models.CASCADE, blank=False, null=False)
+    times_split_num = models.IntegerField(
+        blank=False, null=False, default=0)
+    times_split_unit = models.FloatField(
+        blank=False, null=False, default=0.0)
+    times_split_pprint = models.CharField(
+        max_length=50, blank=False, null=False, default='1x R$ 0,00')
     quantity = models.IntegerField(
         blank=False, null=False, default=1)
+    total_price = models.FloatField(
+        blank=False, null=False, default=0.0)
+    total_price_pprint = models.CharField(
+        max_length=50, blank=False, null=False, default='R$ 0,00')
     publication_date = models.DateTimeField(
         default=datetime.now, blank=True)
 

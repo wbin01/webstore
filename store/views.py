@@ -486,7 +486,12 @@ def product_cart(request, product_id):
             cart_item = models.ModelCart.objects.create(
                 user=get_object_or_404(User, pk=request.user.id),
                 product=new_product,
-                quantity=int(quantity))
+                times_split_num=new_product.times_split_num,
+                times_split_unit=new_product.times_split_unit,
+                times_split_pprint=new_product.times_split_pprint,
+                quantity=int(quantity),
+                total_price=new_product.price,
+                total_price_pprint=new_product.price_pprint)
             cart_item.save()
 
     return redirect('product', model_product.title_for_url, model_product.id)
