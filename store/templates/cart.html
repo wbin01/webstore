@@ -21,7 +21,7 @@
     <h6 class="text-truncate py-1">{{ cart.product.title}}</h6>
 
     <div class="row">
-      <div class="col mx-0" style="min-width: 210px;">
+      <div class="col mx-0" style="min-width: 300px;">
 
         <div class="row">
           <div class="col" style="max-width: 100px;">
@@ -64,30 +64,31 @@
 
       </div>
 
-
       <div class="col" style="min-width: 300px;">
-
-        <p class="my-0 py-0">
-          <button class="btn btn-white border-0 text-decoration-none" data-bs-toggle="modal" data-bs-target="#edit{{ cart.product.id }}Modal">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
-            <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/>
-            </svg>
-          </button>
-          Quantidade:
-          <span class="fw-light"> {{ cart.quantity }}</span>
-          <span class="fw-light"> ({{ cart.total_price_pprint }})</span>
-        </p>
-
-        <p class="my-0 py-0">
-          <button class="btn btn-white border-0 text-decoration-none" data-bs-toggle="modal" data-bs-target="#edit{{ cart.product.id }}Modal">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
-            <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/>
-            </svg>
-          </button>
-          Divido em:
-          <span class="fw-light">{{ cart.times_split_pprint }}</span>
-        </p>
-
+         <table>
+          <tr>
+            <td>
+              <p class="my-0 py-0">
+                Quantidade:
+                <span class="fw-light"> {{ cart.quantity }}</span>
+                <span class="fw-light"> ({{ cart.total_price_pprint }})</span>
+              </p>
+              <p class="my-0 py-0">
+                Divido em:
+                <span class="fw-light">{{ cart.times_split_pprint }}</span>
+              </p>
+            </td>
+            <td>
+              <p class="my-0 py-0">
+                <button class="btn btn-white border-0 text-decoration-none" data-bs-toggle="modal" data-bs-target="#edit{{ cart.product.id }}Modal">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
+                <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/>
+                </svg>
+                </button>
+              </p>
+            </td>
+          </tr>
+        </table>
       </div>
 
       <!-- EDIT MODAL -->
@@ -105,7 +106,7 @@
               <img src="{{ cart.product.image_1.url }}" class="img-thumbnail" style="width:85px;">
               <span class="fs-4">{{ cart.product.price_pprint }}</span>
 
-              <form action="{% url 'cart_edit' cart.product.id %}" method="post">
+              <form action="{% url 'cart_edit' cart.id %}" method="post">
                 {% csrf_token %}
                 <div class="input-group my-3" style="width: 300px;">
                   <span class="input-group-text fw-light">Quantidade</span>

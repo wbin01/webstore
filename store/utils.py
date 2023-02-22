@@ -253,6 +253,54 @@ def total_shipping_price_pprint(price):
     return 'R$ {},{}'.format(reais, centavos)
 
 
+def cart_edit_times_split_unit(
+        price, quantity, times_split_num, times_split_interest) -> float:
+    """5.00
+
+    One unit extracted. If it is 10 times of 5.0, then it returns 5.0
+    """
+    preco = float(price)
+    quantity = int(quantity)
+    preco = round(preco * quantity, 2)
+    vezes = int(times_split_num)
+    juros = int(times_split_interest)
+    if preco > 0.0:
+        if vezes == 1:
+            return preco
+        if vezes > 1 and juros == 0:
+            preco = round((preco / vezes), 2)
+            return preco
+        if vezes > 1 and juros > 1:
+            preco_real_com_juros = (preco / 100) * juros + preco
+            preco = round((preco_real_com_juros / vezes), 2)
+            return preco
+    return 0.0
+
+
+def cart_edit_times_split_pprint(
+        times_split_num, times_split_unit) -> str:
+
+    reais, centavos = str(times_split_unit).split('.')
+    if len(centavos) == 1:
+        centavos = f'{centavos}0'
+    price = 'R$ {},{}'.format(reais, centavos)
+
+    return '{}x {}'.format(times_split_num, price)
+
+
+def cart_edit_total_price(price: float, quantity: int):
+    return round(price * quantity, 2)
+
+
+def cart_edit_total_price_pprint(price: float):
+    reais, centavos = str(price).split('.')
+
+    if len(centavos) == 1:
+        centavos = f'{centavos}0'
+
+    return 'R$ {},{}'.format(reais, centavos)
+
+
 def total_price(cart_list):
     if not cart_list:
         return 0.0

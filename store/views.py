@@ -65,24 +65,39 @@ def cart(request):
             return render(request, 'cart.html', context)
 
 
-def cart_edit(request, product_id):
+def cart_edit(request, cart_id):
     if not request.user.is_authenticated:
         return redirect('index')
 
-    model_product = models.ModelProduct.objects.get(pk=product_id)
-
     if request.method == 'POST':
-        cart_item = utils.get_cart(request, model_product)
-        cart_item.delete()
+        cart_item = models.ModelCart.objects.get(pk=cart_id)
+        cart_product = models.ModelProduct.objects.get(pk=cart_item.product.id)
 
-        quantity = request.POST['quantity']
-        new_product = models.ModelProduct.objects.get(pk=product_id)
-        cart_item = models.ModelCart.objects.create(
-            user=get_object_or_404(User, pk=request.user.id),
-            product=new_product,
-            quantity=int(quantity))
+        quantity = int(request.POST['quantity'])
+        cart_item.quantity = quantity
+
+        times_split_num = 2
+        cart_item.times_split_num = times_split_num
+
+        times_split_unit = utils.cart_edit_times_split_unit(
+            cart_product.price,
+            quantity,
+            times_split_num,
+            cart_product.times_split_interest)
+        cart_item.times_split_unit = times_split_unit
+
+        cart_item.times_split_pprint = utils.cart_edit_times_split_pprint(
+            times_split_num,
+            times_split_unit)
+
+        total_price = utils.cart_edit_total_price(
+            cart_product.price, quantity)
+        cart_item.total_price = total_price
+
+        cart_item.total_price_pprint = utils.cart_edit_total_price_pprint(
+            total_price)
+
         cart_item.save()
-
     return redirect('cart')
 
 
@@ -486,9 +501,9 @@ def product_cart(request, product_id):
             cart_item = models.ModelCart.objects.create(
                 user=get_object_or_404(User, pk=request.user.id),
                 product=new_product,
-                times_split_num=new_product.times_split_num,
-                times_split_unit=new_product.times_split_unit,
-                times_split_pprint=new_product.times_split_pprint,
+                times_split_num=1,
+                times_split_unit=new_product.price,
+                times_split_pprint='1x ' + new_product.price_pprint,
                 quantity=int(quantity),
                 total_price=new_product.price,
                 total_price_pprint=new_product.price_pprint)
