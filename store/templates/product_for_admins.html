@@ -163,24 +163,13 @@
 
       <form action="{% url 'product_cart' product.id %}" method="post" class="position-absolute bottom-0">
         {% csrf_token %}
-        <p class="text-muted my-0 py-0 ms-1 fw-light">
+        <p class="text-muted my-0 py-0 ms-1 mb-2 fw-light">
           {% if product.available_quantity_display %}
           {{ product.available_quantity }} {% if product.available_quantity == 1 %}disponível{% else %}disponíveis{% endif %}
           {% endif %}
-          </p>
-
-        {% if cart %}
-        <div class="input-group mb-3" style="width: 300px;">
-          <span class="input-group-text fw-light">Quantidade</span>
-          <input type="number" id="quantity" name="quantity" class="form-control text-center" step="1" value="{{ cart.0.quantity }}" min="1" max="{{ product.max_quantity_per_sale }}">
-          <label class="text-muted mt-2 ms-2 fw-light"><small>Máximo {{ product.max_quantity_per_sale }}</small></label>
-        </div>
-        {% else %}
-        <div class="input-group mb-3" style="width: 300px;">
-          <span class="input-group-text fw-light">Quantidade</span>
-          <input type="number" id="quantity" name="quantity" class="form-control text-center" step="1" value="1" min="1" max="{{ product.max_quantity_per_sale }}">
-          <label class="text-muted mt-2 ms-2 fw-light"><small>Máximo {{ product.max_quantity_per_sale }}</small></label>
-        </div>
+        </p>
+        {% if product.available_quantity > 1 %}
+        <p class="text-muted my-0"><small>Escolha a quantidade na compra / carrinho</small></p>
         {% endif %}
 
         <div class="d-grid gap-2 gap-2 col-12" style="width: 400px;">

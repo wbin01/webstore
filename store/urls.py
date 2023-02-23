@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from django.urls import path
 
 from .views import (
-    buy_request,
+    buy,
     cart, cart_edit, cart_remove, cart_favorite,
     favorite, favorite_remove,
     index,
@@ -19,8 +19,8 @@ load_dotenv()
 ADMIN_ROUTE = os.getenv('ADMIN_ROUTE')
 
 urlpatterns = [
-    path('buy_request/<int:product_id>:<int:quantity>/',
-         buy_request, name='buy_request'),
+    path('buy/<int:product_id>/',
+         buy, name='buy'),
     path('cart/',
          cart, name='cart'),
     path('cart_edit/<int:cart_id>/',

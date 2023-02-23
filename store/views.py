@@ -13,7 +13,7 @@ import store.validation as validation
 import store.utils as utils
 
 
-def buy_request(request, product_id, quantity):
+def buy(request, product_id):
     if not request.user.is_authenticated:
         return redirect('index')
 
@@ -25,9 +25,13 @@ def buy_request(request, product_id, quantity):
         cart_item = models.ModelCart.objects.create(
             user=get_object_or_404(User, pk=request.user.id),
             product=new_product,
-            quantity=int(quantity))
+            times_split_num=1,
+            times_split_unit=new_product.price,
+            times_split_pprint='1x ' + new_product.price_pprint,
+            quantity=1,
+            total_price=new_product.price,
+            total_price_pprint=new_product.price_pprint)
         cart_item.save()
-
     return redirect('cart')
 
 
@@ -76,7 +80,7 @@ def cart_edit(request, cart_id):
         quantity = int(request.POST['quantity'])
         cart_item.quantity = quantity
 
-        times_split_num = 2
+        times_split_num = int(request.POST['times_split_num'])
         cart_item.times_split_num = times_split_num
 
         times_split_unit = utils.cart_edit_times_split_unit(
@@ -488,10 +492,8 @@ def product_cart(request, product_id):
     model_product = models.ModelProduct.objects.get(pk=product_id)
 
     if request.method == 'POST':
-        quantity = request.POST['quantity']
-
         if 'buy' in request.POST:
-            return redirect('buy_request', product_id, quantity)
+            return redirect('buy', product_id)
 
         cart_item = utils.get_cart(request, model_product)
         if cart_item:
@@ -504,7 +506,7 @@ def product_cart(request, product_id):
                 times_split_num=1,
                 times_split_unit=new_product.price,
                 times_split_pprint='1x ' + new_product.price_pprint,
-                quantity=int(quantity),
+                quantity=1,
                 total_price=new_product.price,
                 total_price_pprint=new_product.price_pprint)
             cart_item.save()
