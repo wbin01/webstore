@@ -113,6 +113,7 @@
       </a>
       {% endif %}
 
+      <div style="min-width: 250px;">
       <h5 class="me-3">
         {{ product.title }}
       </h5>
@@ -159,6 +160,7 @@
       </p>
       {% endif %}
       <div style="height: 200px;"></div>
+      </div>
 
 
       <form action="{% url 'product_cart' product.id %}" method="post" class="position-absolute bottom-0">

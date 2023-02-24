@@ -4,7 +4,7 @@
 {% block content %}
 <div class="container shadow-sm bg-white mt-4 py-2 px-0 rounded-2" xmlns="http://www.w3.org/1999/html">
 
-  <h3 class="text-center">
+  <h3 class="text-center text-primary">
     <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-cart3" viewBox="0 0 16 16">
       <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l.84 4.479 9.144-.459L13.89 4H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
     </svg>
@@ -18,7 +18,11 @@
   {% for cart in cart_list %}
 <!--  {% if forloop.counter > 1 %}<div class="text-muted"><hr></div>{% endif %}-->
   <div class="m-2 p-2 rounded-2 bg-white bg-opacity-100" style="box-shadow: 0px 0px 10px #ddd;">
-    <h6 class="text-truncate py-1">{{ cart.product.title}}</h6>
+    <h6 class="text-truncate py-1">
+      <a href="{% url 'product' cart.product.title_for_url cart.product.id %}" class="text-decoration-none text-dark">
+        {{ cart.product.title}}
+      </a>
+    </h6>
 
     <div class="row">
       <div class="col mx-0" style="min-width: 300px;">
@@ -32,9 +36,7 @@
 
           <div class="col" style="max-width: 200px;">
             <p class="my-0 py-0">
-              <a href="{% url 'product' cart.product.title_for_url cart.product.id %}" class="text-decoration-none text-dark">
-                <span class="fs-4">{{ cart.product.price_pprint }}</span>
-              </a>
+              <span class="fs-4 fw-light">{{ cart.product.price_pprint }}</span>
             </p>
             <p class="fw-light my-0 py-0">
               <!-- FAVORITE BUTTON -->
@@ -64,21 +66,21 @@
 
       </div>
 
-      <div class="col" style="min-width: 300px;">
+      <div class="col mx-3 mt-2 rounded" style="min-width: 300px; background-color: #F2F2F2;">
          <table>
           <tr>
             <td>
               <p class="my-0 py-0">
                 Quantidade:
-                <span class="fw-light"> {{ cart.quantity }}</span>
+                <span class="text-muted"> {{ cart.quantity }}</span>
               </p>
               <p class="my-0 py-0">
                 Divido em:
-                <span class="fw-light">{{ cart.times_split_pprint }}</span>
+                <span class="text-muted"> {{ cart.times_split_pprint }}</span>
               </p>
               <p class="my-0 py-0">
                 Sai por:
-                <span class="fw-light">{{ cart.total_price_pprint }}</span>
+                <span class="text-muted"> {{ cart.total_price_pprint }}</span>
               </p>
             </td>
             <td>

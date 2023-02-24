@@ -107,6 +107,7 @@
       </svg>
       </button>
 
+      <div style="min-width: 250px;">
       <h5 class="me-3">
         {{ product.title }}
       </h5>
@@ -152,8 +153,10 @@
         </svg> Frete grátis
       </p>
       {% endif %}
+      <div style="height: 200px;"></div>
+      </div>
 
-      <div class="d-grid gap-2 gap-2 col-8 position-absolute bottom-0">
+      <div class="d-grid gap-2 gap-2 col-8 position-absolute bottom-0" style="width: 400px;">
         <p class="text-muted">
         {% if product.available_quantity_display %}
         {{ product.available_quantity }} {% if product.available_quantity == 1 %}disponível{% else %}disponíveis{% endif %}
