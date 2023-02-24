@@ -95,7 +95,10 @@ def cart_edit(request, cart_id):
             times_split_unit)
 
         total_price = utils.cart_edit_total_price(
-            cart_product.price, quantity)
+            cart_product.price,
+            quantity,
+            cart_product.times_split_interest,
+            times_split_num)
         cart_item.total_price = total_price
 
         cart_item.total_price_pprint = utils.cart_edit_total_price_pprint(

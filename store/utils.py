@@ -288,11 +288,20 @@ def cart_edit_times_split_pprint(
     return '{}x {}'.format(times_split_num, price)
 
 
-def cart_edit_total_price(price: float, quantity: int):
-    return round(price * quantity, 2)
+def cart_edit_total_price(
+        price: float,
+        quantity: int,
+        times_split_interest: int,
+        times_split_num: int) -> float:
+    if price > 0.0:
+        if times_split_interest and times_split_num > 1:
+            interest = (price / 100) * times_split_interest
+            price += interest
+        return round(price * quantity, 2)
+    return 0.0
 
 
-def cart_edit_total_price_pprint(price: float):
+def cart_edit_total_price_pprint(price: float) -> str:
     reais, centavos = str(price).split('.')
 
     if len(centavos) == 1:
