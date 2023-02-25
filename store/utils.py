@@ -294,10 +294,16 @@ def cart_edit_total_price(
         times_split_interest: int,
         times_split_num: int) -> float:
     if price > 0.0:
-        if times_split_interest and times_split_num > 1:
-            interest = (price / 100) * times_split_interest
+        if times_split_num == 1:
+            return price * quantity
+
+        if times_split_num > 1 and not times_split_interest:
+            return price * quantity
+
+        if times_split_num > 1 and times_split_interest:
+            interest = round(price / 100, 2) * times_split_interest
             price += interest
-        return round(price * quantity, 2)
+            return price * quantity
     return 0.0
 
 
@@ -310,17 +316,39 @@ def cart_edit_total_price_pprint(price: float) -> str:
     return 'R$ {},{}'.format(reais, centavos)
 
 
-def total_price(cart_list):
+def cart_total_price(cart_list):
     if not cart_list:
         return 0.0
 
     total = 0.0
     for cart in cart_list:
-        total += cart.product.price
+        total += cart.total_price
     return round(total + total_shipping_price(cart_list), 2)
 
 
-def total_price_pprint(total):
+def cart_total_price_split_list(cart_list) -> dict:
+    split_price = {0: 0.0}
+    for cart in cart_list:
+        for i in range(cart.times_split_num):
+            if i in split_price.keys():
+                split_price[i] = split_price[i] + cart.times_split_unit
+            else:
+                split_price[i] = cart.times_split_unit
+    return split_price
+
+
+def cart_total_price_split_list_pprint(total_price_split_list) -> dict:
+    split_price = {}
+    for key, value in total_price_split_list.items():
+        reais, centavos = str(value).split('.')
+        if len(centavos) == 1:
+            centavos = f'{centavos}0'
+        split_price[key + 1] = 'R$ {},{}'.format(reais, centavos)
+
+    return split_price
+
+
+def cart_total_price_pprint(total):
     reais, centavos = str(total).split('.')
 
     if len(centavos) == 1:

@@ -16,7 +16,6 @@
 
   {% else %}
   {% for cart in cart_list %}
-<!--  {% if forloop.counter > 1 %}<div class="text-muted"><hr></div>{% endif %}-->
   <div class="m-2 p-2 rounded-2 bg-white bg-opacity-100" style="box-shadow: 0px 0px 10px #ddd;">
     <h6 class="text-truncate py-1">
       <a href="{% url 'product' cart.product.title_for_url cart.product.id %}" class="text-decoration-none text-dark">
@@ -28,7 +27,7 @@
       <div class="col mx-0" style="min-width: 300px;">
 
         <div class="row">
-          <div class="col" style="max-width: 100px;">
+          <div class="col" style="max-width: 110px;">
             <a href="{% url 'product' cart.product.title_for_url cart.product.id %}" class="text-decoration-none text-dark">
               <img src="{{ cart.product.image_1.url }}" class="img-thumbnail">
             </a>
@@ -36,7 +35,7 @@
 
           <div class="col" style="max-width: 200px;">
             <p class="my-0 py-0">
-              <span class="fs-4 fw-light">{{ cart.product.price_pprint }}</span>
+              <span class="fs-5 fw-light text-muted">{{ cart.product.price_pprint }}</span>
             </p>
             <p class="fw-light my-0 py-0">
               <!-- FAVORITE BUTTON -->
@@ -66,31 +65,30 @@
 
       </div>
 
-      <div class="col mx-3 mt-2 rounded" style="min-width: 300px; background-color: #F2F2F2;">
+      <div class="col mx-3 mt-2 rounded position-relative" style="min-width: 300px;">
          <table>
           <tr>
             <td>
               <p class="my-0 py-0">
                 Quantidade:
-                <span class="text-muted"> {{ cart.quantity }}</span>
+                <span class="text-muted fw-light"> {{ cart.quantity }}</span>
               </p>
               <p class="my-0 py-0">
                 Divido em:
-                <span class="text-muted"> {{ cart.times_split_pprint }}</span>
+                <span class="text-muted fw-light"> {{ cart.times_split_pprint }}</span>
               </p>
-              <p class="my-0 py-0">
-                Sai por:
-                <span class="text-muted"> {{ cart.total_price_pprint }}</span>
+              <p class="my-0 py-0 fs-5 fw-light">
+                <span class="text-primary"> {{ cart.total_price_pprint }}</span>
               </p>
             </td>
             <td>
-              <p class="my-0 py-0 ps-4 ms-4">
-                <button class="btn btn-white border-0 text-decoration-none" data-bs-toggle="modal" data-bs-target="#edit{{ cart.product.id }}Modal">
+              <div class="my-0 py-0 ps-4 ms-4 position-absolute top-50 end-0 translate-middle">
+                <button class="btn btn-white text-decoration-none" data-bs-toggle="modal" data-bs-target="#edit{{ cart.product.id }}Modal">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
                 <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/>
                 </svg>
                 </button>
-              </p>
+              </div>
             </td>
           </tr>
         </table>
@@ -162,21 +160,36 @@
     </div>
   </div>
   {% endfor %}
-  {% endif %}
+
 
   <!-- TOTAL -->
   <div>
-    <div class="row m-4 pt-4 fs-3">
+    <div class="pt-4">
+    {% for index, price_split_item in total_price_split_list_pprint.items %}
+    <div class="row">
       <div class="col">
-        <p>Frete <span class="fs-5 fw-light">{{ shipping_price_pprint }}</span></p>
+        <p class="m-0 p-0 ms-5"><span class="fw-light">Parcela</span> {{ index }}</p>
+      </div>
+
+      <div class="col m-0 p-0">
+        <p class="m-0 p-0">{{ price_split_item }}</p>
+      </div>
+    </div>
+    {% endfor %}
+    </div>
+
+    <div class="row m-4 fs-3">
+      <div class="col">
+        <p>Frete <span class="fs-5 fw-light text-primary">{{ shipping_price_pprint }}</span></p>
       </div>
 
       <div class="col">
-        <p>Total com frete <span class="fs-5 fw-light">{{ total_price_pprint }}</span></p>
+        <p>Total com frete <span class="fs-4 fw-light text-success">{{ total_price_pprint }}</span></p>
       </div>
 
     </div>
   </div>
+  {% endif %}
 
 </div>
 {% endblock %}

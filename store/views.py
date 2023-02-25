@@ -41,10 +41,13 @@ def cart(request):
 
     profile = utils.get_user_profile(request)
     cart_list = utils.get_cart_list(request)
-    total_price = utils.total_price(cart_list)
-    total_price_pprint = utils.total_price_pprint(total_price)
     shipping = utils.total_shipping_price(cart_list)
     shipping_pprint = utils.total_shipping_price_pprint(shipping)
+    total_price = utils.cart_total_price(cart_list)
+    total_price_pprint = utils.cart_total_price_pprint(total_price)
+    total_price_split_list = utils.cart_total_price_split_list(cart_list)
+    total_price_split_list_pprint = utils.cart_total_price_split_list_pprint(
+        total_price_split_list)
 
     context = {
         'store_profile': utils.get_store_profile(),
@@ -56,7 +59,9 @@ def cart(request):
         'shipping_price': shipping,
         'shipping_price_pprint': shipping_pprint,
         'total_price': total_price,
-        'total_price_pprint': total_price_pprint}
+        'total_price_pprint': total_price_pprint,
+        'total_price_split_list': total_price_split_list,
+        'total_price_split_list_pprint': total_price_split_list_pprint}
 
     if not profile:
         return redirect('index')
