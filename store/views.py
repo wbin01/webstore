@@ -288,6 +288,24 @@ def manage_products_edit(request, product_url_title, product_id):
     return redirect('manage_products')
 
 
+def manage_products(request):
+    if not request.user.is_authenticated:
+        return redirect('index')
+
+    profile = utils.get_user_profile(request)
+    if profile.is_admin:
+        products = (
+            models.ModelProduct.objects.order_by('-publication_date'))
+        context = {
+            'store_profile': utils.get_store_profile(),
+            'user_profile': profile,
+            'products': products[:4]}
+
+        return render(request, 'manage_products.html', context)
+
+    return redirect('index')
+
+
 def manage_products_edit_save(request, product_id):
     editable = models.ModelProduct.objects.get(pk=product_id)
     if request.method == 'POST':
@@ -440,25 +458,6 @@ def manage_products_new(request):
             return redirect('manage_products')
 
         return render(request, 'manage_products_new.html', context)
-
-    return redirect('index')
-
-
-def manage_products(request):
-    if not request.user.is_authenticated:
-        return redirect('index')
-
-    profile = utils.get_user_profile(request)
-    if profile.is_admin:
-        products = (
-            models.ModelProduct.objects.order_by('-publication_date')
-            .filter(is_published=True))
-        context = {
-            'store_profile': utils.get_store_profile(),
-            'user_profile': profile,
-            'products': products[:4]}
-
-        return render(request, 'manage_products.html', context)
 
     return redirect('index')
 
