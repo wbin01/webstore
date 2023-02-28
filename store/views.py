@@ -61,17 +61,18 @@ def cart(request):
         'total_price': total_price,
         'total_price_pprint': total_price_pprint,
         'total_price_split_list': total_price_split_list,
+        'len_total_price_split_list': len(total_price_split_list),
         'total_price_split_list_pprint': total_price_split_list_pprint}
 
     if not profile:
         return redirect('index')
 
     if profile:
-        if profile.is_admin:
-            return redirect('index')
-
-        if not profile.is_admin:
-            return render(request, 'cart.html', context)
+        # if profile.is_admin:
+        #     return redirect('index')
+        # if not profile.is_admin:
+        #     return render(request, 'cart.html', context)
+        return render(request, 'cart.html', context)
 
 
 def cart_edit(request, cart_id):
@@ -248,6 +249,33 @@ def logout(request):
     return redirect('index')
 
 
+def manage_products(request):
+    if not request.user.is_authenticated:
+        return redirect('index')
+
+    profile = utils.get_user_profile(request)
+
+    if profile.is_admin:
+        search_text = '' if 'q' not in request.GET else request.GET['q']
+        if search_text:
+            products = (models.ModelProduct.objects.order_by(
+                '-publication_date').filter(
+                title__icontains=request.GET['q']) if request.GET['q'] else [])
+        else:
+            products = (
+                models.ModelProduct.objects.order_by('-publication_date'))
+
+        context = {
+            'store_profile': utils.get_store_profile(),
+            'user_profile': profile,
+            'products': products,
+            'search_text': search_text}
+
+        return render(request, 'manage_products.html', context)
+
+    return redirect('index')
+
+
 def manage_products_edit(request, product_url_title, product_id):
     if not request.user.is_authenticated:
         return redirect('index')
@@ -286,24 +314,6 @@ def manage_products_edit(request, product_url_title, product_id):
 
         return render(request, 'manage_products_edit.html', context)
     return redirect('manage_products')
-
-
-def manage_products(request):
-    if not request.user.is_authenticated:
-        return redirect('index')
-
-    profile = utils.get_user_profile(request)
-    if profile.is_admin:
-        products = (
-            models.ModelProduct.objects.order_by('-publication_date'))
-        context = {
-            'store_profile': utils.get_store_profile(),
-            'user_profile': profile,
-            'products': products[:4]}
-
-        return render(request, 'manage_products.html', context)
-
-    return redirect('index')
 
 
 def manage_products_edit_save(request, product_id):
