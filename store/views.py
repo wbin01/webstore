@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.contrib import auth
 from django.utils import timezone
 
+import users.models as user_models
 import store.models as models
 import store.forms as forms
 
@@ -269,7 +270,8 @@ def manage_products(request):
             'store_profile': utils.get_store_profile(),
             'user_profile': profile,
             'products': products,
-            'search_text': search_text}
+            'search_text': search_text,
+            'cart_list': utils.get_cart_list(request)}
 
         return render(request, 'manage_products.html', context)
 
@@ -310,7 +312,8 @@ def manage_products_edit(request, product_url_title, product_id):
             'user_profile': profile,
             'form': form,
             'product': post,
-            'product_status': None}
+            'product_status': None,
+            'cart_list': utils.get_cart_list(request)}
 
         return render(request, 'manage_products_edit.html', context)
     return redirect('manage_products')
@@ -404,7 +407,8 @@ def manage_products_new(request):
             'store_profile': utils.get_store_profile(),
             'user_profile': profile,
             'form': forms.FormProductNew,
-            'new_product_status': None}
+            'new_product_status': None,
+            'cart_list': utils.get_cart_list(request)}
 
         if request.method == 'POST':
             new_product = models.ModelProduct.objects.create(
@@ -468,6 +472,33 @@ def manage_products_new(request):
             return redirect('manage_products')
 
         return render(request, 'manage_products_new.html', context)
+
+    return redirect('index')
+
+
+def manage_users(request):
+    if not request.user.is_authenticated:
+        return redirect('index')
+
+    profile = utils.get_user_profile(request)
+    if profile.is_admin:
+        search_text = '' if 'q' not in request.GET else request.GET['q']
+        if search_text:
+            user_profiles = (
+                models.ModelUserProfile.objects.filter(
+                    user__first_name__icontains=search_text)
+                if search_text else [])
+        else:
+            user_profiles = models.ModelUserProfile.objects.all()
+
+        context = {
+            'store_profile': utils.get_store_profile(),
+            'user_profile': profile,
+            'users': user_profiles,
+            'search_text': '',
+            'cart_list': utils.get_cart_list(request)}
+
+        return render(request, 'manage_users.html', context)
 
     return redirect('index')
 

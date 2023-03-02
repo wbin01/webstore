@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+
+<div class="row bg-light mb-2" style="max-width: 90%; margin-left: auto; margin-right: auto; padding: 5px; padding-right: 10px;">
+  <div class="col pt-2">
+    <a href="{% url 'manage_users' %}" class="text-decoration-none text-dark">GERENCIAR USUÁRIOS</a>
+  </div>
+
+  <!-- Search -->
+  <div class="col" style="max-width: 50px;">
+    <button class="btn btn-light border-0 rounded-circle" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSearchProducts" aria-controls="offcanvasSearchProducts">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+      </svg>
+    </button>
+  </div>
+  <!-- Search offcanvas -->
+  <div class="offcanvas offcanvas-top my-0 mx-0 py-0 px-0" tabindex="-1" id="offcanvasSearchProducts" aria-labelledby="offcanvasSearchProductsLabel" style="background-color: {{ store_profile.theme_color_admin }}; height: 70px;">
+    <div class="offcanvas-header my-0 py-0">
+      <span> </span>
+      <form class="d-flex offcanvas-body" role="search" action="{% url 'manage_users' %}">
+        <input class="form-control me-2" type="search" placeholder="Procurar" aria-label="Search" name="q">
+      </form>
+      <button type="button" data-bs-dismiss="offcanvas" aria-label="Close" style="color: {{ store_profile.theme_color_text }}; background-color: {{ store_profile.theme_color_admin }};">
+        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+        <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Add new -->
+  <div class="col"  style="max-width: 50px;">
+    <a href="#" role="button" class="btn btn-light border-0 rounded-circle">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
+      </svg>
+    </a>
+  </div>
+
+
+</div>
+
+  <div class="text-center text-muted">
+    {% if search_text %}
+    <h3>
+      "{{ search_text }}"
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+      <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+      </svg>
+    </h3>
+    {% else %}
+    <h3>&nbsp;</h3>
+    {% endif %}
+  </div>
+
+  <!-- CARD -->
+  {% if users %}
+  <div class="container mt-4">
+    <div class="row row-cols-1 row-cols-md-4 g-4">
+      {% for user in users %}
+      {% if not user.is_admin %}
+      <div class="col">
+          <div class="bg-white h-100 border-0 shadow-sm rounded">
+            <div class="row gap-4 gap-4">
+              <div class="col position-relative" style="max-width: 55px;">
+                {% if user.profile_image %}
+                <img src="{{ user.profile_image.url }}" alt="..." style="height: 50px;">
+                {% else %}
+                <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
+                  <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3Zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
+                </svg>
+                {% endif %}
+              </div>
+
+              <div class="col position-relative">
+                <p class="position-absolute start-0 top-50 translate-middle ms-2">{{ user.user.first_name }}</p>
+              </div>
+
+              <div class="col position-relative">
+                <a href="#" role="button" class="btn btn-danger position-absolute end-0 top-50 translate-middle">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
+                    <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/>
+                  </svg>
+                </a>
+              </div>
+
+            </div>
+          </div>
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+  {% else %}
+  <div class="text-center text-muted mb-5 pt-5 pb-5"><h1 class="mt-5 mb-5 pt-5 pb-5">Nada encontrado!</h1></div>
+  {% endif %}
+</div>
+{% endblock %}
