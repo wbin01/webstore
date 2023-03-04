@@ -503,6 +503,35 @@ def manage_users(request):
     return redirect('index')
 
 
+def manage_users_edit(request, user_username, profile_user_id):
+    if not request.user.is_authenticated:
+        return redirect('index')
+
+    logging.info(user_username)
+    profile = utils.get_user_profile(request)
+
+    user_profile = models.ModelUserProfile.objects.get(pk=profile_user_id)
+    form_user = forms.FormUserEdit(
+        initial={
+            'name': user_profile.user.first_name,
+            'username': user_profile.user.username,
+            'email': user_profile.user.email,
+        })
+    form_user_profile = forms.FormUserProfileEdit()
+
+    if profile.is_admin:
+        context = {
+            'store_profile': utils.get_store_profile(),
+            'user_profile': profile,
+            'form_user': form_user,
+            'form_user_profile': form_user_profile,
+            'form_status': None,
+            'cart_list': utils.get_cart_list(request)}
+
+        return render(request, 'manage_users_edit.html', context)
+    return redirect('manage_users')
+
+
 def product(request, product_url_title, product_id):
     logging.info(product_url_title)
     model_product = models.ModelProduct.objects.get(pk=product_id)

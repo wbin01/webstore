@@ -1,6 +1,6 @@
 from django import forms
 from users.models import ModelUser
-from store.models import ModelProduct
+from store.models import ModelProduct, ModelUserProfile
 
 
 class FormLogin(forms.ModelForm):
@@ -112,4 +112,53 @@ class FormSignup(forms.ModelForm):
         widgets = {
             'password': forms.PasswordInput(),
             'password_confirm': forms.PasswordInput(),
+        }
+
+
+class FormUserEdit(forms.ModelForm):
+    password = forms.CharField(
+        max_length=30,
+        label=(
+            '<h6>Senha</h6>'
+            '<small class="text-muted">'
+            'Adicinar uma senha aqui, alterará a senha antiga.<br>'
+            'A senha precisa conter letra, número e caractere especial'
+            '</small>'), required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for visible in self.visible_fields():
+            visible.field.widget.attrs['class'] = 'form-control'
+
+    class Meta:
+        model = ModelUser
+        exclude = ['password_confirm', 'password']
+        labels = {
+            'name': '<h6>Nome</h6>',
+
+            'username': (
+                '<h6>Nome de usuário</h6>'
+                '<small class="text-muted">'
+                'Pode conter letra minúscula e número'
+                '</small>'),
+
+            'email': '<h6>Email</h6>',
+        }
+
+
+class FormUserProfileEdit(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for visible in self.visible_fields():
+            if visible.name == 'is_admin' or visible.name == 'is_blocked':
+                visible.field.widget.attrs['class'] = 'form-check-input'
+            else:
+                visible.field.widget.attrs['class'] = 'form-control'
+
+    class Meta:
+        model = ModelUserProfile
+        fields = ['profile_image', 'is_blocked']
+        labels = {
+            'profile_image': '<h6>Imagem de perfil</h6>',
+            'is_blocked': '<h6>Suspender conta</h6>',
         }

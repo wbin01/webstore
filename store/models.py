@@ -198,6 +198,8 @@ class ModelUserProfile(models.Model):
         blank=False, null=False, default=False)
     is_superuser = models.BooleanField(
         blank=False, null=False, default=False)
+    is_blocked = models.BooleanField(
+        blank=False, null=False, default=False)
 
     def __str__(self):
         return self.user.first_name
