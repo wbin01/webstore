@@ -320,6 +320,9 @@ def manage_products_edit(request, product_url_title, product_id):
 
 
 def manage_products_edit_save(request, product_id):
+    if not request.user.is_authenticated:
+        return redirect('index')
+
     editable = models.ModelProduct.objects.get(pk=product_id)
     if request.method == 'POST':
         if 'title' in request.POST:
@@ -503,19 +506,22 @@ def manage_users(request):
     return redirect('index')
 
 
-def manage_users_edit(request, user_username, profile_user_id):
+def manage_users_edit(request, user_username, user_profile_id):
+    logging.info(user_username)
+
     if not request.user.is_authenticated:
         return redirect('index')
 
-    logging.info(user_username)
     profile = utils.get_user_profile(request)
+    if not profile.is_admin:
+        return redirect('index')
 
-    user_profile = models.ModelUserProfile.objects.get(pk=profile_user_id)
+    edit_user_profile = models.ModelUserProfile.objects.get(pk=user_profile_id)
     form_user = forms.FormUserEdit(
         initial={
-            'name': user_profile.user.first_name,
-            'username': user_profile.user.username,
-            'email': user_profile.user.email,
+            'name': edit_user_profile.user.first_name,
+            'username': edit_user_profile.user.username,
+            'email': edit_user_profile.user.email,
         })
     form_user_profile = forms.FormUserProfileEdit()
 
@@ -523,12 +529,49 @@ def manage_users_edit(request, user_username, profile_user_id):
         context = {
             'store_profile': utils.get_store_profile(),
             'user_profile': profile,
+            'edit_user_profile': edit_user_profile,
             'form_user': form_user,
             'form_user_profile': form_user_profile,
             'form_status': None,
             'cart_list': utils.get_cart_list(request)}
 
         return render(request, 'manage_users_edit.html', context)
+    return redirect('manage_users')
+
+
+def manage_users_edit_save(request, edit_user_profile_id):
+    if not request.user.is_authenticated:
+        return redirect('index')
+
+    profile = utils.get_user_profile(request)
+    if not profile.is_admin:
+        return redirect('index')
+
+    if request.method == 'POST':
+        edit_user_profile = models.ModelUserProfile.objects.get(
+            pk=edit_user_profile_id)
+        if 'profile_image' in request.FILES:
+            edit_user_profile.profile_image = request.FILES['profile_image']
+        edit_user_profile.is_blocked = (
+            True if 'is_blocked' in request.POST else False)
+        edit_user_profile.save()
+
+        edit_user = get_object_or_404(User, pk=edit_user_profile.user.id)
+        err = validation.username_or_email_already_exists(edit_user)
+        if err:
+            return redirect(
+                'manage_users_edit',
+                edit_user.first_name,
+                edit_user_profile.id)
+        else:
+            if 'name' in request.POST:
+                edit_user.first_name = request.POST['name']
+            if 'username' in request.POST:
+                edit_user.username = request.POST['username']
+            if 'email' in request.POST:
+                edit_user.email = request.POST['email']
+            edit_user.save()
+
     return redirect('manage_users')
 
 

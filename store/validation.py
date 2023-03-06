@@ -70,3 +70,7 @@ def invalid_password(password: str, password_confirm: str) -> str | None:
         return 'As senhas não coincidem'
 
     return None
+
+
+def username_or_email_already_exists(user) -> str | None:
+    return None

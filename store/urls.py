@@ -11,7 +11,7 @@ from .views import (
     login, logout,
     manage_products, manage_products_new,
     manage_products_edit, manage_products_edit_save,
-    manage_users, manage_users_edit,
+    manage_users, manage_users_edit, manage_users_edit_save,
     product, product_cart, product_favorite,
     signup,
     search, search_tag)
@@ -50,8 +50,12 @@ urlpatterns = [
          manage_products_edit_save, name='manage_products_edit_save'),
     path('manage/users/',
          manage_users, name='manage_users'),
-    path('manage/users/edit/<str:user_username>:<int:profile_user_id>/',
+    path('manage/users/edit/<str:user_username>:<int:user_profile_id>/',
          manage_users_edit, name='manage_users_edit'),
+
+    path('manage/users/edit/save/<int:edit_user_profile_id>/',
+         manage_users_edit_save, name='manage_users_edit_save'),
+
     path('product/<str:product_url_title>:<int:product_id>/',
          product, name='product'),
     path('product_cart/<int:product_id>/',
