@@ -159,6 +159,6 @@ class FormUserProfileEdit(forms.ModelForm):
         model = ModelUserProfile
         fields = ['profile_image', 'is_blocked']
         labels = {
-            'profile_image': '<h6>Imagem de perfil</h6>',
+            'profile_image': '<h6>Imagem de perfil&nbsp;</h6>',
             'is_blocked': '<h6>Suspender conta</h6>',
         }

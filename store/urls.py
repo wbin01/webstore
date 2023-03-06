@@ -50,7 +50,8 @@ urlpatterns = [
          manage_products_edit_save, name='manage_products_edit_save'),
     path('manage/users/',
          manage_users, name='manage_users'),
-    path('manage/users/edit/<str:user_username>:<int:user_profile_id>/',
+    path('manage/users/edit/'
+         '<str:user_username>/<int:user_profile_id>/<str:status>/',
          manage_users_edit, name='manage_users_edit'),
 
     path('manage/users/edit/save/<int:edit_user_profile_id>/',

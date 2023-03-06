@@ -1,6 +1,8 @@
 import logging
 import string
 
+from django.contrib.auth.models import User
+
 
 def invalid_whitespace(items: list) -> str | None:
     for item in items:
@@ -21,12 +23,17 @@ def invalid_username(username: str) -> str | None:
         if char not in string.ascii_lowercase + string.digits:
             return f'Nome de usuário não pode conter " {char} "'
 
+    if User.objects.filter(username=username).exists():
+        return 'Usuário já cadastrado'
+
     return None
 
 
 def invalid_email(email: str) -> str | None:
     if '@' not in email or '.' not in email:
         return 'O email fornecido é inválido'
+    if User.objects.filter(email=email).exists():
+        return 'Email já cadastrado'
     return None
 
 
@@ -72,5 +79,19 @@ def invalid_password(password: str, password_confirm: str) -> str | None:
     return None
 
 
-def username_or_email_already_exists(user) -> str | None:
-    return None
+def available_email(user, new_email) -> bool:
+    if user.email != new_email:
+        for item in User.objects.all():
+            if item.id != user.id:
+                if new_email == item.email:
+                    return False
+    return True
+
+
+def available_username(user, new_username) -> bool:
+    if user.username != new_username:
+        for item in User.objects.all():
+            if item.id != user.id:
+                if new_username == item.username:
+                    return False
+    return True

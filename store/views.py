@@ -499,6 +499,7 @@ def manage_users(request):
             'user_profile': profile,
             'users': user_profiles,
             'search_text': '',
+            'status': '_',
             'cart_list': utils.get_cart_list(request)}
 
         return render(request, 'manage_users.html', context)
@@ -506,7 +507,7 @@ def manage_users(request):
     return redirect('index')
 
 
-def manage_users_edit(request, user_username, user_profile_id):
+def manage_users_edit(request, user_username, user_profile_id, status):
     logging.info(user_username)
 
     if not request.user.is_authenticated:
@@ -523,7 +524,12 @@ def manage_users_edit(request, user_username, user_profile_id):
             'username': edit_user_profile.user.username,
             'email': edit_user_profile.user.email,
         })
-    form_user_profile = forms.FormUserProfileEdit()
+    form_user_profile = forms.FormUserProfileEdit(
+        initial={
+            # 'profile_image': edit_user_profile.profile_image,
+            'is_blocked': edit_user_profile.is_blocked,
+        }
+    )
 
     if profile.is_admin:
         context = {
@@ -532,7 +538,7 @@ def manage_users_edit(request, user_username, user_profile_id):
             'edit_user_profile': edit_user_profile,
             'form_user': form_user,
             'form_user_profile': form_user_profile,
-            'form_status': None,
+            'form_status': None if status == '_' else status,
             'cart_list': utils.get_cart_list(request)}
 
         return render(request, 'manage_users_edit.html', context)
@@ -548,29 +554,33 @@ def manage_users_edit_save(request, edit_user_profile_id):
         return redirect('index')
 
     if request.method == 'POST':
-        edit_user_profile = models.ModelUserProfile.objects.get(
-            pk=edit_user_profile_id)
+        profile_id = edit_user_profile_id
+        edit_user_profile = models.ModelUserProfile.objects.get(pk=profile_id)
+        edit_user = get_object_or_404(User, pk=edit_user_profile.user.id)
+
         if 'profile_image' in request.FILES:
             edit_user_profile.profile_image = request.FILES['profile_image']
         edit_user_profile.is_blocked = (
             True if 'is_blocked' in request.POST else False)
         edit_user_profile.save()
 
-        edit_user = get_object_or_404(User, pk=edit_user_profile.user.id)
-        err = validation.username_or_email_already_exists(edit_user)
-        if err:
-            return redirect(
-                'manage_users_edit',
-                edit_user.first_name,
-                edit_user_profile.id)
-        else:
-            if 'name' in request.POST:
-                edit_user.first_name = request.POST['name']
-            if 'username' in request.POST:
-                edit_user.username = request.POST['username']
-            if 'email' in request.POST:
-                edit_user.email = request.POST['email']
-            edit_user.save()
+        if 'name' in request.POST:
+            edit_user.first_name = request.POST['name']
+        if 'username' in request.POST:
+            username = request.POST['username']
+            if not validation.available_username(edit_user, username):
+                return redirect(
+                    'manage_users_edit', edit_user.username, profile_id,
+                    f'O nome de usuário fornecido já está sendo usado')
+            edit_user.username = username
+        if 'email' in request.POST:
+            email = request.POST['email']
+            if not validation.available_email(edit_user, email):
+                return redirect(
+                    'manage_users_edit', edit_user.username, profile_id,
+                    f'O email fornecido já está sendo usado')
+            edit_user.email = email
+        edit_user.save()
 
     return redirect('manage_users')
 
