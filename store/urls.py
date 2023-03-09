@@ -3,18 +3,7 @@ from dotenv import load_dotenv
 
 from django.urls import path
 
-from .views import (
-    buy,
-    cart, cart_edit, cart_remove, cart_favorite,
-    favorite, favorite_remove,
-    index,
-    login, logout,
-    manage_products, manage_products_new,
-    manage_products_edit, manage_products_edit_save,
-    manage_users, manage_users_edit, manage_users_edit_save,
-    product, product_cart, product_favorite,
-    signup,
-    search, search_tag)
+from .views import *
 
 load_dotenv()
 ADMIN_ROUTE = os.getenv('ADMIN_ROUTE')

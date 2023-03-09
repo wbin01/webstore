@@ -566,6 +566,7 @@ def manage_users_edit_save(request, edit_user_profile_id):
 
         if 'name' in request.POST:
             edit_user.first_name = request.POST['name']
+
         if 'username' in request.POST:
             username = request.POST['username']
             if not validation.available_username(edit_user, username):
@@ -573,6 +574,7 @@ def manage_users_edit_save(request, edit_user_profile_id):
                     'manage_users_edit', edit_user.username, profile_id,
                     f'O nome de usuário fornecido já está sendo usado')
             edit_user.username = username
+
         if 'email' in request.POST:
             email = request.POST['email']
             if not validation.available_email(edit_user, email):
@@ -580,6 +582,17 @@ def manage_users_edit_save(request, edit_user_profile_id):
                     'manage_users_edit', edit_user.username, profile_id,
                     f'O email fornecido já está sendo usado')
             edit_user.email = email
+
+        if 'password' in request.POST and 'password_confirm' in request.POST:
+            password = request.POST['password']
+            password_confirm = request.POST['password_confirm']
+            pass_err = validation.invalid_password(password, password_confirm)
+            if pass_err:
+                return redirect(
+                    'manage_users_edit',
+                    edit_user.username, profile_id, pass_err)
+            edit_user.set_password(password)
+
         edit_user.save()
 
     return redirect('manage_users')

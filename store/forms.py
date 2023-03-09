@@ -116,14 +116,6 @@ class FormSignup(forms.ModelForm):
 
 
 class FormUserEdit(forms.ModelForm):
-    password = forms.CharField(
-        max_length=30,
-        label=(
-            '<h6>Senha</h6>'
-            '<small class="text-muted">'
-            'Adicinar uma senha aqui, alterará a senha antiga.<br>'
-            'A senha precisa conter letra, número e caractere especial'
-            '</small>'), required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -132,18 +124,25 @@ class FormUserEdit(forms.ModelForm):
 
     class Meta:
         model = ModelUser
-        exclude = ['password_confirm', 'password']
+        fields = '__all__'
         labels = {
             'name': '<h6>Nome</h6>',
-
             'username': (
                 '<h6>Nome de usuário</h6>'
                 '<small class="text-muted">'
                 'Pode conter letra minúscula e número'
                 '</small>'),
-
             'email': '<h6>Email</h6>',
-        }
+            'password': (
+                '<h6>Senha</h6>'
+                '<small class="text-muted">'
+                'Adicinar uma senha aqui, alterará a senha antiga.<br>'
+                'A senha precisa conter letra, número e caractere especial'
+                '</small>'),
+            'password_confirm': '<h6>Senha novamente</h6>'}
+        widgets = {
+            'password': forms.PasswordInput(),
+            'password_confirm': forms.PasswordInput()}
 
 
 class FormUserProfileEdit(forms.ModelForm):
