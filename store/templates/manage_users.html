@@ -3,12 +3,17 @@
 
 {% block content %}
 <div class="container-fluid">
+<div class="bg-white bg-opacity-50 shadow-sm mx-2 my-4 p-2 pb-4 rounded-2">
 
-<div class="row bg-light mb-2" style="max-width: 90%; margin-left: auto; margin-right: auto; padding: 5px; padding-right: 10px;">
-  <div class="col pt-2">
-    <a href="{% url 'manage_users' %}" class="text-decoration-none text-dark">GERENCIAR USUÁRIOS</a>
+  <div class="row mx-auto">
+  <!-- Add new -->
+  <div class="col"  style="max-width: 50px;">
+    <a href="#" role="button" class="btn btn-light border-0 rounded-circle">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
+      </svg>
+    </a>
   </div>
-
   <!-- Search -->
   <div class="col" style="max-width: 50px;">
     <button class="btn btn-light border-0 rounded-circle" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSearchProducts" aria-controls="offcanvasSearchProducts">
@@ -32,16 +37,6 @@
     </div>
   </div>
 
-  <!-- Add new -->
-  <div class="col"  style="max-width: 50px;">
-    <a href="#" role="button" class="btn btn-light border-0 rounded-circle">
-      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
-        <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
-      </svg>
-    </a>
-  </div>
-
-
 </div>
 
   <div class="text-center text-muted">
@@ -59,7 +54,7 @@
 
   <!-- CARD -->
   {% if users %}
-  <div class="container mt-4">
+  <div class="container mt-2">
     <div class="row row-cols-1 row-cols-md-4 g-4">
       {% for user in users %}
       {% if not user.is_admin %}
@@ -99,5 +94,6 @@
   {% else %}
   <div class="text-center text-muted mb-5 pt-5 pb-5"><h1 class="mt-5 mb-5 pt-5 pb-5">Nada encontrado!</h1></div>
   {% endif %}
+</div>
 </div>
 {% endblock %}

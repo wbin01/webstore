@@ -271,7 +271,8 @@ def manage_products(request):
             'user_profile': profile,
             'products': products,
             'search_text': search_text,
-            'cart_list': utils.get_cart_list(request)}
+            'cart_list': utils.get_cart_list(request),
+            'manage_url': True}
 
         return render(request, 'manage_products.html', context)
 
@@ -500,7 +501,8 @@ def manage_users(request):
             'users': user_profiles,
             'search_text': '',
             'status': '_',
-            'cart_list': utils.get_cart_list(request)}
+            'cart_list': utils.get_cart_list(request),
+            'manage_url': True}
 
         return render(request, 'manage_users.html', context)
 
