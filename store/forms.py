@@ -116,6 +116,16 @@ class FormSignup(forms.ModelForm):
 
 
 class FormUserEdit(forms.ModelForm):
+    password = forms.CharField(
+        required=False,
+        label='<h6>Senha atual</h6>')
+    password_confirm = forms.CharField(
+        required=False,
+        label=('<h6>Nova Senha</h6>'
+               '<small class="text-muted">'
+               'Adicinar uma senha aqui, alterará a senha atual.<br>'
+               'A senha precisa conter letra, número e caractere especial'
+               '</small>'))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -132,17 +142,7 @@ class FormUserEdit(forms.ModelForm):
                 '<small class="text-muted">'
                 'Pode conter letra minúscula e número'
                 '</small>'),
-            'email': '<h6>Email</h6>',
-            'password': (
-                '<h6>Senha</h6>'
-                '<small class="text-muted">'
-                'Adicinar uma senha aqui, alterará a senha antiga.<br>'
-                'A senha precisa conter letra, número e caractere especial'
-                '</small>'),
-            'password_confirm': '<h6>Senha novamente</h6>'}
-        widgets = {
-            'password': forms.PasswordInput(),
-            'password_confirm': forms.PasswordInput()}
+            'email': '<h6>Email</h6>'}
 
 
 class FormUserProfileEdit(forms.ModelForm):

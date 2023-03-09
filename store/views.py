@@ -557,6 +557,7 @@ def manage_users_edit_save(request, edit_user_profile_id):
         profile_id = edit_user_profile_id
         edit_user_profile = models.ModelUserProfile.objects.get(pk=profile_id)
         edit_user = get_object_or_404(User, pk=edit_user_profile.user.id)
+        status = None
 
         if 'profile_image' in request.FILES:
             edit_user_profile.profile_image = request.FILES['profile_image']
@@ -570,31 +571,32 @@ def manage_users_edit_save(request, edit_user_profile_id):
         if 'username' in request.POST:
             username = request.POST['username']
             if not validation.available_username(edit_user, username):
-                return redirect(
-                    'manage_users_edit', edit_user.username, profile_id,
-                    f'O nome de usuário fornecido já está sendo usado')
-            edit_user.username = username
+                status = 'O nome de usuário fornecido já está sendo usado'
+            else:
+                edit_user.username = username
 
-        if 'email' in request.POST:
+        if not status and 'email' in request.POST:
             email = request.POST['email']
             if not validation.available_email(edit_user, email):
-                return redirect(
-                    'manage_users_edit', edit_user.username, profile_id,
-                    f'O email fornecido já está sendo usado')
-            edit_user.email = email
+                status = 'O email fornecido já está sendo usado'
+            else:
+                edit_user.email = email
 
-        if 'password' in request.POST and 'password_confirm' in request.POST:
-            password = request.POST['password']
-            password_confirm = request.POST['password_confirm']
-            pass_err = validation.invalid_password(password, password_confirm)
+        password = (
+            request.POST['password_confirm']
+            if 'password_confirm' in request.POST else None)
+        if not status and password:
+            pass_err = validation.invalid_password(password, password)
             if pass_err:
-                return redirect(
-                    'manage_users_edit',
-                    edit_user.username, profile_id, pass_err)
-            edit_user.set_password(password)
+                status = pass_err
+            else:
+                edit_user.set_password(password)
+
+        if status:
+            return redirect(
+                'manage_users_edit', edit_user.username, profile_id, status)
 
         edit_user.save()
-
     return redirect('manage_users')
 
 
