@@ -602,6 +602,31 @@ def manage_users_edit_save(request, edit_user_profile_id):
     return redirect('manage_users')
 
 
+def manage_users_new(request):
+    if not request.user.is_authenticated:
+        return redirect('index')
+
+    profile = utils.get_user_profile(request)
+    if profile.is_admin:
+        context = {
+            'store_profile': utils.get_store_profile(),
+            'user_profile': profile,
+            'form': forms.FormSignup,
+            'status': None,
+            'cart_list': utils.get_cart_list(request)}
+
+        if request.method != 'POST':
+            return render(request, 'manage_users_new.html', context)
+        else:
+            new_user_status = __create_new_user(request)
+            if new_user_status != 'success':
+                context['status'] = new_user_status
+                return render(request, 'manage_users_new.html', context)
+            return redirect('manage_users')
+
+    return redirect('index')
+
+
 def product(request, product_url_title, product_id):
     logging.info(product_url_title)
     model_product = models.ModelProduct.objects.get(pk=product_id)
@@ -730,49 +755,60 @@ def signup(request):
     if not request.user.is_authenticated:
         if request.method != 'POST':
             return render(request, 'signup.html', context)
-
-        if request.method == 'POST':
-            name = request.POST['name']
-            username = request.POST['username']
-            email = request.POST['email']
-            password = request.POST['password']
-            password_confirm = request.POST['password_confirm']
-
-            space_err = validation.invalid_whitespace(
-                [name, username, email, password, password_confirm])
-            if space_err:
-                context['signup_status'] = space_err
-
-            username_err = validation.invalid_username(username)
-            if username_err:
-                context['signup_status'] = username_err
-
-            email_err = validation.invalid_email(email)
-            if email_err:
-                context['signup_status'] = email_err
-
-            pass_err = validation.invalid_password(password, password_confirm)
-            if pass_err:
-                context['signup_status'] = pass_err
-
-            if User.objects.filter(username=email).exists():
-                context['signup_status'] = 'Usuário já cadastrado'
-
-            if User.objects.filter(email=email).exists():
-                context['signup_status'] = 'Email já cadastrado'
-
-            if context['signup_status']:
+        else:
+            new_user_status = __create_new_user(request)
+            if new_user_status != 'success':
+                context['signup_status'] = new_user_status
                 return render(request, 'signup.html', context)
-
-            user = User.objects.create_user(
-                username=username, first_name=name,
-                email=email, password=password)
-            user.save()
-
-            profile = models.ModelUserProfile.objects.create(
-                user=user,
-                is_admin=False,
-                is_superuser=False)
-            profile.save()
-
             return redirect('login')
+
+
+def __create_new_user(request) -> str:
+    """Create new user
+
+    Create a user and their profile
+
+    :param request: request
+    :return: "success" str or a message with the error
+    """
+    name = request.POST['name']
+    username = request.POST['username']
+    email = request.POST['email']
+    password = request.POST['password']
+    password_confirm = request.POST['password_confirm']
+
+    space_err = validation.invalid_whitespace(
+        [name, username, email, password, password_confirm])
+    if space_err:
+        return space_err
+
+    username_err = validation.invalid_username(username)
+    if username_err:
+        return username_err
+
+    email_err = validation.invalid_email(email)
+    if email_err:
+        return email_err
+
+    pass_err = validation.invalid_password(password, password_confirm)
+    if pass_err:
+        return pass_err
+
+    if User.objects.filter(username=email).exists():
+        return 'Usuário já cadastrado'
+
+    if User.objects.filter(email=email).exists():
+        return 'Email já cadastrado'
+
+    user = User.objects.create_user(
+        username=username, first_name=name,
+        email=email, password=password)
+    user.save()
+
+    profile = models.ModelUserProfile.objects.create(
+        user=user,
+        is_admin=False,
+        is_superuser=False)
+    profile.save()
+
+    return 'success'

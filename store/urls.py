@@ -42,10 +42,10 @@ urlpatterns = [
     path('manage/users/edit/'
          '<str:user_username>/<int:user_profile_id>/<str:status>/',
          manage_users_edit, name='manage_users_edit'),
-
     path('manage/users/edit/save/<int:edit_user_profile_id>/',
          manage_users_edit_save, name='manage_users_edit_save'),
-
+    path('manage/users/new/',
+         manage_users_new, name='manage_users_new'),
     path('product/<str:product_url_title>:<int:product_id>/',
          product, name='product'),
     path('product_cart/<int:product_id>/',
