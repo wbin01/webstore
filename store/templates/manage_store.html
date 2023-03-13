@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+<h2 class="text-center text-muted">Gerenciar loja</h2>
+<div class="bg-white bg-opacity-50 shadow-sm mx-2 my-4 p-2 pb-4 rounded-2">
+
+  <!-- Body -->
+  <div class="container mt-4">
+    <form action="#" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% for field in form.visible_fields %}
+
+          {% if field.field.widget.input_type == 'checkbox' %}
+          <div class="form-group mt-3">
+            {{ field }} <label for="{{ field.id_for_label }}">{{ field.label | safe }}</label>
+          </div>
+          {% elif field.field.widget.input_type == 'number' %}
+          <div class="form-group mt-3">
+            <label for="{{ field.id_for_label }}">{{ field.label | safe }}</label>
+            <div style="max-width: 100px;">{{ field }}</div>
+          </div>
+          {% else %}
+          <div class="form-group mt-3">
+            <label for="{{ field.id_for_label }}">{{ field.label | safe }}</label>{{ field }}
+          </div>
+          {% endif %}
+
+        {% endfor %}
+        <input type="submit" value="Salvar" class="btn btn-dark mt-3 mb-5">
+      </form>
+  </div>
+
+</div>
+</div>
+{% endblock %}

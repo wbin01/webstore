@@ -90,7 +90,7 @@
         <div class="offcanvas-body">
           <div class="list-group">
             {% if user_profile.is_admin or user_profile.is_superuser %}
-            <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+            <a href="{% url 'manage_store' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
               Gerenciar loja
             </a>
             <a href="{% url 'manage_products' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">

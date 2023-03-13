@@ -480,6 +480,46 @@ def manage_products_new(request):
     return redirect('index')
 
 
+def manage_store(request):
+    if not request.user.is_authenticated:
+        return redirect('index')
+
+    profile = utils.get_user_profile(request)
+    if profile.is_admin:
+        store_profile = utils.get_store_profile()
+        form_store_profile = forms.FormStoreProfile(
+            initial={
+                'brand_name': store_profile.brand_name,
+                'show_brand_name_on_nav': store_profile.show_brand_name_on_nav,
+                'brand_image': store_profile.brand_image,
+                'show_brand_image_on_nav': (
+                    store_profile.show_brand_image_on_nav),
+                'theme_color': store_profile.theme_color,
+                'theme_color_text': store_profile.theme_color_text,
+                'social_media_facebook': store_profile.social_media_facebook,
+                'social_media_whatsapp': store_profile.social_media_whatsapp,
+                'social_media_twitter': store_profile.social_media_twitter,
+                'social_media_youtube': store_profile.social_media_youtube,
+                'social_media_instagram': store_profile.social_media_instagram,
+                'social_media_twitch': store_profile.social_media_twitch,
+                'social_media_discord': store_profile.social_media_discord,
+                'social_media_linkedin': store_profile.social_media_linkedin,
+                'social_media_github': store_profile.social_media_github,
+                'social_media_other': store_profile.social_media_other})
+
+        context = {
+            'store_profile': store_profile,
+            'user_profile': profile,
+            'status': None,
+            'cart_list': utils.get_cart_list(request),
+            'manage_url': True,
+            'form': form_store_profile}
+
+        return render(request, 'manage_store.html', context)
+
+    return redirect('index')
+
+
 def manage_users(request):
     if not request.user.is_authenticated:
         return redirect('index')

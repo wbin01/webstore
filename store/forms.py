@@ -1,6 +1,6 @@
 from django import forms
 from users.models import ModelUser
-from store.models import ModelProduct, ModelUserProfile
+from store.models import ModelProduct, ModelUserProfile, ModelStoreProfile
 
 
 class FormLogin(forms.ModelForm):
@@ -112,6 +112,46 @@ class FormSignup(forms.ModelForm):
         widgets = {
             'password': forms.PasswordInput(),
             'password_confirm': forms.PasswordInput(),
+        }
+
+
+class FormStoreProfile(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for visible in self.visible_fields():
+            if visible.field.widget.input_type == 'checkbox':
+                visible.field.widget.attrs['class'] = 'form-check-input'
+            else:
+                visible.field.widget.attrs['class'] = 'form-control'
+
+    class Meta:
+        model = ModelStoreProfile
+        exclude = ['owner', 'background_color', 'theme_color_admin']
+        labels = {
+            'brand_name': '<h6>Nome da loja</h6>',
+            'show_brand_name_on_nav': '<h6>&nbsp;Exibir nome da loja</h6>',
+            'brand_image': '<h6>Imagem da logo</h6>',
+            'show_brand_image_on_nav': '<h6>&nbsp;Exibir a logo</h6>',
+            'theme_color': (
+                '<h6>Cor de destaque da loja</h6>'
+                '<small class="text-muted">'
+                'Hex like: #8A42AA'
+                '</small>'),
+            'theme_color_text': (
+                '<h6>Cor do texto na cor de destaque</h6>'
+                '<small class="text-muted">'
+                'Hex like: #FFFFFF'
+                '</small>'),
+            'social_media_facebook': '<h6>Link do Facebook</h6>',
+            'social_media_whatsapp': '<h6>Link do WhatsApp</h6>',
+            'social_media_twitter': '<h6>Link do Twitter</h6>',
+            'social_media_youtube': '<h6>Link do YouTube</h6>',
+            'social_media_instagram': '<h6>Link do Instagram</h6>',
+            'social_media_twitch': '<h6>Link da Twitch</h6>',
+            'social_media_discord': '<h6>Link do Discord</h6>',
+            'social_media_linkedin': '<h6>Link do LinkedIn</h6>',
+            'social_media_github': '<h6>Link do GitHub</h6>',
+            'social_media_other': '<h6>Link de outra página da web</h6>',
         }
 
 
