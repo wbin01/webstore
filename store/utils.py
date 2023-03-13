@@ -6,44 +6,6 @@ from django.shortcuts import get_object_or_404
 import store.models as models
 
 
-class GenericStoreProfile(object):
-    def __init__(self) -> None:
-        self.owner = None
-        self.brand_name = 'Brand'
-        self.show_brand_name_on_nav = True
-        self.brand_image = None
-        self.show_brand_image_on_nav = True
-        self.background_color = '#ECECEC'
-        self.theme_color = '#8A42AA'
-        self.theme_color_admin = '#8F222D'
-        self.theme_color_text = '#FFFFFF'
-        self.social_media_facebook = None
-        self.social_media_whatsapp = None
-        self.social_media_twitter = None
-        self.social_media_youtube = None
-        self.social_media_instagram = None
-        self.social_media_twitch = None
-        self.social_media_discord = None
-        self.social_media_linkedin = None
-        self.social_media_github = None
-        self.social_media_other = None
-
-
-class GenericUserProfile(object):
-    def __init__(self, request):
-        self.user = request.user
-        try:
-            profile = get_object_or_404(
-                models.ModelUserProfile, user=request.user.id)
-        except Exception as err:
-            profile = None
-            logging.error(err)
-
-        self.profile_image = profile.profile_image if profile else None
-        self.is_admin = profile.is_admin if profile else False
-        self.is_superuser = profile.is_superuser if profile else False
-
-
 def get_cart(request, product) -> models.ModelCart | None:
     """..."""
     try:
@@ -87,7 +49,7 @@ def get_favorite_list(request):
     return favs
 
 
-def get_store_profile() -> models.ModelUserProfile | GenericStoreProfile:
+def get_store_profile() -> models.ModelStoreProfile:
     """..."""
     try:
         profile = models.ModelStoreProfile.objects.all()
@@ -95,19 +57,46 @@ def get_store_profile() -> models.ModelUserProfile | GenericStoreProfile:
         logging.error(err)
         profile = None
 
-    if profile:
-        return profile[0]
-    return GenericStoreProfile()
+    if not profile:
+        profile = models.ModelStoreProfile.objects.create(
+            brand_name='Brand',
+            show_brand_name_on_nav=True,
+            brand_image=None,
+            show_brand_image_on_nav=True,
+            background_color='#ECECEC',
+            theme_color='#8A42AA',
+            theme_color_admin='#8F222D',
+            theme_color_text='#FFFFFF',
+            social_media_facebook=None,
+            social_media_whatsapp=None,
+            social_media_twitter=None,
+            social_media_youtube=None,
+            social_media_instagram=None,
+            social_media_twitch=None,
+            social_media_discord=None,
+            social_media_linkedin=None,
+            social_media_github=None,
+            social_media_other=None)
+        profile.save()
+
+    profile = models.ModelStoreProfile.objects.all()
+    return profile[0]
 
 
-def get_user_profile(request) -> models.ModelUserProfile | GenericUserProfile:
+def get_user_profile(request) -> models.ModelUserProfile:
     """..."""
     try:
         return get_object_or_404(
             models.ModelUserProfile, user=request.user.id)
     except Exception as err:
         logging.error(err)
-        return GenericUserProfile(request)
+        profile = models.ModelUserProfile.objects.create(
+            user=request.user,
+            is_admin=False,
+            is_superuser=False)
+        profile.save()
+        return get_object_or_404(
+            models.ModelUserProfile, user=request.user.id)
 
 
 def product_title_for_url(title: str) -> str:

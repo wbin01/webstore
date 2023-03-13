@@ -8,21 +8,27 @@
 
   <!-- Body -->
   <div class="container mt-4">
-    <form action="#" method="post" enctype="multipart/form-data">
+    {{ form.media }}
+    <form action="{% url 'manage_store_save' %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {% for field in form.visible_fields %}
 
           {% if field.field.widget.input_type == 'checkbox' %}
-          <div class="form-group mt-3">
+          <div class="form-group mt-2">
             {{ field }} <label for="{{ field.id_for_label }}">{{ field.label | safe }}</label>
           </div>
-          {% elif field.field.widget.input_type == 'number' %}
-          <div class="form-group mt-3">
+          {% elif field.field.widget.input_type == 'number'%}
+          <div class="form-group mt-4">
             <label for="{{ field.id_for_label }}">{{ field.label | safe }}</label>
             <div style="max-width: 100px;">{{ field }}</div>
           </div>
+          {% elif 'color' in field.name %}
+          <div class="form-group mt-4">
+            <label for="{{ field.id_for_label }}">{{ field.label | safe }}</label>
+            <div style="max-width: 150px;">{{ field }}</div>
+          </div>
           {% else %}
-          <div class="form-group mt-3">
+          <div class="form-group mt-4">
             <label for="{{ field.id_for_label }}">{{ field.label | safe }}</label>{{ field }}
           </div>
           {% endif %}

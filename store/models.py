@@ -144,8 +144,8 @@ class ModelProductHighlight(models.Model):
 
 
 class ModelStoreProfile(models.Model):
-    owner = models.ForeignKey(
-        User, on_delete=models.CASCADE, blank=False, null=False)
+    # owner = models.ForeignKey(
+    #     User, on_delete=models.CASCADE, blank=False, null=False)
     brand_name = models.CharField(
         max_length=200, blank=False, null=False)
     show_brand_name_on_nav = models.BooleanField(

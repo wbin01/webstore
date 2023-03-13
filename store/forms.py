@@ -13,7 +13,6 @@ class FormLogin(forms.ModelForm):
     class Meta:
         model = ModelUser
         fields = ['username', 'password']
-        # fields = '__all__'
         labels = {
             'username': '<h6>Nome de usuário</h6>',
             'password': '<h6>Senha</h6>',
@@ -74,11 +73,7 @@ class FormProductNew(forms.ModelForm):
             'is_published': (
                 '<h6>Marcar como publicado '
                 '<small class="text-muted">(Visível ao público)</small></h6>'),
-            # '': '<h6></h6>',
         }
-        # widgets = {
-        #     'password': forms.PasswordInput(),
-        # }
 
 
 class FormSignup(forms.ModelForm):
@@ -131,17 +126,9 @@ class FormStoreProfile(forms.ModelForm):
             'brand_name': '<h6>Nome da loja</h6>',
             'show_brand_name_on_nav': '<h6>&nbsp;Exibir nome da loja</h6>',
             'brand_image': '<h6>Imagem da logo</h6>',
-            'show_brand_image_on_nav': '<h6>&nbsp;Exibir a logo</h6>',
-            'theme_color': (
-                '<h6>Cor de destaque da loja</h6>'
-                '<small class="text-muted">'
-                'Hex like: #8A42AA'
-                '</small>'),
-            'theme_color_text': (
-                '<h6>Cor do texto na cor de destaque</h6>'
-                '<small class="text-muted">'
-                'Hex like: #FFFFFF'
-                '</small>'),
+            'show_brand_image_on_nav': '<h6>&nbsp;Exibir imagem da logo</h6>',
+            'theme_color': '<h6>Cor de destaque da loja</h6>',
+            'theme_color_text': '<h6>Cor do texto na cor de destaque</h6>',
             'social_media_facebook': '<h6>Link do Facebook</h6>',
             'social_media_whatsapp': '<h6>Link do WhatsApp</h6>',
             'social_media_twitter': '<h6>Link do Twitter</h6>',
