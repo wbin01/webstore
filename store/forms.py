@@ -188,3 +188,55 @@ class FormUserProfileEdit(forms.ModelForm):
             'profile_image': '<h6>Imagem de perfil&nbsp;</h6>',
             'is_blocked': '<h6>Suspender conta</h6>',
         }
+
+
+class FormUserDashboard(forms.ModelForm):
+    password = forms.CharField(
+        required=False,
+        label=(
+            '<h3 class="my-3">Senha</h3>'
+            '<h6>Senha atual</h6>'
+            '<small class="text-muted">'
+            'A senha atual é usada para confirmar a nova senha<br>'
+            '</small>'))
+    password_confirm = forms.CharField(
+        required=False,
+        label=(
+            '<h6>Nova Senha</h6>'
+            '<small class="text-muted">'
+            'Precisa conter letras, números e caracteres especiais'
+            '</small>'))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for visible in self.visible_fields():
+            visible.field.widget.attrs['class'] = 'form-control'
+
+    class Meta:
+        model = ModelUser
+        fields = '__all__'
+        labels = {
+            'name': '<h3 class="my-3">Conta</h3><h6>Nome</h6>',
+            'username': (
+                '<h6>Nome de usuário</h6>'
+                '<small class="text-muted">'
+                'Pode conter letra minúscula e número'
+                '</small>'),
+            'email': '<h6>Email</h6>'}
+
+
+class FormUserDashboardProfile(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for visible in self.visible_fields():
+            if visible.field.widget.input_type == 'checkbox':
+                visible.field.widget.attrs['class'] = 'form-check-input'
+            else:
+                visible.field.widget.attrs['class'] = 'form-control'
+
+    class Meta:
+        model = ModelUserProfile
+        fields = ['profile_image']
+        labels = {
+            'profile_image': (
+                '<h3 class="my-3">Perfil</h3><h6>Imagem de perfil&nbsp;</h6>')}

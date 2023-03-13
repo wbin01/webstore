@@ -101,7 +101,7 @@
             </a>
 
             {% else %}
-            <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+            <a href="{% url 'user_dashboard' user_profile.user.username 'dashboard' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
               Perfil
             </a>
             <a href="{% url 'cart' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center text-decoration-none">

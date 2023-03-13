@@ -859,6 +859,39 @@ def signup(request):
             return redirect('login')
 
 
+def user_dashboard(request, username, status):
+    logging.info(username)
+
+    if not request.user.is_authenticated:
+        return redirect('index')
+
+    profile = utils.get_user_profile(request)
+    # if profile.is_admin:  # REVISÃO
+    #     return redirect('index')
+    form_user = forms.FormUserDashboard(
+        initial={
+            'name': profile.user.first_name,
+            'username': profile.user.username,
+            'email': profile.user.email,
+            'password': None,
+            'password_confirm': None})
+    form_user_profile = forms.FormUserDashboardProfile(
+        initial={
+            # 'profile_image': profile.profile_image,
+            'is_blocked': profile.is_blocked})
+
+    # if profile.is_admin:
+    context = {
+        'store_profile': utils.get_store_profile(),
+        'user_profile': profile,
+        'form_user': form_user,
+        'form_user_profile': form_user_profile,
+        'form_status': None if status == 'dashboard' else status,
+        'cart_list': utils.get_cart_list(request)}
+
+    return render(request, 'user_dashboard.html', context)
+
+
 def __create_new_user(request) -> str:
     """Create new user
 
