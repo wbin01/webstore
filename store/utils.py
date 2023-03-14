@@ -31,6 +31,7 @@ def get_cart_list(request):
 
 
 def get_favorite(request, product) -> models.ModelFavorite | None:
+    """..."""
     try:
         return models.ModelFavorite.objects.filter(
             user=request.user.id).filter(product_id=product.id)
@@ -119,16 +120,11 @@ def product_title_for_card(title: str) -> str:
 
 def product_price_pprint(price: str) -> str:
     """R$ 0,00"""
-
-    reais, cents = str(float(price)).split('.')
-    if len(cents) == 1:
-        cents = f'{cents}0'
-
-    return f'R$ {reais},{cents}'
+    return money_pprint(float(price))
 
 
 def product_price_off(price: str, price_old: str) -> float:
-    """10% OFF"""
+    """10 -> 10% OFF"""
     price, price_old = float(price), float(price_old)
     off = 0
     if price_old > price:
@@ -185,13 +181,7 @@ def product_times_split_pprint(
         if int(times_split_num) and int(times_split_num) > 1:
             preco = product_times_split_unit(
                 price, times_split_num, times_split_interest)
-            reais, centavos = str(float(preco)).split('.')
-
-            if len(centavos) == 1:
-                centavos = f'{centavos}0'
-
-            return '{}x R$ {},{}'.format(
-                times_split_num, reais, centavos)
+            return '{}x {}'.format(times_split_num, money_pprint(float(preco)))
 
     return ''
 
@@ -200,11 +190,7 @@ def product_shipping_price_pprint(shipping_price) -> str:
     """Frete grátis"""
     if not shipping_price:
         return ''
-    reais, centavos = str(float(shipping_price)).split('.')
-    if len(centavos) == 1:
-        centavos = f'{centavos}0'
-
-    return 'R$ {},{}'.format(reais, centavos)
+    return money_pprint(shipping_price)
 
 
 def product_max_quantity_per_sale(
@@ -223,6 +209,7 @@ def product_tags(tags: str) -> list:
 
 
 def total_shipping_price(cart_list):
+    """..."""
     if not cart_list:
         return 0.0
 
@@ -234,12 +221,8 @@ def total_shipping_price(cart_list):
 
 
 def total_shipping_price_pprint(price):
-    reais, centavos = str(price).split('.')
-
-    if len(centavos) == 1:
-        centavos = f'{centavos}0'
-
-    return 'R$ {},{}'.format(reais, centavos)
+    """..."""
+    return money_pprint(price)
 
 
 def cart_edit_times_split_unit(
@@ -268,12 +251,8 @@ def cart_edit_times_split_unit(
 
 def cart_edit_times_split_pprint(
         times_split_num, times_split_unit) -> str:
-
-    reais, centavos = str(times_split_unit).split('.')
-    if len(centavos) == 1:
-        centavos = f'{centavos}0'
-    price = 'R$ {},{}'.format(reais, centavos)
-
+    """..."""
+    price = money_pprint(times_split_unit)
     return '{}x {}'.format(times_split_num, price)
 
 
@@ -282,6 +261,7 @@ def cart_edit_total_price(
         quantity: int,
         times_split_interest: int,
         times_split_num: int) -> float:
+    """..."""
     if price > 0.0:
         if times_split_num == 1:
             return price * quantity
@@ -297,15 +277,12 @@ def cart_edit_total_price(
 
 
 def cart_edit_total_price_pprint(price: float) -> str:
-    reais, centavos = str(price).split('.')
-
-    if len(centavos) == 1:
-        centavos = f'{centavos}0'
-
-    return 'R$ {},{}'.format(reais, centavos)
+    """..."""
+    return money_pprint(price)
 
 
 def cart_total_price(cart_list):
+    """..."""
     if not cart_list:
         return 0.0
 
@@ -316,6 +293,7 @@ def cart_total_price(cart_list):
 
 
 def cart_total_price_split_list(cart_list) -> dict:
+    """..."""
     split_price = {0: 0.0}
     for cart in cart_list:
         for i in range(cart.times_split_num):
@@ -327,20 +305,41 @@ def cart_total_price_split_list(cart_list) -> dict:
 
 
 def cart_total_price_split_list_pprint(total_price_split_list) -> dict:
+    """..."""
     split_price = {}
     for key, value in total_price_split_list.items():
-        reais, centavos = str(value).split('.')
-        if len(centavos) == 1:
-            centavos = f'{centavos}0'
-        split_price[key + 1] = 'R$ {},{}'.format(reais, centavos)
+        split_price[key + 1] = money_pprint(value)
 
     return split_price
 
 
 def cart_total_price_pprint(total):
-    reais, centavos = str(total).split('.')
+    """..."""
+    return money_pprint(total)
 
-    if len(centavos) == 1:
-        centavos = f'{centavos}0'
 
-    return 'R$ {},{}'.format(reais, centavos)
+def money_pprint(value: float, hide_sign: bool = False) -> str:
+    """Money in pprint format
+
+    10,00
+    100,30
+    1.000,50
+    """
+    dollar, cents = str(value).split('.')
+    return '{}{},{}'.format(
+        '' if hide_sign else 'R$ ',
+        money_dollar_pprint(dollar), money_cents_pprint(cents))
+
+
+def money_dollar_pprint(real: str) -> str:
+    """..."""
+    if len(real) > 3:
+        real = '{}.{}'.format(real[:-3], real[-3:])
+    return real
+
+
+def money_cents_pprint(cent: str) -> str:
+    """..."""
+    if len(cent) == 1:
+        cent = f'{cent}0'
+    return cent
