@@ -202,7 +202,7 @@ class FormUserDashboard(forms.ModelForm):
     password_confirm = forms.CharField(
         required=False,
         label=(
-            '<h6>Nova Senha</h6>'
+            '<h6>Nova senha</h6>'
             '<small class="text-muted">'
             'Precisa conter letras, números e caracteres especiais'
             '</small>'))
