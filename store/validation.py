@@ -79,6 +79,16 @@ def invalid_password(password: str, password_confirm: str) -> str | None:
     return None
 
 
+def invalid_image(image) -> str | None:
+    """..."""
+    msg_err = 'Use imagens com extesões ".jpg" ".png" ou ".jpeg"'
+    if '.' not in image.name:
+        return msg_err
+    if image.name.split('.')[-1] not in ['jpg', 'png', 'jpeg']:
+        return msg_err
+    return None
+
+
 def available_email(user, new_email) -> bool:
     if user.email != new_email:
         for item in User.objects.all():

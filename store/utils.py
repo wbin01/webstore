@@ -190,7 +190,7 @@ def product_shipping_price_pprint(shipping_price) -> str:
     """Frete grátis"""
     if not shipping_price:
         return ''
-    return money_pprint(shipping_price)
+    return money_pprint(float(shipping_price))
 
 
 def product_max_quantity_per_sale(
@@ -222,7 +222,7 @@ def total_shipping_price(cart_list):
 
 def total_shipping_price_pprint(price):
     """..."""
-    return money_pprint(price)
+    return money_pprint(float(price))
 
 
 def cart_edit_times_split_unit(
@@ -252,7 +252,7 @@ def cart_edit_times_split_unit(
 def cart_edit_times_split_pprint(
         times_split_num, times_split_unit) -> str:
     """..."""
-    price = money_pprint(times_split_unit)
+    price = money_pprint(float(times_split_unit))
     return '{}x {}'.format(times_split_num, price)
 
 
@@ -308,14 +308,14 @@ def cart_total_price_split_list_pprint(total_price_split_list) -> dict:
     """..."""
     split_price = {}
     for key, value in total_price_split_list.items():
-        split_price[key + 1] = money_pprint(value)
+        split_price[key + 1] = money_pprint(float(value))
 
     return split_price
 
 
 def cart_total_price_pprint(total):
     """..."""
-    return money_pprint(total)
+    return money_pprint(float(total))
 
 
 def money_pprint(value: float, hide_sign: bool = False) -> str:

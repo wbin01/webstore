@@ -360,15 +360,20 @@ def manage_products_edit_save(request, product_id):
                     request.POST['available_quantity'],
                     request.POST['max_quantity_per_sale']))
         if 'image_1' in request.FILES:
-            editable.image_1 = request.FILES['image_1']
+            if not validation.invalid_image(request.FILES['image_1']):
+                editable.image_1 = request.FILES['image_1']
         if 'image_2' in request.FILES:
-            editable.image_2 = request.FILES['image_2']
+            if not validation.invalid_image(request.FILES['image_2']):
+                editable.image_2 = request.FILES['image_2']
         if 'image_3' in request.FILES:
-            editable.image_3 = request.FILES['image_3']
+            if not validation.invalid_image(request.FILES['image_3']):
+                editable.image_3 = request.FILES['image_3']
         if 'image_4' in request.FILES:
-            editable.image_4 = request.FILES['image_4']
+            if not validation.invalid_image(request.FILES['image_4']):
+                editable.image_4 = request.FILES['image_4']
         if 'image_5' in request.FILES:
-            editable.image_5 = request.FILES['image_5']
+            if not validation.invalid_image(request.FILES['image_5']):
+                editable.image_5 = request.FILES['image_5']
         if 'summary' in request.POST:
             editable.summary = request.POST['summary']
         if 'content' in request.POST:
@@ -396,6 +401,7 @@ def manage_products_edit_save(request, product_id):
             False)
         editable.is_published = (
             True if 'is_published' in request.POST else False)
+
         editable.save()
         return redirect('manage_products')
     return redirect('manage_products')
@@ -415,6 +421,11 @@ def manage_products_new(request):
             'cart_list': utils.get_cart_list(request)}
 
         if request.method == 'POST':
+            status = validation.invalid_image(request.FILES['image_1'])
+            if status:
+                context['new_product_status'] = status
+                return render(request, 'manage_products_new.html', context)
+
             new_product = models.ModelProduct.objects.create(
                 user=request.user,
                 title=request.POST['title'],
