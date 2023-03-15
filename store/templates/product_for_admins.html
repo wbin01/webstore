@@ -188,7 +188,7 @@
 
       </div>
 
-      <form action="{% url 'product_cart' product.id %}" method="post" class="position-absolute bottom-0">
+      <form action="{% url 'product' product.title_for_url product.id %}" method="post" class="position-absolute bottom-0">
         {% csrf_token %}
         <p class="text-muted my-0 py-0 ms-1 mb-2 fw-light">
           {% if product.available_quantity_display %}

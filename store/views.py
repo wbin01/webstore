@@ -746,6 +746,19 @@ def product(request, product_url_title, product_id):
     if not request.user.is_authenticated:
         return render(request, 'product_for_visitors.html', context)
 
+    if request.method == 'POST':
+        cart_item = utils.get_cart(request, model_product)
+
+        if 'buy' in request.POST:
+            if not cart_item:
+                __create_cart_item(request.user.id, model_product)
+            return redirect('cart')
+
+        if cart_item:
+            cart_item.delete()
+        else:
+            __create_cart_item(request.user.id, model_product)
+
     profile = utils.get_user_profile(request)
     context['user_profile'] = profile
     context['favorite'] = utils.get_favorite(request, model_product)
@@ -753,31 +766,8 @@ def product(request, product_url_title, product_id):
 
     if not profile.is_admin and not profile.is_superuser:
         return render(request, 'product_for_users.html', context)
-
     if profile.is_admin or profile.is_superuser:
         return render(request, 'product_for_admins.html', context)
-
-
-def product_cart(request, product_id):
-    if not request.user.is_authenticated:
-        return redirect('index')
-
-    model_product = models.ModelProduct.objects.get(pk=product_id)
-
-    if request.method == 'POST':
-        cart_item = utils.get_cart(request, model_product)
-
-        if 'buy' in request.POST:
-            if not cart_item:
-                __create_cart_item(request.user.id, model_product)
-                return redirect('cart')
-
-        if cart_item:
-            cart_item.delete()
-        else:
-            __create_cart_item(request.user.id, model_product)
-
-    return redirect('product', model_product.title_for_url, model_product.id)
 
 
 def product_favorite(request, product_id):
