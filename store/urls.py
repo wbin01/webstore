@@ -9,8 +9,6 @@ load_dotenv()
 ADMIN_ROUTE = os.getenv('ADMIN_ROUTE')
 
 urlpatterns = [
-    path('buy/<int:product_id>/',
-         buy, name='buy'),
     path('cart/',
          cart, name='cart'),
     path('cart_edit/<int:cart_id>/',

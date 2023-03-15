@@ -14,28 +14,6 @@ import store.validation as validation
 import store.utils as utils
 
 
-def buy(request, product_id):
-    if not request.user.is_authenticated:
-        return redirect('index')
-
-    model_product = models.ModelProduct.objects.get(pk=product_id)
-
-    cart_item = utils.get_cart(request, model_product)
-    if not cart_item:
-        new_product = models.ModelProduct.objects.get(pk=product_id)
-        cart_item = models.ModelCart.objects.create(
-            user=get_object_or_404(User, pk=request.user.id),
-            product=new_product,
-            times_split_num=1,
-            times_split_unit=new_product.price,
-            times_split_pprint='1x ' + new_product.price_pprint,
-            quantity=1,
-            total_price=new_product.price,
-            total_price_pprint=new_product.price_pprint)
-        cart_item.save()
-    return redirect('cart')
-
-
 def cart(request):
     if not request.user.is_authenticated:
         return redirect('index')
@@ -754,8 +732,8 @@ def manage_users_new(request):
 
 def product(request, product_url_title, product_id):
     logging.info(product_url_title)
-    model_product = models.ModelProduct.objects.get(pk=product_id)
 
+    model_product = models.ModelProduct.objects.get(pk=product_id)
     context = {
         'store_profile': utils.get_store_profile(),
         'product': model_product,
@@ -768,18 +746,16 @@ def product(request, product_url_title, product_id):
     if not request.user.is_authenticated:
         return render(request, 'product_for_visitors.html', context)
 
-    if request.user.is_authenticated:
-        profile = utils.get_user_profile(request)
-        context['user_profile'] = profile
+    profile = utils.get_user_profile(request)
+    context['user_profile'] = profile
+    context['favorite'] = utils.get_favorite(request, model_product)
+    context['cart'] = utils.get_cart(request, model_product)
 
-        context['favorite'] = utils.get_favorite(request, model_product)
-        context['cart'] = utils.get_cart(request, model_product)
+    if not profile.is_admin and not profile.is_superuser:
+        return render(request, 'product_for_users.html', context)
 
-        if not profile.is_admin and not profile.is_superuser:
-            return render(request, 'product_for_users.html', context)
-
-        if profile.is_admin or profile.is_superuser:
-            return render(request, 'product_for_admins.html', context)
+    if profile.is_admin or profile.is_superuser:
+        return render(request, 'product_for_admins.html', context)
 
 
 def product_cart(request, product_id):
@@ -789,24 +765,17 @@ def product_cart(request, product_id):
     model_product = models.ModelProduct.objects.get(pk=product_id)
 
     if request.method == 'POST':
-        if 'buy' in request.POST:
-            return redirect('buy', product_id)
-
         cart_item = utils.get_cart(request, model_product)
+
+        if 'buy' in request.POST:
+            if not cart_item:
+                __create_cart_item(request.user.id, model_product)
+                return redirect('cart')
+
         if cart_item:
             cart_item.delete()
         else:
-            new_product = models.ModelProduct.objects.get(pk=product_id)
-            cart_item = models.ModelCart.objects.create(
-                user=get_object_or_404(User, pk=request.user.id),
-                product=new_product,
-                times_split_num=1,
-                times_split_unit=new_product.price,
-                times_split_pprint='1x ' + new_product.price_pprint,
-                quantity=1,
-                total_price=new_product.price,
-                total_price_pprint=new_product.price_pprint)
-            cart_item.save()
+            __create_cart_item(request.user.id, model_product)
 
     return redirect('product', model_product.title_for_url, model_product.id)
 
@@ -970,3 +939,16 @@ def __create_new_user(request) -> str:
     profile.save()
 
     return 'success'
+
+
+def __create_cart_item(user_id, model_product) -> None:
+    cart_item = models.ModelCart.objects.create(
+        user=get_object_or_404(User, pk=user_id),
+        product=model_product,
+        times_split_num=1,
+        times_split_unit=model_product.price,
+        times_split_pprint='1x ' + model_product.price_pprint,
+        quantity=1,
+        total_price=model_product.price,
+        total_price_pprint=model_product.price_pprint)
+    cart_item.save()
