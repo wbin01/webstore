@@ -11,8 +11,6 @@ ADMIN_ROUTE = os.getenv('ADMIN_ROUTE')
 urlpatterns = [
     path('cart/',
          cart, name='cart'),
-    path('cart_edit/<int:cart_id>/',
-         cart_edit, name='cart_edit'),
     path('cart_remove/<int:product_id>/',
          cart_remove, name='cart_remove'),
     path('cart_favorite/<int:product_id>/',

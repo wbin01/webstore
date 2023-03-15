@@ -109,8 +109,9 @@
               <img src="{{ cart.product.image_1.url }}" class="img-thumbnail" style="width:85px;">
               <span class="fs-4">{{ cart.product.price_pprint }}</span>
 
-              <form action="{% url 'cart_edit' cart.id %}" method="post">
+              <form action="{% url 'cart' %}" method="post">
                 {% csrf_token %}
+                <input type="hidden" id="edit" name="edit" value="{{ cart.id }}">
                 <div class="input-group my-3" style="width: 410px;">
                   <span class="input-group-text fw-light" style="width: 110px;">Quantidade</span>
                   <input type="number" id="quantity" name="quantity" class="form-control text-center" step="1" value="{{ cart.quantity }}" min="1" max="{{ cart.product.max_quantity_per_sale }}">

@@ -43,54 +43,46 @@ def cart(request):
         'len_total_price_split_list': len(total_price_split_list),
         'total_price_split_list_pprint': total_price_split_list_pprint}
 
-    if not profile:
-        return redirect('index')
-
-    if profile:
-        # if profile.is_admin:
-        #     return redirect('index')
-        # if not profile.is_admin:
-        #     return render(request, 'cart.html', context)
+    if request.method != 'POST':
         return render(request, 'cart.html', context)
 
-
-def cart_edit(request, cart_id):
-    if not request.user.is_authenticated:
-        return redirect('index')
-
-    if request.method == 'POST':
-        cart_item = models.ModelCart.objects.get(pk=cart_id)
-        cart_product = models.ModelProduct.objects.get(pk=cart_item.product.id)
-
-        quantity = int(request.POST['quantity'])
-        cart_item.quantity = quantity
-
-        times_split_num = int(request.POST['times_split_num'])
-        cart_item.times_split_num = times_split_num
-
-        times_split_unit = utils.cart_edit_times_split_unit(
-            cart_product.price,
-            quantity,
-            times_split_num,
-            cart_product.times_split_interest)
-        cart_item.times_split_unit = times_split_unit
-
-        cart_item.times_split_pprint = utils.cart_edit_times_split_pprint(
-            times_split_num,
-            times_split_unit)
-
-        total_price = utils.cart_edit_total_price(
-            cart_product.price,
-            quantity,
-            cart_product.times_split_interest,
-            times_split_num)
-        cart_item.total_price = total_price
-
-        cart_item.total_price_pprint = utils.cart_edit_total_price_pprint(
-            total_price)
-
-        cart_item.save()
+    if 'edit' in request.POST:
+        __cart_edit(request)
     return redirect('cart')
+
+
+def __cart_edit(request):
+    cart_item = models.ModelCart.objects.get(pk=request.POST['edit'])
+    cart_product = models.ModelProduct.objects.get(pk=cart_item.product.id)
+
+    quantity = int(request.POST['quantity'])
+    cart_item.quantity = quantity
+
+    times_split_num = int(request.POST['times_split_num'])
+    cart_item.times_split_num = times_split_num
+
+    times_split_unit = utils.cart_edit_times_split_unit(
+        cart_product.price,
+        quantity,
+        times_split_num,
+        cart_product.times_split_interest)
+    cart_item.times_split_unit = times_split_unit
+
+    cart_item.times_split_pprint = utils.cart_edit_times_split_pprint(
+        times_split_num,
+        times_split_unit)
+
+    total_price = utils.cart_edit_total_price(
+        cart_product.price,
+        quantity,
+        cart_product.times_split_interest,
+        times_split_num)
+    cart_item.total_price = total_price
+
+    cart_item.total_price_pprint = utils.cart_edit_total_price_pprint(
+        total_price)
+
+    cart_item.save()
 
 
 def cart_favorite(request, product_id):
