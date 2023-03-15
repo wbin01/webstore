@@ -680,7 +680,8 @@ def __manage_users_edit_save(request, edit_user, edit_user_profile) -> None:
     if 'password_confirm' in request.POST:
         password = request.POST['password_confirm']
         password = None if not password else password
-        edit_user.set_password(password)
+        if password:
+            edit_user.set_password(password)
     edit_user.save()
 
     if 'profile_image' in request.FILES:
@@ -822,6 +823,8 @@ def signup(request):
 def user_dashboard(request, username):
     logging.info(username)
     if not request.user.is_authenticated:
+        return redirect('index')
+    if request.user.username != username:
         return redirect('index')
 
     profile = utils.get_user_profile(request)

@@ -56,13 +56,13 @@
   <!-- CARD -->
   {% if users %}
   <div class="container mt-2">
-    <div class="row row-cols-1 row-cols-md-4 g-4">
+    <div class="row row-cols-1 row-cols-md-3 g-3">
       {% for user in users %}
       {% if not user.is_admin %}
       <div class="col">
           <div class="bg-white h-100 border-0 shadow-sm rounded">
-            <div class="row gap-4 gap-4">
-              <div class="col position-relative m-2" style="max-width: 55px;">
+            <div class="row">
+              <div class="col position-relative m-2" style="max-width: 50px;">
                 {% if user.profile_image %}
                 <img src="{{ user.profile_image.url }}" alt="..." style="height: 50px;" class="rounded border">
                 {% else %}
@@ -72,11 +72,11 @@
                 {% endif %}
               </div>
 
-              <div class="col position-relative">
-                <p class="position-absolute start-0 top-50 translate-middle ms-2">{{ user.user.first_name }}</p>
+              <div class="col position-relative text-truncate pt-3">
+                <span class="start-0 top-50">{{ user.user.first_name }}</span>
               </div>
 
-              <div class="col position-relative">
+              <div class="col position-relative" style="max-width: 50px;">
                 <a href="{% url 'manage_users_edit' user.user.username user.id %}" role="button" class="btn btn-danger position-absolute end-0 top-50 translate-middle">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen-fill" viewBox="0 0 16 16">
                     <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/>

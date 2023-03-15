@@ -46,6 +46,23 @@
             <label for="{{ field.id_for_label }}">{{ field.label | safe }}</label>
             <div style="max-width: 100px;">{{ field }}</div>
           </div>
+
+          {% elif field.name == 'profile_image' %}
+          <div class="form-group mt-3">
+            <label for="{{ field.id_for_label }}">{{ field.label | safe }}</label>
+            {% if user_profile.profile_image %}
+              <div class="row">
+                <div class="col" style="max-width: 50px;">
+                  <img src="{{ user_profile.profile_image.url }}" class="rounded">
+                </div>
+                <div class="col">{{ field }}</div>
+              </div>
+            <p>[°] Perfil sem imagem</p>
+            {% else %}
+            {{ field }}
+            {% endif %}
+          </div>
+
           {% else %}
           <div class="form-group mt-3">
             <label for="{{ field.id_for_label }}">{{ field.label | safe }}</label>{{ field }}
