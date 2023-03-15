@@ -50,6 +50,6 @@ urlpatterns = [
          search_tag, name='search_tag'),
     path('signup/',
          signup, name='signup'),
-    path('<str:username>/<str:status>/',
+    path('<str:username>/',
          user_dashboard, name='user_dashboard'),
 ]

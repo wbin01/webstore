@@ -517,13 +517,6 @@ def manage_store(request):
         'manage_url': True,
         'form': form_store_profile}
 
-    """
-    context['warning'] = __manage_products_get_warning(request)
-    if context['warning']:
-        return render(request, 'manage_products_edit.html', context)
-    __manage_products_edit_save(request, product_id)
-    return redirect('manage_products')
-    """
     if request.method != 'POST':
         return render(request, 'manage_store.html', context)
 
@@ -669,12 +662,19 @@ def __manage_users_get_warning(request, edit_user) -> str | None:
 
     if 'username' in request.POST:
         username = request.POST['username']
-        if not validation.available_username(edit_user, username):
-            warning = 'O nome de usuário fornecido já está sendo usado'
+        if username != edit_user.username:
+            if not validation.available_username(edit_user, username):
+                warning = 'O nome de usuário fornecido já está sendo usado'
+            if not warning:
+                warning = validation.invalid_username(username)
 
     if 'email' in request.POST:
-        if not validation.available_email(edit_user, request.POST['email']):
-            warning = 'O email fornecido já está sendo usado'
+        email = request.POST['email']
+        if email != edit_user.email:
+            if not validation.available_email(edit_user, email):
+                warning = 'O email fornecido já está sendo usado'
+            if not warning:
+                warning = validation.invalid_email(email)
 
     if 'password_confirm' in request.POST:
         password = request.POST['password_confirm']
@@ -834,15 +834,15 @@ def signup(request):
             return redirect('login')
 
 
-def user_dashboard(request, username, status):
+def user_dashboard(request, username):
     logging.info(username)
-
     if not request.user.is_authenticated:
         return redirect('index')
 
     profile = utils.get_user_profile(request)
-    # if profile.is_admin:  # REVISÃO
-    #     return redirect('index')
+    if profile.is_admin:
+        return redirect('index')
+
     form_user = forms.FormUserDashboard(
         initial={
             'name': profile.user.first_name,
@@ -854,17 +854,83 @@ def user_dashboard(request, username, status):
         initial={
             # 'profile_image': profile.profile_image,
             'is_blocked': profile.is_blocked})
-
-    # if profile.is_admin:
     context = {
         'store_profile': utils.get_store_profile(),
         'user_profile': profile,
         'form_user': form_user,
         'form_user_profile': form_user_profile,
-        'form_status': None if status == 'dashboard' else status,
+        'warning': None,
         'cart_list': utils.get_cart_list(request)}
 
-    return render(request, 'user_dashboard.html', context)
+    if request.method != 'POST':
+        return render(request, 'user_dashboard.html', context)
+
+    context['warning'] = __manage_user_dashboard_warning(request)
+    if context['warning']:
+        return render(request, 'user_dashboard.html', context)
+
+    __manage_user_dashboard_save(request, profile)
+    return redirect('user_dashboard', request.user.username)
+
+
+def __manage_user_dashboard_warning(request) -> str | None:
+    warning = None
+    if 'profile_image' in request.FILES:
+        warning = validation.invalid_image(request.FILES['profile_image'])
+
+    if 'username' in request.POST:
+        username = request.POST['username']
+        if username != request.user.username:
+            if not validation.available_username(request.user, username):
+                warning = 'O nome de usuário fornecido já está sendo usado'
+            if not warning:
+                warning = validation.invalid_username(username)
+
+    if 'email' in request.POST:
+        email = request.POST['email']
+        if email != request.user.email:
+            if not validation.available_email(request.user, email):
+                warning = 'O email fornecido já está sendo usado'
+            if not warning:
+                warning = validation.invalid_email(email)
+
+    if 'password' in request.POST and 'password_confirm' in request.POST:
+        password = request.POST['password']
+        password = None if not password else password
+
+        password_confirm = request.POST['password_confirm']
+        password_confirm = None if not password_confirm else password_confirm
+
+        if password and password_confirm:
+            warning = validation.invalid_password(password, password_confirm)
+        elif password_confirm and not password:
+            warning = 'Coloque a senha atual'
+
+    return warning
+
+
+def __manage_user_dashboard_save(request, profile) -> None:
+    if 'name' in request.POST:
+        request.user.first_name = request.POST['name']
+    if 'username' in request.POST:
+        request.user.username = request.POST['username']
+    if 'email' in request.POST:
+        request.user.email = request.POST['email']
+    if 'password' in request.POST and 'password_confirm' in request.POST:
+        password = request.POST['password']
+        password = None if not password else password
+        password_confirm = request.POST['password_confirm']
+        password_confirm = None if not password_confirm else password_confirm
+        if password and password_confirm:
+            request.user.set_password(password)
+
+    request.user.save()
+
+    if 'profile_image' in request.FILES:
+        profile.profile_image = request.FILES['profile_image']
+    profile.is_blocked = (
+        True if 'is_blocked' in request.POST else False)
+    profile.save()
 
 
 def __create_new_user(request) -> str:

@@ -6,15 +6,15 @@
     <h1 class="text-center">Perfil</h1>
 
       <div style="height: 30px;">
-      {% if form_status %}
-      <p class="text-center bg-danger-subtle text-danger border border-danger-subtle px-2 rounded-3">
-        {{ form_status }}
+      {% if warning %}
+      <p class="bg-danger-subtle text-danger border border-danger-subtle px-2 rounded-3">
+        {{ warning }}
       </p>
       {% endif %}
       </div>
 
       <div class="form-group shadow-sm bg-white px-4 py-2 rounded-2 bg-opacity-50">
-      <form action="#" method="post" enctype="multipart/form-data">
+      <form action="{% url 'user_dashboard' user_profile.user.username %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
 
         <!-- User Form -->
