@@ -748,16 +748,21 @@ def product(request, product_url_title, product_id):
 
     if request.method == 'POST':
         cart_item = utils.get_cart(request, model_product)
-
         if 'buy' in request.POST:
             if not cart_item:
                 __create_cart_item(request.user.id, model_product)
             return redirect('cart')
 
-        if cart_item:
-            cart_item.delete()
-        else:
+        if 'add_favorite' in request.POST:
+            __create_favorite_item(request.user.id, model_product)
+        elif 'remove_favorite' in request.POST:
+            fav_item = utils.get_favorite(request, model_product)
+            fav_item.delete()
+
+        elif 'add_cart' in request.POST:
             __create_cart_item(request.user.id, model_product)
+        elif 'remove_cart' in request.POST:
+            cart_item.delete()
 
     profile = utils.get_user_profile(request)
     context['user_profile'] = profile
@@ -768,24 +773,6 @@ def product(request, product_url_title, product_id):
         return render(request, 'product_for_users.html', context)
     if profile.is_admin or profile.is_superuser:
         return render(request, 'product_for_admins.html', context)
-
-
-def product_favorite(request, product_id):
-    if not request.user.is_authenticated:
-        return redirect('index')
-
-    model_product = models.ModelProduct.objects.get(pk=product_id)
-
-    fav = utils.get_favorite(request, model_product)
-    if fav:
-        fav.delete()
-    else:
-        fav = models.ModelFavorite.objects.create(
-            user=get_object_or_404(User, pk=request.user.id),
-            product=model_product)
-        fav.save()
-
-    return redirect('product', model_product.title_for_url, model_product.id)
 
 
 def search(request):
@@ -942,3 +929,10 @@ def __create_cart_item(user_id, model_product) -> None:
         total_price=model_product.price,
         total_price_pprint=model_product.price_pprint)
     cart_item.save()
+
+
+def __create_favorite_item(user_id, model_product) -> None:
+    fav = models.ModelFavorite.objects.create(
+        user=get_object_or_404(User, pk=user_id),
+        product=model_product)
+    fav.save()

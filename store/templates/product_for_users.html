@@ -145,29 +145,28 @@
         </svg> Frete grátis
       </p>
       {% endif %}
-      <div style="height: 200px;">
-        <!-- Salvar -->
-        <p>
-        {% if favorite %}
-        <a href="{% url 'product_favorite' product.id %}" class="btn btn-white py-0 px-0 mx-0 my-0 text-danger border-0" role="button">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
-          <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
-        </svg>
-        </a>
-        {% else %}
-        <a href="{% url 'product_favorite' product.id %}" class="btn btn-white py-0 px-0 mx-0 my-0 border-0" role="button">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
-          <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
-        </svg>
-        </a>
-        {% endif %}
-        </p>
-      </div>
       </div>
 
-
+      <div style="height: 200px;"></div>
       <form action="{% url 'product' product.title_for_url product.id %}" method="post" class="position-absolute bottom-0">
         {% csrf_token %}
+
+        <div class="mx-1" style="height: 50px;">
+          {% if favorite %}
+          <button type="submit" class="btn btn-white py-0 px-0 mx-0 my-0 text-danger border-0" name="remove_favorite">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+          </svg>
+          </button>
+          {% else %}
+          <button type="submit" class="btn btn-white py-0 px-0 mx-0 my-0 border-0" name="add_favorite">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+            <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+          </svg>
+          </button>
+          {% endif %}
+        </div>
+
         <p class="text-muted my-0 py-0 ms-1 mb-2 fw-light">
           {% if product.available_quantity_display %}
           {{ product.available_quantity }} {% if product.available_quantity == 1 %}disponível{% else %}disponíveis{% endif %}

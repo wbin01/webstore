@@ -44,8 +44,6 @@ urlpatterns = [
          manage_users_new, name='manage_users_new'),
     path('product/<str:product_url_title>:<int:product_id>/',
          product, name='product'),
-    path('product_favorite/<int:product_id>/',
-         product_favorite, name='product_favorite'),
     path('search/',
          search, name='search'),
     path('search_tag/',
