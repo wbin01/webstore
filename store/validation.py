@@ -38,7 +38,10 @@ def invalid_email(email: str) -> str | None:
 
 
 def invalid_password(password: str, password_confirm: str) -> str | None:
-    if len(password) < 8:
+    if password == '' or password_confirm == '':
+        return None
+
+    if password and len(password) < 8:
         return 'Senha muito pequena, precisa ter 8 ou mais caracteres'
 
     found_lowercase_in_password = False

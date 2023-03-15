@@ -279,6 +279,90 @@ def manage_products(request):
     return redirect('index')
 
 
+def manage_products_new(request):
+    if not request.user.is_authenticated:
+        return redirect('index')
+
+    profile = utils.get_user_profile(request)
+    if profile.is_admin:
+        context = {
+            'store_profile': utils.get_store_profile(),
+            'user_profile': profile,
+            'form': forms.FormProductNew,
+            'new_product_status': None,
+            'cart_list': utils.get_cart_list(request)}
+
+        if request.method == 'POST':
+            status = validation.invalid_image(request.FILES['image_1'])
+            if status:
+                context['new_product_status'] = status
+                return render(request, 'manage_products_new.html', context)
+
+            new_product = models.ModelProduct.objects.create(
+                user=request.user,
+                title=request.POST['title'],
+                title_for_card=utils.product_title_for_card(
+                    request.POST['title']),
+                title_for_url=utils.product_title_for_url(
+                    request.POST['title']),
+                price=float(
+                    request.POST['price']),
+                price_pprint=utils.product_price_pprint(
+                    request.POST['price']),
+                price_old=float(
+                    request.POST['price']),
+                price_old_pprint=utils.product_price_pprint(
+                    request.POST['price']),
+                price_off=utils.product_price_off(
+                    request.POST['price'], request.POST['price']),
+                price_off_pprint=utils.product_price_off_pprint(
+                    request.POST['price'], request.POST['price']),
+                price_off_display=(
+                    True if 'price_off_display' in request.POST else False),
+                times_split_num=int(
+                    request.POST['times_split_num']),
+                times_split_interest=int(
+                    request.POST['times_split_interest']),
+                times_split_unit=utils.product_times_split_unit(
+                    request.POST['price'],
+                    request.POST['times_split_num'],
+                    request.POST['times_split_interest']),
+                times_split_pprint=utils.product_times_split_pprint(
+                    request.POST['price'],
+                    request.POST['times_split_num'],
+                    request.POST['times_split_interest']),
+                shipping_price=float(
+                    request.POST['shipping_price']),
+                shipping_price_pprint=utils.product_shipping_price_pprint(
+                    request.POST['shipping_price']),
+                available_quantity=int(
+                    request.POST['available_quantity']),
+                available_quantity_display=(
+                    True if 'available_quantity_display' in request.POST else
+                    False),
+                max_quantity_per_sale=utils.product_max_quantity_per_sale(
+                    request.POST['available_quantity'],
+                    request.POST['max_quantity_per_sale']),
+                image_1=request.FILES['image_1'],
+                image_2=request.FILES.get('image_2', None),
+                image_3=request.FILES.get('image_3', None),
+                image_4=request.FILES.get('image_4', None),
+                image_5=request.FILES.get('image_5', None),
+                summary=request.POST['summary'],
+                content=request.POST['content'],
+                tags=request.POST['tags'],
+                publication_date=timezone.now(),
+                is_published=(
+                    True if 'is_published' in request.POST else False))
+
+            new_product.save()
+            return redirect('manage_products')
+
+        return render(request, 'manage_products_new.html', context)
+
+    return redirect('index')
+
+
 def manage_products_edit(request, product_url_title, product_id):
     logging.info(product_url_title)
     if not request.user.is_authenticated:
@@ -418,90 +502,6 @@ def __manage_products_edit_save(request, product_id) -> None:
     editable.save()
 
 
-def manage_products_new(request):
-    if not request.user.is_authenticated:
-        return redirect('index')
-
-    profile = utils.get_user_profile(request)
-    if profile.is_admin:
-        context = {
-            'store_profile': utils.get_store_profile(),
-            'user_profile': profile,
-            'form': forms.FormProductNew,
-            'new_product_status': None,
-            'cart_list': utils.get_cart_list(request)}
-
-        if request.method == 'POST':
-            status = validation.invalid_image(request.FILES['image_1'])
-            if status:
-                context['new_product_status'] = status
-                return render(request, 'manage_products_new.html', context)
-
-            new_product = models.ModelProduct.objects.create(
-                user=request.user,
-                title=request.POST['title'],
-                title_for_card=utils.product_title_for_card(
-                    request.POST['title']),
-                title_for_url=utils.product_title_for_url(
-                    request.POST['title']),
-                price=float(
-                    request.POST['price']),
-                price_pprint=utils.product_price_pprint(
-                    request.POST['price']),
-                price_old=float(
-                    request.POST['price']),
-                price_old_pprint=utils.product_price_pprint(
-                    request.POST['price']),
-                price_off=utils.product_price_off(
-                    request.POST['price'], request.POST['price']),
-                price_off_pprint=utils.product_price_off_pprint(
-                    request.POST['price'], request.POST['price']),
-                price_off_display=(
-                    True if 'price_off_display' in request.POST else False),
-                times_split_num=int(
-                    request.POST['times_split_num']),
-                times_split_interest=int(
-                    request.POST['times_split_interest']),
-                times_split_unit=utils.product_times_split_unit(
-                    request.POST['price'],
-                    request.POST['times_split_num'],
-                    request.POST['times_split_interest']),
-                times_split_pprint=utils.product_times_split_pprint(
-                    request.POST['price'],
-                    request.POST['times_split_num'],
-                    request.POST['times_split_interest']),
-                shipping_price=float(
-                    request.POST['shipping_price']),
-                shipping_price_pprint=utils.product_shipping_price_pprint(
-                    request.POST['shipping_price']),
-                available_quantity=int(
-                    request.POST['available_quantity']),
-                available_quantity_display=(
-                    True if 'available_quantity_display' in request.POST else
-                    False),
-                max_quantity_per_sale=utils.product_max_quantity_per_sale(
-                    request.POST['available_quantity'],
-                    request.POST['max_quantity_per_sale']),
-                image_1=request.FILES['image_1'],
-                image_2=request.FILES.get('image_2', None),
-                image_3=request.FILES.get('image_3', None),
-                image_4=request.FILES.get('image_4', None),
-                image_5=request.FILES.get('image_5', None),
-                summary=request.POST['summary'],
-                content=request.POST['content'],
-                tags=request.POST['tags'],
-                publication_date=timezone.now(),
-                is_published=(
-                    True if 'is_published' in request.POST else False))
-
-            new_product.save()
-            return redirect('manage_products')
-
-        return render(request, 'manage_products_new.html', context)
-
-    return redirect('index')
-
-
 def manage_store(request):
     if not request.user.is_authenticated:
         return redirect('index')
@@ -627,9 +627,8 @@ def manage_users(request):
     return redirect('index')
 
 
-def manage_users_edit(request, user_username, user_profile_id, status):
+def manage_users_edit(request, user_username, user_profile_id):
     logging.info(user_username)
-
     if not request.user.is_authenticated:
         return redirect('index')
 
@@ -638,6 +637,7 @@ def manage_users_edit(request, user_username, user_profile_id, status):
         return redirect('index')
 
     edit_user_profile = models.ModelUserProfile.objects.get(pk=user_profile_id)
+    edit_user = get_object_or_404(User, pk=edit_user_profile.user.id)
     form_user = forms.FormUserEdit(
         initial={
             'name': edit_user_profile.user.first_name,
@@ -650,74 +650,66 @@ def manage_users_edit(request, user_username, user_profile_id, status):
             'is_blocked': edit_user_profile.is_blocked,
         }
     )
+    context = {
+        'store_profile': utils.get_store_profile(),
+        'user_profile': profile,
+        'edit_user_profile': edit_user_profile,
+        'form_user': form_user,
+        'form_user_profile': form_user_profile,
+        'warning': None,
+        'cart_list': utils.get_cart_list(request)}
 
-    if profile.is_admin:
-        context = {
-            'store_profile': utils.get_store_profile(),
-            'user_profile': profile,
-            'edit_user_profile': edit_user_profile,
-            'form_user': form_user,
-            'form_user_profile': form_user_profile,
-            'form_status': None if status == '_' else status,
-            'cart_list': utils.get_cart_list(request)}
-
+    if request.method != 'POST':
         return render(request, 'manage_users_edit.html', context)
+
+    context['warning'] = __manage_users_get_warning(request, edit_user)
+    if context['warning']:
+        return render(request, 'manage_users_edit.html', context)
+    __manage_users_edit_save(request, edit_user, edit_user_profile)
     return redirect('manage_users')
 
 
-def manage_users_edit_save(request, edit_user_profile_id):
-    if not request.user.is_authenticated:
-        return redirect('index')
+def __manage_users_get_warning(request, edit_user) -> str | None:
+    warning = None
+    if 'profile_image' in request.FILES:
+        warning = validation.invalid_image(request.FILES['profile_image'])
 
-    profile = utils.get_user_profile(request)
-    if not profile.is_admin:
-        return redirect('index')
+    if 'username' in request.POST:
+        username = request.POST['username']
+        if not validation.available_username(edit_user, username):
+            warning = 'O nome de usuário fornecido já está sendo usado'
 
-    if request.method == 'POST':
-        profile_id = edit_user_profile_id
-        edit_user_profile = models.ModelUserProfile.objects.get(pk=profile_id)
-        edit_user = get_object_or_404(User, pk=edit_user_profile.user.id)
-        status = None
+    if 'email' in request.POST:
+        if not validation.available_email(edit_user, request.POST['email']):
+            warning = 'O email fornecido já está sendo usado'
 
-        if 'profile_image' in request.FILES:
-            edit_user_profile.profile_image = request.FILES['profile_image']
-        edit_user_profile.is_blocked = (
-            True if 'is_blocked' in request.POST else False)
-        edit_user_profile.save()
+    if 'password_confirm' in request.POST:
+        password = request.POST['password_confirm']
+        password = None if not password else password
+        if password:
+            warning = validation.invalid_password(password, password)
 
-        if 'name' in request.POST:
-            edit_user.first_name = request.POST['name']
+    return warning
 
-        if 'username' in request.POST:
-            username = request.POST['username']
-            if not validation.available_username(edit_user, username):
-                status = 'O nome de usuário fornecido já está sendo usado'
-            else:
-                edit_user.username = username
 
-        if not status and 'email' in request.POST:
-            email = request.POST['email']
-            if not validation.available_email(edit_user, email):
-                status = 'O email fornecido já está sendo usado'
-            else:
-                edit_user.email = email
+def __manage_users_edit_save(request, edit_user, edit_user_profile) -> None:
+    if 'name' in request.POST:
+        edit_user.first_name = request.POST['name']
+    if 'username' in request.POST:
+        edit_user.username = request.POST['username']
+    if 'email' in request.POST:
+        edit_user.email = request.POST['email']
+    if 'password_confirm' in request.POST:
+        password = request.POST['password_confirm']
+        password = None if not password else password
+        edit_user.set_password(password)
+    edit_user.save()
 
-        password = (
-            request.POST['password_confirm']
-            if 'password_confirm' in request.POST else None)
-        if not status and password:
-            pass_err = validation.invalid_password(password, password)
-            if pass_err:
-                status = pass_err
-            else:
-                edit_user.set_password(password)
-
-        if status:
-            return redirect(
-                'manage_users_edit', edit_user.username, profile_id, status)
-
-        edit_user.save()
-    return redirect('manage_users')
+    if 'profile_image' in request.FILES:
+        edit_user_profile.profile_image = request.FILES['profile_image']
+    edit_user_profile.is_blocked = (
+        True if 'is_blocked' in request.POST else False)
+    edit_user_profile.save()
 
 
 def manage_users_new(request):
