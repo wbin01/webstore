@@ -37,8 +37,6 @@ urlpatterns = [
          manage_products_edit, name='manage_products_edit'),
     path('manage/store/',
          manage_store, name='manage_store'),
-    path('manage/store/save/',
-         manage_store_save, name='manage_store_save'),
     path('manage/users/',
          manage_users, name='manage_users'),
     path('manage/users/edit/'

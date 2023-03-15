@@ -507,95 +507,110 @@ def manage_store(request):
         return redirect('index')
 
     profile = utils.get_user_profile(request)
-    if profile.is_admin:
-        store_profile = utils.get_store_profile()
-        form_store_profile = forms.FormStoreProfile(
-            initial={
-                'brand_name': store_profile.brand_name,
-                'show_brand_name_on_nav': store_profile.show_brand_name_on_nav,
-                # 'brand_image': store_profile.brand_image,
-                'show_brand_image_on_nav': (
-                    store_profile.show_brand_image_on_nav),
-                'theme_color': store_profile.theme_color,
-                'theme_color_text': store_profile.theme_color_text,
-                'social_media_facebook': store_profile.social_media_facebook,
-                'social_media_whatsapp': store_profile.social_media_whatsapp,
-                'social_media_twitter': store_profile.social_media_twitter,
-                'social_media_youtube': store_profile.social_media_youtube,
-                'social_media_instagram': store_profile.social_media_instagram,
-                'social_media_twitch': store_profile.social_media_twitch,
-                'social_media_discord': store_profile.social_media_discord,
-                'social_media_linkedin': store_profile.social_media_linkedin,
-                'social_media_github': store_profile.social_media_github,
-                'social_media_other': store_profile.social_media_other})
-
-        context = {
-            'store_profile': store_profile,
-            'user_profile': profile,
-            'status': None,
-            'cart_list': utils.get_cart_list(request),
-            'manage_url': True,
-            'form': form_store_profile}
-
-        return render(request, 'manage_store.html', context)
-
-    return redirect('index')
-
-
-def manage_store_save(request):
-    if not request.user.is_authenticated:
+    if not profile.is_admin:
         return redirect('index')
 
     store_profile = utils.get_store_profile()
-    if request.method == 'POST':
-        if 'brand_name' in request.POST:
-            store_profile.brand_name = request.POST['brand_name']
-        store_profile.show_brand_name_on_nav = (
-            True if 'show_brand_name_on_nav' in request.POST else False)
+    form_store_profile = forms.FormStoreProfile(
+        initial={
+            'brand_name': store_profile.brand_name,
+            'show_brand_name_on_nav': store_profile.show_brand_name_on_nav,
+            # 'brand_image': store_profile.brand_image,
+            'show_brand_image_on_nav': (
+                store_profile.show_brand_image_on_nav),
+            'theme_color': store_profile.theme_color,
+            'theme_color_text': store_profile.theme_color_text,
+            'social_media_facebook': store_profile.social_media_facebook,
+            'social_media_whatsapp': store_profile.social_media_whatsapp,
+            'social_media_twitter': store_profile.social_media_twitter,
+            'social_media_youtube': store_profile.social_media_youtube,
+            'social_media_instagram': store_profile.social_media_instagram,
+            'social_media_twitch': store_profile.social_media_twitch,
+            'social_media_discord': store_profile.social_media_discord,
+            'social_media_linkedin': store_profile.social_media_linkedin,
+            'social_media_github': store_profile.social_media_github,
+            'social_media_other': store_profile.social_media_other})
 
-        if 'brand_image' in request.FILES:
-            store_profile.brand_image = request.FILES['brand_image']
-        store_profile.show_brand_image_on_nav = (
-            True if 'show_brand_image_on_nav' in request.POST else False)
+    context = {
+        'store_profile': store_profile,
+        'user_profile': profile,
+        'warning': None,
+        'cart_list': utils.get_cart_list(request),
+        'manage_url': True,
+        'form': form_store_profile}
 
-        if 'theme_color' in request.POST:
-            store_profile.theme_color = request.POST['theme_color']
+    """
+    context['warning'] = __manage_products_get_warning(request)
+    if context['warning']:
+        return render(request, 'manage_products_edit.html', context)
+    __manage_products_edit_save(request, product_id)
+    return redirect('manage_products')
+    """
+    if request.method != 'POST':
+        return render(request, 'manage_store.html', context)
 
-        if 'theme_color_text' in request.POST:
-            store_profile.theme_color_text = request.POST['theme_color_text']
-
-        if 'social_media_facebook' in request.POST:
-            store_profile.social_media_facebook = (
-                request.POST['social_media_facebook'])
-        if 'social_media_whatsapp' in request.POST:
-            store_profile.social_media_whatsapp = (
-                request.POST['social_media_whatsapp'])
-        if 'social_media_twitter' in request.POST:
-            store_profile.social_media_twitter = (
-                request.POST['social_media_twitter'])
-        if 'social_media_youtube' in request.POST:
-            store_profile.social_media_youtube = (
-                request.POST['social_media_youtube'])
-        if 'social_media_instagram' in request.POST:
-            store_profile.social_media_instagram = (
-                request.POST['social_media_instagram'])
-        if 'social_media_twitch' in request.POST:
-            store_profile.social_media_twitch = (
-                request.POST['social_media_twitch'])
-        if 'social_media_discord' in request.POST:
-            store_profile.social_media_discord = (
-                request.POST['social_media_discord'])
-        if 'social_media_linkedin' in request.POST:
-            store_profile.social_media_linkedin = (
-                request.POST['social_media_linkedin'])
-        if 'social_media_github' in request.POST:
-            store_profile.social_media_github = (
-                request.POST['social_media_github'])
-        if 'social_media_other' in request.POST:
-            store_profile.social_media_other = (
-                request.POST['social_media_other'])
-        store_profile.save()
+    context['warning'] = __manage_store_get_warning(request)
+    if context['warning']:
+        return render(request, 'manage_store.html', context)
+    __manage_store_save(request, store_profile)
     return redirect('manage_store')
+
+
+def __manage_store_get_warning(request) -> str | None:
+    warning = None
+    if 'brand_image' in request.FILES:
+        warning = validation.invalid_image(request.FILES['brand_image'])
+    return warning
+
+
+def __manage_store_save(request, store_profile):
+    if 'brand_name' in request.POST:
+        store_profile.brand_name = request.POST['brand_name']
+    store_profile.show_brand_name_on_nav = (
+        True if 'show_brand_name_on_nav' in request.POST else False)
+
+    if 'brand_image' in request.FILES:
+        store_profile.brand_image = request.FILES['brand_image']
+    store_profile.show_brand_image_on_nav = (
+        True if 'show_brand_image_on_nav' in request.POST else False)
+
+    if 'theme_color' in request.POST:
+        store_profile.theme_color = request.POST['theme_color']
+
+    if 'theme_color_text' in request.POST:
+        store_profile.theme_color_text = request.POST['theme_color_text']
+
+    if 'social_media_facebook' in request.POST:
+        store_profile.social_media_facebook = (
+            request.POST['social_media_facebook'])
+    if 'social_media_whatsapp' in request.POST:
+        store_profile.social_media_whatsapp = (
+            request.POST['social_media_whatsapp'])
+    if 'social_media_twitter' in request.POST:
+        store_profile.social_media_twitter = (
+            request.POST['social_media_twitter'])
+    if 'social_media_youtube' in request.POST:
+        store_profile.social_media_youtube = (
+            request.POST['social_media_youtube'])
+    if 'social_media_instagram' in request.POST:
+        store_profile.social_media_instagram = (
+            request.POST['social_media_instagram'])
+    if 'social_media_twitch' in request.POST:
+        store_profile.social_media_twitch = (
+            request.POST['social_media_twitch'])
+    if 'social_media_discord' in request.POST:
+        store_profile.social_media_discord = (
+            request.POST['social_media_discord'])
+    if 'social_media_linkedin' in request.POST:
+        store_profile.social_media_linkedin = (
+            request.POST['social_media_linkedin'])
+    if 'social_media_github' in request.POST:
+        store_profile.social_media_github = (
+            request.POST['social_media_github'])
+    if 'social_media_other' in request.POST:
+        store_profile.social_media_other = (
+            request.POST['social_media_other'])
+    store_profile.save()
 
 
 def manage_users(request):
