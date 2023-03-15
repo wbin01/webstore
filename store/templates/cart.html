@@ -39,19 +39,22 @@
             </p>
             <p class="fw-light my-0 py-0">
               <!-- FAVORITE BUTTON -->
-              {% if cart.product.id in favorite_product_id_list %}
-              <a href="{% url 'cart_favorite' cart.product.id %}" class="btn btn-white border-0 text-danger text-decoration-none" role="button">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
-              </svg>
-              </a>
-              {% else %}
-              <a href="{% url 'cart_favorite' cart.product.id %}" class="btn btn-white border-0 text-decoration-none" role="button">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
-                <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
-              </svg>
-              </a>
-              {% endif %}
+              <form action="{% url 'cart' %}" method="post">
+                {% csrf_token %}
+                {% if cart.product.id in favorite_product_id_list %}
+                <button type="submit" name="remove_from_favorites" value="{{ cart.product.id }}" class="btn btn-white border-0 text-danger text-decoration-none">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+                </svg>
+                </button>
+                {% else %}
+                <button type="submit" name="add_to_favorites" value="{{ cart.product.id }}" class="btn btn-white border-0 text-decoration-none">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+                  <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+                </svg>
+                </button>
+                {% endif %}
+              </form>
               <!-- REMOVE BUTTON -->
               <button class="btn btn-white border-0 text-decoration-none" data-bs-toggle="modal" data-bs-target="#remove{{ cart.product.id }}Modal">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
@@ -111,7 +114,7 @@
 
               <form action="{% url 'cart' %}" method="post">
                 {% csrf_token %}
-                <input type="hidden" id="edit" name="edit" value="{{ cart.id }}">
+                <input type="hidden" id="edit_item" name="edit_item" value="{{ cart.id }}">
                 <div class="input-group my-3" style="width: 410px;">
                   <span class="input-group-text fw-light" style="width: 110px;">Quantidade</span>
                   <input type="number" id="quantity" name="quantity" class="form-control text-center" step="1" value="{{ cart.quantity }}" min="1" max="{{ cart.product.max_quantity_per_sale }}">
@@ -149,7 +152,7 @@
 
               <form action="{% url 'cart' %}" method="post">
                 {% csrf_token %}
-                <input type="hidden" id="remove" name="remove" value="{{ cart.product.id }}">
+                <input type="hidden" id="remove_item" name="remove_item" value="{{ cart.product.id }}">
                 <div class="d-grid gap-2">
                   <button type="submit" class="btn btn-danger">Remover</button>
                 </div>

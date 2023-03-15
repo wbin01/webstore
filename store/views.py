@@ -46,15 +46,20 @@ def cart(request):
     if request.method != 'POST':
         return render(request, 'cart.html', context)
 
-    if 'edit' in request.POST:
-        __cart_edit(request)
-    elif 'remove' in request.POST:
-        __cart_remove(request)
+    if 'edit_item' in request.POST:
+        __cart_edit_item(request)
+    elif 'remove_item' in request.POST:
+        __cart_remove_item(request)
+    elif 'add_to_favorites' in request.POST:
+        __cart_add_to_favorites(request)
+    elif 'remove_from_favorites' in request.POST:
+        __cart_remove_from_favorites(request)
+
     return redirect('cart')
 
 
-def __cart_edit(request):
-    cart_item = models.ModelCart.objects.get(pk=request.POST['edit'])
+def __cart_edit_item(request):
+    cart_item = models.ModelCart.objects.get(pk=request.POST['edit_item'])
     cart_product = models.ModelProduct.objects.get(pk=cart_item.product.id)
 
     quantity = int(request.POST['quantity'])
@@ -87,27 +92,27 @@ def __cart_edit(request):
     cart_item.save()
 
 
-def cart_favorite(request, product_id):
-    if not request.user.is_authenticated:
-        return redirect('index')
-
-    model_product = models.ModelProduct.objects.get(pk=product_id)
-    fav = utils.get_favorite(request, model_product)
-    if fav:
-        fav.delete()
-    else:
-        fav = models.ModelFavorite.objects.create(
-            user=get_object_or_404(User, pk=request.user.id),
-            product=model_product)
-        fav.save()
-
-    return redirect('cart')
-
-
-def __cart_remove(request):
-    model_product = models.ModelProduct.objects.get(pk=request.POST['remove'])
+def __cart_remove_item(request):
+    model_product = models.ModelProduct.objects.get(
+        pk=request.POST['remove_item'])
     cart_item = utils.get_cart(request, model_product)
     cart_item.delete()
+
+
+def __cart_add_to_favorites(request):
+    favorite_item = models.ModelFavorite.objects.create(
+        user=get_object_or_404(User, pk=request.user.id),
+        product=models.ModelProduct.objects.get(
+            pk=request.POST['add_to_favorites']))
+    favorite_item.save()
+
+
+def __cart_remove_from_favorites(request):
+    favorite_item = utils.get_favorite(
+        request, models.ModelProduct.objects.get(
+            pk=request.POST['remove_from_favorites']))
+    if favorite_item:
+        favorite_item.delete()
 
 
 def favorite(request):
