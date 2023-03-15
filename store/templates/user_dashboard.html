@@ -51,19 +51,24 @@
           <div class="form-group mt-3">
             <label for="{{ field.id_for_label }}">{{ field.label | safe }}</label>
             {% if user_profile.profile_image %}
-              <div class="row">
-                <div class="col" style="max-width: 50px;">
-                  <img src="{{ user_profile.profile_image.url }}" class="rounded">
-                </div>
-                <div class="col">{{ field }}</div>
+            <div class="row">
+              <div class="col" style="max-width: 50px;">
+                <img src="{{ user_profile.profile_image.url }}" class="rounded">
               </div>
-            <p>[°] Perfil sem imagem</p>
+              <div class="col">{{ field }}</div>
+            </div>
+
+            <input class="form-check-input" type="checkbox" value="" name="remove_image" id="remove_image">
+            <label class="form-check-label" for="remove_image">
+              &nbsp;Limpar imagem do perfil
+            </label>
+
             {% else %}
             {{ field }}
             {% endif %}
           </div>
-
           {% else %}
+
           <div class="form-group mt-3">
             <label for="{{ field.id_for_label }}">{{ field.label | safe }}</label>{{ field }}
           </div>

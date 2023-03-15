@@ -684,8 +684,16 @@ def __manage_users_edit_save(request, edit_user, edit_user_profile) -> None:
             edit_user.set_password(password)
     edit_user.save()
 
-    if 'profile_image' in request.FILES:
-        edit_user_profile.profile_image = request.FILES['profile_image']
+    # if 'profile_image' in request.FILES:
+    #     edit_user_profile.profile_image = request.FILES['profile_image']
+
+    remove_image = True if 'remove_image' in request.POST else False
+    if remove_image:
+        edit_user_profile.profile_image = None
+    else:
+        if 'profile_image' in request.FILES:
+            edit_user_profile.profile_image = request.FILES['profile_image']
+
     edit_user_profile.is_blocked = (
         True if 'is_blocked' in request.POST else False)
     edit_user_profile.save()
@@ -914,10 +922,13 @@ def __manage_user_dashboard_save(request, profile) -> None:
 
     request.user.save()
 
-    if 'profile_image' in request.FILES:
-        profile.profile_image = request.FILES['profile_image']
-    profile.is_blocked = (
-        True if 'is_blocked' in request.POST else False)
+    remove_image = True if 'remove_image' in request.POST else False
+    if remove_image:
+        profile.profile_image = None
+    else:
+        if 'profile_image' in request.FILES:
+            profile.profile_image = request.FILES['profile_image']
+
     profile.save()
 
 
