@@ -81,10 +81,10 @@ def invalid_password(password: str, password_confirm: str) -> str | None:
 
 def invalid_image(image) -> str | None:
     """..."""
-    msg_err = 'Use imagens com extesões ".jpg" ".png" ou ".jpeg"'
+    msg_err = "Use imagens com extesões 'jpg', 'png' ou 'jpeg'"
     if '.' not in image.name:
         return msg_err
-    if image.name.split('.')[-1] not in ['jpg', 'png', 'jpeg']:
+    if image.name.split('.')[-1].lower() not in ['jpg', 'png', 'jpeg']:
         return msg_err
     return None
 

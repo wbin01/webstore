@@ -280,10 +280,14 @@ def manage_products(request):
 
 
 def manage_products_edit(request, product_url_title, product_id):
+    logging.info(product_url_title)
     if not request.user.is_authenticated:
         return redirect('index')
 
-    logging.info(product_url_title)
+    profile = utils.get_user_profile(request)
+    if not profile.is_admin:
+        return redirect('index')
+
     post = models.ModelProduct.objects.get(pk=product_id)
     form = forms.FormProductNew(
         initial={
@@ -304,107 +308,114 @@ def manage_products_edit(request, product_url_title, product_id):
             'summary': post.summary,
             'content': post.content,
             'tags': post.tags,
-            'is_published': post.is_published,
-        })
-    profile = utils.get_user_profile(request)
-    if profile.is_admin:
-        context = {
-            'store_profile': utils.get_store_profile(),
-            'user_profile': profile,
-            'form': form,
-            'product': post,
-            'product_status': None,
-            'cart_list': utils.get_cart_list(request)}
+            'is_published': post.is_published})
+    context = {
+        'store_profile': utils.get_store_profile(),
+        'user_profile': profile,
+        'form': form,
+        'product': post,
+        'warning': None,
+        'cart_list': utils.get_cart_list(request)}
 
+    if request.method != 'POST':
         return render(request, 'manage_products_edit.html', context)
+
+    context['warning'] = __manage_products_get_warning(request)
+    if context['warning']:
+        return render(request, 'manage_products_edit.html', context)
+    __manage_products_edit_save(request, product_id)
     return redirect('manage_products')
 
 
-def manage_products_edit_save(request, product_id):
-    if not request.user.is_authenticated:
-        return redirect('index')
+def __manage_products_get_warning(request) -> str | None:
+    warning = None
+    for image in ['image_1', 'image_2', 'image_3', 'image_4', 'image_5']:
+        if image in request.FILES:
+            warning = validation.invalid_image(request.FILES[image])
+            if warning:
+                break
+    return warning
 
+
+def __manage_products_edit_save(request, product_id) -> None:
     editable = models.ModelProduct.objects.get(pk=product_id)
-    if request.method == 'POST':
-        if 'title' in request.POST:
-            editable.title = request.POST['title']
-            editable.title_for_card = utils.product_title_for_card(
-                request.POST['title'])
-        if 'price' in request.POST:
-            editable.price_old = editable.price
-            editable.price_old_pprint = utils.product_price_pprint(
-                str(editable.price))
-            editable.price = float(request.POST['price'])
-            editable.price_pprint = utils.product_price_pprint(
-                request.POST['price'])
-            editable.price_off = utils.product_price_off(
-                request.POST['price'], str(editable.price_old))
-            editable.price_off_pprint = utils.product_price_off_pprint(
-                request.POST['price'], str(editable.price_old))
-        if 'times_split_num' in request.POST:
-            editable.times_split_num = int(request.POST['times_split_num'])
-        if 'times_split_interest' in request.POST:
-            editable.times_split_interest = int(
-                request.POST['times_split_interest'])
-        if 'shipping_price' in request.POST:
-            editable.shipping_price = float(request.POST['shipping_price'])
-            editable.shipping_price_pprint = (
-                utils.product_shipping_price_pprint(
-                    request.POST['shipping_price']))
-        if 'available_quantity' in request.POST:
-            editable.available_quantity = int(
-                request.POST['available_quantity'])
-        if 'max_quantity_per_sale' in request.POST:
-            editable.max_quantity_per_sale = (
-                utils.product_max_quantity_per_sale(
-                    request.POST['available_quantity'],
-                    request.POST['max_quantity_per_sale']))
-        if 'image_1' in request.FILES:
-            if not validation.invalid_image(request.FILES['image_1']):
-                editable.image_1 = request.FILES['image_1']
-        if 'image_2' in request.FILES:
-            if not validation.invalid_image(request.FILES['image_2']):
-                editable.image_2 = request.FILES['image_2']
-        if 'image_3' in request.FILES:
-            if not validation.invalid_image(request.FILES['image_3']):
-                editable.image_3 = request.FILES['image_3']
-        if 'image_4' in request.FILES:
-            if not validation.invalid_image(request.FILES['image_4']):
-                editable.image_4 = request.FILES['image_4']
-        if 'image_5' in request.FILES:
-            if not validation.invalid_image(request.FILES['image_5']):
-                editable.image_5 = request.FILES['image_5']
-        if 'summary' in request.POST:
-            editable.summary = request.POST['summary']
-        if 'content' in request.POST:
-            editable.content = request.POST['content']
-        if 'tags' in request.POST:
-            editable.tags = request.POST['tags']
-        if ('price' not in request.POST or
-                'times_split_num' not in request.POST or
-                'times_split_interest' not in request.POST):
-            context['product_status'] = 'há campos vazios'
-        else:
-            editable.times_split_unit = utils.product_times_split_unit(
-                request.POST['price'],
-                request.POST['times_split_num'],
-                request.POST['times_split_interest'])
-            editable.times_split_pprint = utils.product_times_split_pprint(
-                request.POST['price'],
-                request.POST['times_split_num'],
-                request.POST['times_split_interest'])
-        editable.publication_date = timezone.now()
-        editable.price_off_display = (
-            True if 'price_off_display' in request.POST else False)
-        editable.available_quantity_display = (
-            True if 'available_quantity_display' in request.POST else
-            False)
-        editable.is_published = (
-            True if 'is_published' in request.POST else False)
+    if 'title' in request.POST:
+        editable.title = request.POST['title']
+        editable.title_for_card = utils.product_title_for_card(
+            request.POST['title'])
+    if 'price' in request.POST:
+        editable.price_old = editable.price
+        editable.price_old_pprint = utils.product_price_pprint(
+            str(editable.price))
+        editable.price = float(request.POST['price'])
+        editable.price_pprint = utils.product_price_pprint(
+            request.POST['price'])
+        editable.price_off = utils.product_price_off(
+            request.POST['price'], str(editable.price_old))
+        editable.price_off_pprint = utils.product_price_off_pprint(
+            request.POST['price'], str(editable.price_old))
+    if 'times_split_num' in request.POST:
+        editable.times_split_num = int(request.POST['times_split_num'])
+    if 'times_split_interest' in request.POST:
+        editable.times_split_interest = int(
+            request.POST['times_split_interest'])
+    if 'shipping_price' in request.POST:
+        editable.shipping_price = float(request.POST['shipping_price'])
+        editable.shipping_price_pprint = (
+            utils.product_shipping_price_pprint(
+                request.POST['shipping_price']))
+    if 'available_quantity' in request.POST:
+        editable.available_quantity = int(
+            request.POST['available_quantity'])
+    if 'max_quantity_per_sale' in request.POST:
+        editable.max_quantity_per_sale = (
+            utils.product_max_quantity_per_sale(
+                request.POST['available_quantity'],
+                request.POST['max_quantity_per_sale']))
+    if 'image_1' in request.FILES:
+        if not validation.invalid_image(request.FILES['image_1']):
+            editable.image_1 = request.FILES['image_1']
+    if 'image_2' in request.FILES:
+        if not validation.invalid_image(request.FILES['image_2']):
+            editable.image_2 = request.FILES['image_2']
+    if 'image_3' in request.FILES:
+        if not validation.invalid_image(request.FILES['image_3']):
+            editable.image_3 = request.FILES['image_3']
+    if 'image_4' in request.FILES:
+        if not validation.invalid_image(request.FILES['image_4']):
+            editable.image_4 = request.FILES['image_4']
+    if 'image_5' in request.FILES:
+        if not validation.invalid_image(request.FILES['image_5']):
+            editable.image_5 = request.FILES['image_5']
+    if 'summary' in request.POST:
+        editable.summary = request.POST['summary']
+    if 'content' in request.POST:
+        editable.content = request.POST['content']
+    if 'tags' in request.POST:
+        editable.tags = request.POST['tags']
+    if ('price' not in request.POST or
+            'times_split_num' not in request.POST or
+            'times_split_interest' not in request.POST):
+        context['product_status'] = 'há campos vazios'
+    else:
+        editable.times_split_unit = utils.product_times_split_unit(
+            request.POST['price'],
+            request.POST['times_split_num'],
+            request.POST['times_split_interest'])
+        editable.times_split_pprint = utils.product_times_split_pprint(
+            request.POST['price'],
+            request.POST['times_split_num'],
+            request.POST['times_split_interest'])
+    editable.publication_date = timezone.now()
+    editable.price_off_display = (
+        True if 'price_off_display' in request.POST else False)
+    editable.available_quantity_display = (
+        True if 'available_quantity_display' in request.POST else
+        False)
+    editable.is_published = (
+        True if 'is_published' in request.POST else False)
 
-        editable.save()
-        return redirect('manage_products')
-    return redirect('manage_products')
+    editable.save()
 
 
 def manage_products_new(request):
