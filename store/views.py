@@ -48,6 +48,8 @@ def cart(request):
 
     if 'edit' in request.POST:
         __cart_edit(request)
+    elif 'remove' in request.POST:
+        __cart_remove(request)
     return redirect('cart')
 
 
@@ -102,17 +104,10 @@ def cart_favorite(request, product_id):
     return redirect('cart')
 
 
-def cart_remove(request, product_id):
-    if not request.user.is_authenticated:
-        return redirect('index')
-
-    model_product = models.ModelProduct.objects.get(pk=product_id)
-
-    if request.method == 'POST':
-        cart_item = utils.get_cart(request, model_product)
-        cart_item.delete()
-
-    return redirect('cart')
+def __cart_remove(request):
+    model_product = models.ModelProduct.objects.get(pk=request.POST['remove'])
+    cart_item = utils.get_cart(request, model_product)
+    cart_item.delete()
 
 
 def favorite(request):

@@ -147,8 +147,9 @@
               <img src="{{ cart.product.image_1.url }}" class="img-thumbnail" style="width:85px;">
               <span class="fs-4">{{ cart.product.price_pprint }}</span>
 
-              <form action="{% url 'cart_remove' cart.product.id %}" method="post">
+              <form action="{% url 'cart' %}" method="post">
                 {% csrf_token %}
+                <input type="hidden" id="remove" name="remove" value="{{ cart.product.id }}">
                 <div class="d-grid gap-2">
                   <button type="submit" class="btn btn-danger">Remover</button>
                 </div>
