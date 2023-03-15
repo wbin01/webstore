@@ -126,27 +126,20 @@ def favorite(request):
         'cart_list': utils.get_cart_list(request),  # nav
         'favorite_list': utils.get_favorite_list(request)}
 
-    if not profile:
-        return redirect('index')
+    if request.method != 'POST':
+        return render(request, 'favorite.html', context)
 
-    if profile:
-        if profile.is_admin:
-            return redirect('index')
-
-        if not profile.is_admin:
-            return render(request, 'favorite.html', context)
-
-
-def favorite_remove(request, product_id):
-    if not request.user.is_authenticated:
-        return redirect('index')
-
-    model_product = models.ModelProduct.objects.get(pk=product_id)
-    fav = utils.get_favorite(request, model_product)
-    if fav:
-        fav.delete()
-
+    if 'remove_from_favorites' in request.POST:
+        __favorite_remove_from_favorites(request)
     return redirect('favorite')
+
+
+def __favorite_remove_from_favorites(request):
+    favorite_item = utils.get_favorite(
+        request, models.ModelProduct.objects.get(
+            pk=request.POST['remove_from_favorites']))
+    if favorite_item:
+        favorite_item.delete()
 
 
 def index(request):

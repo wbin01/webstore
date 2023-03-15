@@ -13,8 +13,6 @@ urlpatterns = [
          cart, name='cart'),
     path('favorite/',
          favorite, name='favorite'),
-    path('favorite_remove/<int:product_id>/',
-         favorite_remove, name='favorite_remove'),
     path('',
          index, name='index'),
     path('login/',
