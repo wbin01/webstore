@@ -99,6 +99,53 @@ class ModelProduct(models.Model):
         return self.title
 
 
+class ModelProductEdit(models.Model):
+    title = models.CharField(
+        max_length=200, blank=False, null=False, default='Título')
+    price = models.FloatField(
+        blank=False, null=False, default=0.0)
+    price_off_display = models.BooleanField(
+        default=True, blank=False, null=False)
+    times_split_num = models.IntegerField(
+        blank=False, null=False, default=0)
+    times_split_interest = models.IntegerField(
+        blank=False, null=False, default=0)
+    shipping_price = models.FloatField(
+        blank=False, null=False, default=0.0)
+    available_quantity = models.IntegerField(
+        blank=False, null=False, default=1)
+    available_quantity_display = models.BooleanField(
+        default=True, blank=False, null=False)
+    max_quantity_per_sale = models.IntegerField(
+        blank=False, null=False, default=1)
+    image_1 = ResizedImageField(
+        size=[500, 500], crop=['middle', 'center'],
+        upload_to='img_posts/', blank=True, null=True)
+    image_2 = ResizedImageField(
+        size=[500, 500], crop=['middle', 'center'],
+        upload_to='img_posts/', blank=True, null=True)
+    image_3 = ResizedImageField(
+        size=[500, 500], crop=['middle', 'center'],
+        upload_to='img_posts/', blank=True, null=True)
+    image_4 = ResizedImageField(
+        size=[500, 500], crop=['middle', 'center'],
+        upload_to='img_posts/', blank=True, null=True)
+    image_5 = ResizedImageField(
+        size=[500, 500], crop=['middle', 'center'],
+        upload_to='img_posts/', blank=True, null=True)
+    summary = models.CharField(
+        max_length=100, default='...', blank=True, null=True)
+    content = models.TextField(
+        default='...', blank=True, null=True)
+    tags = models.CharField(
+        max_length=100, blank=False, null=False, default='Tag 1, Tag 2')
+    is_published = models.BooleanField(
+        default=False, blank=False, null=False)
+
+    def __str__(self):
+        return self.title
+
+
 class ModelCart(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, blank=False, null=False)

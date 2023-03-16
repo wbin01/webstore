@@ -20,16 +20,148 @@
         {% for field in form.visible_fields %}
 
           {% if field.field.widget.input_type == 'checkbox' %}
-          <div class="form-group mt-3">
+          <div class="form-group mt-4">
             {{ field }} <label for="{{ field.id_for_label }}">{{ field.label | safe }}</label>
           </div>
           {% elif field.field.widget.input_type == 'number' %}
-          <div class="form-group mt-3">
+          <div class="form-group mt-4">
             <label for="{{ field.id_for_label }}">{{ field.label | safe }}</label>
             <div style="max-width: 100px;">{{ field }}</div>
           </div>
+
+          <!-- image_1 -->
+          {% elif field.name == 'image_1' %}
+          <div class="form-group mt-4">
+            <label for="{{ field.id_for_label }}">{{ field.label | safe }}</label>
+            {% if product.image_1 %}
+            <div class="row">
+              <div class="col" style="max-width: 55px;">
+                <img src="{{ product.image_1.url }}" class="rounded border" style="width: 50px;">
+              </div>
+              <div class="col mt-2" style="max-width: 400px;">{{ field }}</div>
+            </div>
+            {% else %}
+            <div class="row">
+              <div class="col text-muted" style="max-width: 55px;">
+                <svg class="bi bi-image-alt rounded border" width="50" height="50" fill="currentColor" version="1.1" viewBox="0 0 50 50">
+                <path d="m23.171 12.033c9.76e-4 4.3152-3.4969 7.814-7.8122 7.814-4.3152 0-7.8132-3.4987-7.8122-7.814 9.762e-4 -4.3139 3.4983-7.8104 7.8122-7.8104 4.3139 0 7.8112 3.4966 7.8122 7.8104zm11.902 8.4442c-0.60096-0.30104-1.3271-0.184-1.8031 0.29061l-11.593 14.718-8.3122-8.6622c-0.61876-0.41195-1.4421-0.33093-1.9687 0.19374l-11.393 13.606v6.2498c0 1.7258 1.3991 3.1249 3.1249 3.1249h43.748c1.7258 0 3.1249-1.3991 3.1249-3.1249v-14.062z" stroke-width="3.1249"/>
+                </svg>
+              </div>
+              <div class="col mt-2" style="max-width: 400px;">{{ field }}</div>
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- image_2 -->
+          {% elif field.name == 'image_2' %}
+          <div class="form-group mt-4">
+            <label for="{{ field.id_for_label }}">{{ field.label | safe }}</label>
+            {% if product.image_2 %}
+            <div class="row">
+              <div class="col" style="max-width: 55px;">
+                <img src="{{ product.image_2.url }}" class="rounded border" style="width: 50px;">
+              </div>
+              <div class="col mt-2" style="max-width: 400px;">{{ field }}</div>
+            </div>
+            <input class="form-check-input" type="checkbox" value="" name="remove_image_2" id="remove_image_2">
+            <label class="form-check-label" for="remove_image_2">
+              &nbsp;Limpar imagem 2
+            </label>
+            {% else %}
+            <div class="row">
+              <div class="col text-muted" style="max-width: 55px;">
+                <svg class="bi bi-image-alt rounded border" width="50" height="50" fill="currentColor" version="1.1" viewBox="0 0 50 50">
+                <path d="m23.171 12.033c9.76e-4 4.3152-3.4969 7.814-7.8122 7.814-4.3152 0-7.8132-3.4987-7.8122-7.814 9.762e-4 -4.3139 3.4983-7.8104 7.8122-7.8104 4.3139 0 7.8112 3.4966 7.8122 7.8104zm11.902 8.4442c-0.60096-0.30104-1.3271-0.184-1.8031 0.29061l-11.593 14.718-8.3122-8.6622c-0.61876-0.41195-1.4421-0.33093-1.9687 0.19374l-11.393 13.606v6.2498c0 1.7258 1.3991 3.1249 3.1249 3.1249h43.748c1.7258 0 3.1249-1.3991 3.1249-3.1249v-14.062z" stroke-width="3.1249"/>
+                </svg>
+              </div>
+              <div class="col mt-2" style="max-width: 400px;">{{ field }}</div>
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- image_3 -->
+          {% elif field.name == 'image_3' %}
+          <div class="form-group mt-4">
+            <label for="{{ field.id_for_label }}">{{ field.label | safe }}</label>
+            {% if product.image_3 %}
+            <div class="row">
+              <div class="col" style="max-width: 55px;">
+                <img src="{{ product.image_3.url }}" class="rounded border" style="width: 50px;">
+              </div>
+              <div class="col mt-2" style="max-width: 400px;">{{ field }}</div>
+            </div>
+            <input class="form-check-input" type="checkbox" value="" name="remove_image_3" id="remove_image_3">
+            <label class="form-check-label" for="remove_image_3">
+              &nbsp;Limpar imagem 3
+            </label>
+            {% else %}
+            <div class="row">
+              <div class="col text-muted" style="max-width: 55px;">
+                <svg class="bi bi-image-alt rounded border" width="50" height="50" fill="currentColor" version="1.1" viewBox="0 0 50 50">
+                <path d="m23.171 12.033c9.76e-4 4.3152-3.4969 7.814-7.8122 7.814-4.3152 0-7.8132-3.4987-7.8122-7.814 9.762e-4 -4.3139 3.4983-7.8104 7.8122-7.8104 4.3139 0 7.8112 3.4966 7.8122 7.8104zm11.902 8.4442c-0.60096-0.30104-1.3271-0.184-1.8031 0.29061l-11.593 14.718-8.3122-8.6622c-0.61876-0.41195-1.4421-0.33093-1.9687 0.19374l-11.393 13.606v6.2498c0 1.7258 1.3991 3.1249 3.1249 3.1249h43.748c1.7258 0 3.1249-1.3991 3.1249-3.1249v-14.062z" stroke-width="3.1249"/>
+                </svg>
+              </div>
+              <div class="col mt-2" style="max-width: 400px;">{{ field }}</div>
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- image_4 -->
+          {% elif field.name == 'image_4' %}
+          <div class="form-group mt-4">
+            <label for="{{ field.id_for_label }}">{{ field.label | safe }}</label>
+            {% if product.image_4 %}
+            <div class="row">
+              <div class="col" style="max-width: 55px;">
+                <img src="{{ product.image_4.url }}" class="rounded border" style="width: 50px;">
+              </div>
+              <div class="col mt-2" style="max-width: 400px;">{{ field }}</div>
+            </div>
+            <input class="form-check-input" type="checkbox" value="" name="remove_image_4" id="remove_image_4">
+            <label class="form-check-label" for="remove_image_4">
+              &nbsp;Limpar imagem 4
+            </label>
+            {% else %}
+            <div class="row">
+              <div class="col text-muted" style="max-width: 55px;">
+                <svg class="bi bi-image-alt rounded border" width="50" height="50" fill="currentColor" version="1.1" viewBox="0 0 50 50">
+                <path d="m23.171 12.033c9.76e-4 4.3152-3.4969 7.814-7.8122 7.814-4.3152 0-7.8132-3.4987-7.8122-7.814 9.762e-4 -4.3139 3.4983-7.8104 7.8122-7.8104 4.3139 0 7.8112 3.4966 7.8122 7.8104zm11.902 8.4442c-0.60096-0.30104-1.3271-0.184-1.8031 0.29061l-11.593 14.718-8.3122-8.6622c-0.61876-0.41195-1.4421-0.33093-1.9687 0.19374l-11.393 13.606v6.2498c0 1.7258 1.3991 3.1249 3.1249 3.1249h43.748c1.7258 0 3.1249-1.3991 3.1249-3.1249v-14.062z" stroke-width="3.1249"/>
+                </svg>
+              </div>
+              <div class="col mt-2" style="max-width: 400px;">{{ field }}</div>
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- image_5 -->
+          {% elif field.name == 'image_5' %}
+          <div class="form-group mt-4">
+            <label for="{{ field.id_for_label }}">{{ field.label | safe }}</label>
+            {% if product.image_5 %}
+            <div class="row">
+              <div class="col" style="max-width: 55px;">
+                <img src="{{ product.image_5.url }}" class="rounded border" style="width: 50px;">
+              </div>
+              <div class="col mt-2" style="max-width: 400px;">{{ field }}</div>
+            </div>
+            <input class="form-check-input" type="checkbox" value="" name="remove_image_5" id="remove_image_5">
+            <label class="form-check-label" for="remove_image_5">
+              &nbsp;Limpar imagem 5
+            </label>
+            {% else %}
+            <div class="row">
+              <div class="col text-muted" style="max-width: 55px;">
+                <svg class="bi bi-image-alt rounded border" width="50" height="50" fill="currentColor" version="1.1" viewBox="0 0 50 50">
+                <path d="m23.171 12.033c9.76e-4 4.3152-3.4969 7.814-7.8122 7.814-4.3152 0-7.8132-3.4987-7.8122-7.814 9.762e-4 -4.3139 3.4983-7.8104 7.8122-7.8104 4.3139 0 7.8112 3.4966 7.8122 7.8104zm11.902 8.4442c-0.60096-0.30104-1.3271-0.184-1.8031 0.29061l-11.593 14.718-8.3122-8.6622c-0.61876-0.41195-1.4421-0.33093-1.9687 0.19374l-11.393 13.606v6.2498c0 1.7258 1.3991 3.1249 3.1249 3.1249h43.748c1.7258 0 3.1249-1.3991 3.1249-3.1249v-14.062z" stroke-width="3.1249"/>
+                </svg>
+              </div>
+              <div class="col mt-2" style="max-width: 400px;">{{ field }}</div>
+            </div>
+            {% endif %}
+          </div>
+
           {% else %}
-          <div class="form-group mt-3">
+          <div class="form-group mt-4">
             <label for="{{ field.id_for_label }}">{{ field.label | safe }}</label>{{ field }}
           </div>
           {% endif %}

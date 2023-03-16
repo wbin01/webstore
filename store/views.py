@@ -336,7 +336,7 @@ def manage_products_edit(request, product_url_title, product_id):
         return redirect('index')
 
     post = models.ModelProduct.objects.get(pk=product_id)
-    form = forms.FormProductNew(
+    form = forms.FormProductEdit(
         initial={
             'title': post.title,
             'price': post.price,
@@ -347,11 +347,6 @@ def manage_products_edit(request, product_url_title, product_id):
             'available_quantity': post.available_quantity,
             'available_quantity_display': post.available_quantity_display,
             'max_quantity_per_sale': post.max_quantity_per_sale,
-            'image_1': post.image_1,
-            'image_2': post.image_2,
-            'image_3': post.image_3,
-            'image_4': post.image_4,
-            'image_5': post.image_5,
             'summary': post.summary,
             'content': post.content,
             'tags': post.tags,
@@ -419,21 +414,38 @@ def __manage_products_edit_save(request, product_id) -> None:
             utils.product_max_quantity_per_sale(
                 request.POST['available_quantity'],
                 request.POST['max_quantity_per_sale']))
+
     if 'image_1' in request.FILES:
-        if not validation.invalid_image(request.FILES['image_1']):
-            editable.image_1 = request.FILES['image_1']
-    if 'image_2' in request.FILES:
-        if not validation.invalid_image(request.FILES['image_2']):
+        editable.image_1 = request.FILES['image_1']
+
+    remove_image_2 = True if 'remove_image_2' in request.POST else False
+    if remove_image_2:
+        editable.image_2 = None
+    else:
+        if 'image_2' in request.FILES:
             editable.image_2 = request.FILES['image_2']
-    if 'image_3' in request.FILES:
-        if not validation.invalid_image(request.FILES['image_3']):
+
+    remove_image_3 = True if 'remove_image_3' in request.POST else False
+    if remove_image_3:
+        editable.image_3 = None
+    else:
+        if 'image_3' in request.FILES:
             editable.image_3 = request.FILES['image_3']
-    if 'image_4' in request.FILES:
-        if not validation.invalid_image(request.FILES['image_4']):
+
+    remove_image_4 = True if 'remove_image_4' in request.POST else False
+    if remove_image_4:
+        editable.image_4 = None
+    else:
+        if 'image_4' in request.FILES:
             editable.image_4 = request.FILES['image_4']
-    if 'image_5' in request.FILES:
-        if not validation.invalid_image(request.FILES['image_5']):
+
+    remove_image_5 = True if 'remove_image_5' in request.POST else False
+    if remove_image_5:
+        editable.image_5 = None
+    else:
+        if 'image_5' in request.FILES:
             editable.image_5 = request.FILES['image_5']
+
     if 'summary' in request.POST:
         editable.summary = request.POST['summary']
     if 'content' in request.POST:
@@ -683,9 +695,6 @@ def __manage_users_edit_save(request, edit_user, edit_user_profile) -> None:
         if password:
             edit_user.set_password(password)
     edit_user.save()
-
-    # if 'profile_image' in request.FILES:
-    #     edit_user_profile.profile_image = request.FILES['profile_image']
 
     remove_image = True if 'remove_image' in request.POST else False
     if remove_image:
