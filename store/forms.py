@@ -48,7 +48,7 @@ class FormProductNew(forms.ModelForm):
             'user', 'title_for_card', 'title_for_url', 'price_pprint',
             'price_old', 'price_old_pprint', 'price_off', 'price_off_pprint',
             'times_split_unit', 'times_split_pprint', 'shipping_price_pprint',
-            'publication_date']
+            'summary', 'publication_date']
         # fields = '__all__'
         labels = {
             'title': '<h6>Título</h6>',
@@ -74,7 +74,6 @@ class FormProductNew(forms.ModelForm):
             'image_5': (
                 '<h6>Imagem 5'
                 '<small class="text-muted"> (Opcional)&nbsp;</small></h6>'),
-            'summary': '<h6>Resumo</h6>',
             'tags': '<h6>Tags</h6>',
             'is_published': (
                 '<h6>Marcar como publicado '
@@ -98,7 +97,7 @@ class FormProductEdit(forms.ModelForm):
 
     class Meta:
         model = ModelProductEdit
-        fields = '__all__'
+        exclude = ['summary']
         labels = {
             'title': '<h6>Título</h6>',
             'price': '<h6>Preço</h6>',
@@ -123,7 +122,6 @@ class FormProductEdit(forms.ModelForm):
             'image_5': (
                 '<h6>Imagem 5'
                 '<small class="text-muted"> (Opcional)&nbsp;</small></h6>'),
-            'summary': '<h6>Resumo</h6>',
             'tags': '<h6>Tags</h6>',
             'is_published': (
                 '<h6>Marcar como publicado '

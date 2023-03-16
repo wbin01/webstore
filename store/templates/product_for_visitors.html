@@ -99,21 +99,13 @@
 
     <!-- PRICE AREA-->
     <div class="col my-2 mx-2 position-relative">
-
-      <!-- LIKE | FAV -->
-      <button class="btn btn-white py-0 px-0 mx-0 my-0 position-absolute top-0 end-0  border-0" type="button" data-bs-toggle="modal" data-bs-target="#loginModal">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
-        <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
-      </svg>
-      </button>
-
       <div style="min-width: 250px;">
       <h5 class="me-3">
         {{ product.title }}
       </h5>
 
       {% if product.price_off_display %}
-        {% if product.price_old %}
+        {% if product.price_old and product.price_off %}
         <p class="my-0">
         <span class="text-decoration-line-through text-secondary">
           {{ product.price_old_pprint }}
@@ -153,46 +145,43 @@
         </svg> Frete grátis
       </p>
       {% endif %}
-      <div style="height: 200px;"></div>
       </div>
 
-      <div class="d-grid gap-2 gap-2 col-8 position-absolute bottom-0" style="width: 400px;">
-        <p class="text-muted">
-        {% if product.available_quantity_display %}
-        {{ product.available_quantity }} {% if product.available_quantity == 1 %}disponível{% else %}disponíveis{% endif %}
-        {% endif %}
+      <div style="height: 200px;"></div>
+      <form action="{% url 'product' product.title_for_url product.id %}" method="post" class="position-absolute bottom-0">
+        {% csrf_token %}
+
+        <!-- Favorite -->
+        <div class="mx-1" style="height: 50px;">
+          <button class="btn btn-white py-0 px-0 mx-0 my-0 border-0" type="button" data-bs-toggle="modal" data-bs-target="#loginModal">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+            <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+          </svg>
+          </button>
+        </div>
+
+        <p class="text-muted my-0 py-0 ms-1 mb-2 fw-light">
+          {% if product.available_quantity_display %}
+          {{ product.available_quantity }} {% if product.available_quantity == 1 %}disponível{% else %}disponíveis{% endif %}
+          {% endif %}
         </p>
         {% if product.available_quantity > 1 %}
         <p class="text-muted my-0"><small>Escolha a quantidade na compra / carrinho</small></p>
         {% endif %}
 
-        <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#loginModal">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart3" viewBox="0 0 16 16">
-          <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l.84 4.479 9.144-.459L13.89 4H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
-        </svg> Adicionar ao carrinho
-        </button>
+        <div class="d-grid gap-2 gap-2 col-12" style="width: 400px;">
+          <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#loginModal">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart3" viewBox="0 0 16 16">
+            <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.415 11H13a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l.84 4.479 9.144-.459L13.89 4H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+          </svg> Adicionar ao carrinho
+          </button>
 
-        <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#loginModal">Comprar</button>
-      </div>
-
-      <!-- LOGIN MODAL -->
-      <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <h6>Precisa entrar com a sua conta primeiro</h6>
-              <h6>Se não ainda não tiver uma, poderá criar</h6>
-              <div class="d-grid gap-2">
-                <a href="{% url 'login' %}" target="_blank" class="btn btn-primary" role="button">Entrar</a>
-                <a href="{% url 'signup' %}" target="_blank" class="btn btn-primary" role="button">Criar</a>
-              </div>
-            </div>
-          </div>
+          <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#loginModal">
+            Comprar
+          </button>
         </div>
-      </div>
+
+      </form>
 
     </div>
 
@@ -200,16 +189,30 @@
 
   <!-- DESCRIPTION -->
   <div class="text-secondary"><hr class="my-0 py-0"></div>
-  <div>
-    {% if product.summary %}
-    <p class="mt-4">{{ product.summary | safe  }}</p>
-    {% endif %}
-
+  <div class="pb-4">
     {% if product.content %}
-    <p class="mt-4">{{ product.content | safe  }}</p>
+    <p class="mt-4">{{ product.content | safe }}</p>
     {% endif %}
   </div>
 
+  <!-- LOGIN MODAL -->
+  <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+      <div class="modal-content">
+      <div class="modal-header">
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          <h6>Precisa entrar com a sua conta primeiro</h6>
+          <h6>Se não ainda não tiver uma, poderá criar</h6>
+          <div class="d-grid gap-2">
+          <a href="{% url 'login' %}" target="_blank" class="btn btn-primary" role="button">Entrar</a>
+          <a href="{% url 'signup' %}" target="_blank" class="btn btn-primary" role="button">Criar</a>
+          </div>
+      </div>
+      </div>
+  </div>
+  </div>
 
 </div>
 {% endblock %}

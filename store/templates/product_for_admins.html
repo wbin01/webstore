@@ -212,11 +212,7 @@
 
   <!-- DESCRIPTION -->
   <div class="text-secondary"><hr class="my-0 py-0"></div>
-  <div>
-    {% if product.summary %}
-    <p class="mt-4">{{ product.summary | safe }}</p>
-    {% endif %}
-
+  <div class="pb-4">
     {% if product.content %}
     <p class="mt-4">{{ product.content | safe }}</p>
     {% endif %}
