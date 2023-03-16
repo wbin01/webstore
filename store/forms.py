@@ -1,4 +1,8 @@
 from django import forms
+
+# https://pypi.org/project/django-quill-editor/
+from django_quill.forms import QuillFormField
+
 from users.models import ModelUser
 from store.models import (
     ModelProduct, ModelProductEdit, ModelUserProfile, ModelStoreProfile)
@@ -24,6 +28,8 @@ class FormLogin(forms.ModelForm):
 
 
 class FormProductNew(forms.ModelForm):
+    content = QuillFormField(label='<h6>Decrição</h6>')
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -69,7 +75,6 @@ class FormProductNew(forms.ModelForm):
                 '<h6>Imagem 5'
                 '<small class="text-muted"> (Opcional)&nbsp;</small></h6>'),
             'summary': '<h6>Resumo</h6>',
-            'content': '<h6>Decrição</h6>',
             'tags': '<h6>Tags</h6>',
             'is_published': (
                 '<h6>Marcar como publicado '
@@ -77,6 +82,8 @@ class FormProductNew(forms.ModelForm):
 
 
 class FormProductEdit(forms.ModelForm):
+    content = QuillFormField(label='<h6>Decrição</h6>')
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -117,7 +124,6 @@ class FormProductEdit(forms.ModelForm):
                 '<h6>Imagem 5'
                 '<small class="text-muted"> (Opcional)&nbsp;</small></h6>'),
             'summary': '<h6>Resumo</h6>',
-            'content': '<h6>Decrição</h6>',
             'tags': '<h6>Tags</h6>',
             'is_published': (
                 '<h6>Marcar como publicado '
@@ -242,7 +248,7 @@ class FormUserDashboard(forms.ModelForm):
     password = forms.CharField(
         required=False,
         label=(
-            '<h3 class="my-3">Senha</h3>'
+            '<h3 class="my-3">Alterar senha</h3>'
             '<h6>Senha atual</h6>'
             '<small class="text-muted">'
             'A senha atual é usada para confirmar a nova senha<br>'
@@ -264,8 +270,9 @@ class FormUserDashboard(forms.ModelForm):
         model = ModelUser
         fields = '__all__'
         labels = {
-            'name': '<h3 class="my-3">Conta</h3><h6>Nome</h6>',
+            'name': '<h6>Nome</h6>',
             'username': (
+                '<h3 class="my-3">Conta</h3>'
                 '<h6>Nome de usuário</h6>'
                 '<small class="text-muted">'
                 'Pode conter letra minúscula e número'
@@ -287,4 +294,4 @@ class FormUserDashboardProfile(forms.ModelForm):
         fields = ['profile_image']
         labels = {
             'profile_image': (
-                '<h3 class="my-3">Perfil</h3><h6>Imagem de perfil&nbsp;</h6>')}
+                '<h3 class="my-3">Perfil</h3><h6>Imagem do perfil&nbsp;</h6>')}

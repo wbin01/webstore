@@ -85,7 +85,7 @@ class ModelProduct(models.Model):
         size=[500, 500], crop=['middle', 'center'],
         upload_to='img_posts/', blank=True, null=True)
     summary = models.CharField(
-        max_length=100, default='...', blank=True, null=True)
+        max_length=100, default='', blank=True, null=True)
     content = models.TextField(
         default='...', blank=True, null=True)
     tags = models.CharField(
@@ -198,7 +198,7 @@ class ModelStoreProfile(models.Model):
     show_brand_name_on_nav = models.BooleanField(
         default=False, blank=False, null=False)
     brand_image = ResizedImageField(
-        size=[80, 40], crop=['middle', 'center'],
+        size=[None, 40],  # size=[80, 40], crop=['middle', 'center'],
         upload_to='img_store/', blank=True, null=True)
     show_brand_image_on_nav = models.BooleanField(
         default=True, blank=False, null=False)

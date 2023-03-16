@@ -40,8 +40,8 @@
             <label for="{{ field.id_for_label }}">{{ field.label | safe }}</label>
             {% if store_profile.brand_image %}
             <div class="row">
-              <div class="col" style="max-width: 75px;">
-                <img src="{{ store_profile.brand_image.url }}" class="rounded border" style="width: 70px;">
+              <div class="col align-center" style="max-width: 60px; max-height: 40px;">
+                <img src="{{ store_profile.brand_image.url }}" class="rounded border" style="max-width: 55px; max-height: 40px;">
               </div>
               <div class="col" style="max-width: 400px;">{{ field }}</div>
             </div>
@@ -51,8 +51,8 @@
             </label>
             {% else %}
             <div class="row">
-              <div class="col text-muted" style="max-width: 75px;">
-                <svg class="bi bi-image-alt rounded border" width="70" height="35" fill="currentColor" version="1.1" viewBox="0 0 70 35">
+              <div class="col text-muted" style="max-width: 60px;">
+                <svg class="bi bi-image-alt rounded border" width="55" height="35" fill="currentColor" version="1.1" viewBox="0 0 55 35">
                   <path d="m19.605 4.5195a6.1692 6.1692 0 0 0-6.1699 6.1699 6.1692 6.1692 0 0 0 6.1699 6.1699 6.1692 6.1692 0 0 0 6.168-6.1699 6.1692 6.1692 0 0 0-6.168-6.1699zm35.062 10.566c-0.45543 0.017309-1.0278 0.2001-1.3984 0.33594l-20.967 9.7188-13.432-3.6367c-0.65394-0.14819-1.4871 0.029298-1.9688 0.19336l-16.902 3.9277v6.25c0 1.7258 1.3992 3.125 3.125 3.125h63.75c1.7258 0 3.125-1.3992 3.125-3.125v-9.0625l-14.928-7.6816c-0.11404-0.039071-0.25249-0.050691-0.4043-0.044921z" stroke-width="3.1249"/>
                 </svg>
               </div>

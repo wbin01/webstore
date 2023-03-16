@@ -1,5 +1,6 @@
 import logging
 import string
+import json
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
@@ -261,6 +262,10 @@ def manage_products_new(request):
                 context['new_product_status'] = status
                 return render(request, 'manage_products_new.html', context)
 
+            content_text = request.POST['content']
+            content_text = (
+                json.loads(content_text)['html'] if content_text else '')
+
             new_product = models.ModelProduct.objects.create(
                 user=request.user,
                 title=request.POST['title'],
@@ -312,7 +317,7 @@ def manage_products_new(request):
                 image_4=request.FILES.get('image_4', None),
                 image_5=request.FILES.get('image_5', None),
                 summary=request.POST['summary'],
-                content=request.POST['content'],
+                content=content_text,
                 tags=request.POST['tags'],
                 publication_date=timezone.now(),
                 is_published=(
@@ -448,8 +453,12 @@ def __manage_products_edit_save(request, product_id) -> None:
 
     if 'summary' in request.POST:
         editable.summary = request.POST['summary']
+
     if 'content' in request.POST:
-        editable.content = request.POST['content']
+        content_text = request.POST['content']
+        content_text = json.loads(content_text)['html'] if content_text else ''
+        editable.content = content_text
+
     if 'tags' in request.POST:
         editable.tags = request.POST['tags']
     if ('price' not in request.POST or
@@ -538,24 +547,12 @@ def __manage_store_save(request, store_profile):
     store_profile.show_brand_name_on_nav = (
         True if 'show_brand_name_on_nav' in request.POST else False)
 
-    """
-    remove_image = True if 'remove_image' in request.POST else False
-    if remove_image:
-        profile.profile_image = None
-    else:
-        if 'profile_image' in request.FILES:
-            profile.profile_image = request.FILES['profile_image']
-    """
-
     remove_image = True if 'remove_brand_image' in request.POST else False
     if remove_image:
         store_profile.brand_image = None
     else:
         if 'brand_image' in request.FILES:
             store_profile.brand_image = request.FILES['brand_image']
-
-    # if 'brand_image' in request.FILES:
-    #     store_profile.brand_image = request.FILES['brand_image']
 
     store_profile.show_brand_image_on_nav = (
         True if 'show_brand_image_on_nav' in request.POST else False)

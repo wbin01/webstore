@@ -75,7 +75,7 @@
           {% if user_profile.profile_image %}
           <img src="{{ user_profile.profile_image.url }}" class="rounded-circle mx-2" style="height: 30px;" alt="Logo">
           {% else %}
-          <img src="{% static 'store/profile.svg' %}" style="height: 30px;" alt="Logo" class="mx-2">
+          <img src="{% static 'store/profile.svg' %}" style="height: 30px;" alt="Logo" class="rounded-circle mx-2">
           {% endif%}
 
         {% endif%}
