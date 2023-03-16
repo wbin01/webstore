@@ -525,6 +525,7 @@ def manage_store(request):
 
 
 def __manage_store_get_warning(request) -> str | None:
+    # HEX Color
     warning = None
     if 'brand_image' in request.FILES:
         warning = validation.invalid_image(request.FILES['brand_image'])
@@ -537,8 +538,25 @@ def __manage_store_save(request, store_profile):
     store_profile.show_brand_name_on_nav = (
         True if 'show_brand_name_on_nav' in request.POST else False)
 
-    if 'brand_image' in request.FILES:
-        store_profile.brand_image = request.FILES['brand_image']
+    """
+    remove_image = True if 'remove_image' in request.POST else False
+    if remove_image:
+        profile.profile_image = None
+    else:
+        if 'profile_image' in request.FILES:
+            profile.profile_image = request.FILES['profile_image']
+    """
+
+    remove_image = True if 'remove_brand_image' in request.POST else False
+    if remove_image:
+        store_profile.brand_image = None
+    else:
+        if 'brand_image' in request.FILES:
+            store_profile.brand_image = request.FILES['brand_image']
+
+    # if 'brand_image' in request.FILES:
+    #     store_profile.brand_image = request.FILES['brand_image']
+
     store_profile.show_brand_image_on_nav = (
         True if 'show_brand_image_on_nav' in request.POST else False)
 
