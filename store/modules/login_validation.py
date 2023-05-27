@@ -1,4 +1,3 @@
-import logging
 import string
 
 from django.contrib.auth.models import User

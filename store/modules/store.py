@@ -1,8 +1,4 @@
-# import datetime
-# import string
-# import logging
-#
-# from django.shortcuts import get_object_or_404
+import logging
 
 import store.models as models
 

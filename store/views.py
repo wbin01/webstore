@@ -11,30 +11,36 @@ import users.models as user_models
 import store.models as models
 import store.forms as forms
 
-import store.validation as validation
-import store.utils as utils
+import store.modules.cart as cart_ops
+import store.modules.favorites as favorites_ops
+import store.modules.login_validation as validation_ops
+import store.modules.pprint_format_money as pprint_format_money_ops
+import store.modules.product_obj as product_obj_ops
+import store.modules.store as store_ops
+import store.modules.total_price as total_price_ops
+import store.modules.user as user_ops
 
 
 def cart(request):
     if not request.user.is_authenticated:
         return redirect('index')
 
-    profile = utils.get_user_profile(request)
-    cart_list = utils.get_cart_list(request)
-    shipping = utils.total_shipping_price(cart_list)
-    shipping_pprint = utils.total_shipping_price_pprint(shipping)
-    total_price = utils.cart_total_price(cart_list)
-    total_price_pprint = utils.cart_total_price_pprint(total_price)
-    total_price_split_list = utils.cart_total_price_split_list(cart_list)
-    total_price_split_list_pprint = utils.cart_total_price_split_list_pprint(
-        total_price_split_list)
+    profile = user_ops.get_user_profile(request)
+    cart_list = cart_ops.get_cart_list(request)
+    shipping = total_price_ops.total_shipping_price(cart_list)
+    shipping_pprint = total_price_ops.total_shipping_price_pprint(shipping)
+    total_price = cart_ops.cart_total_price(cart_list)
+    total_price_pprint = cart_ops.cart_total_price_pprint(total_price)
+    total_price_split_list = cart_ops.cart_total_price_split_list(cart_list)
+    total_price_split_list_pprint = (
+        cart_ops.cart_total_price_split_list_pprint(total_price_split_list))
 
     context = {
-        'store_profile': utils.get_store_profile(),
+        'store_profile': store_ops.get_store_profile(),
         'user_profile': profile,
         'cart_list': cart_list,
         'favorite_product_id_list': [
-            x.product_id for x in utils.get_favorite_list(request)],
+            x.product_id for x in favorites_ops.get_favorite_list(request)],
         'cart_url': True,
         'shipping_price': shipping,
         'shipping_price_pprint': shipping_pprint,
@@ -69,25 +75,25 @@ def __cart_edit_item(request):
     times_split_num = int(request.POST['times_split_num'])
     cart_item.times_split_num = times_split_num
 
-    times_split_unit = utils.cart_edit_times_split_unit(
+    times_split_unit = cart_ops.cart_edit_times_split_unit(
         cart_product.price,
         quantity,
         times_split_num,
         cart_product.times_split_interest)
     cart_item.times_split_unit = times_split_unit
 
-    cart_item.times_split_pprint = utils.cart_edit_times_split_pprint(
+    cart_item.times_split_pprint = cart_ops.cart_edit_times_split_pprint(
         times_split_num,
         times_split_unit)
 
-    total_price = utils.cart_edit_total_price(
+    total_price = cart_ops.cart_edit_total_price(
         cart_product.price,
         quantity,
         cart_product.times_split_interest,
         times_split_num)
     cart_item.total_price = total_price
 
-    cart_item.total_price_pprint = utils.cart_edit_total_price_pprint(
+    cart_item.total_price_pprint = cart_ops.cart_edit_total_price_pprint(
         total_price)
 
     cart_item.save()
@@ -96,7 +102,7 @@ def __cart_edit_item(request):
 def __cart_remove_item(request):
     model_product = models.ModelProduct.objects.get(
         pk=request.POST['remove_item'])
-    cart_item = utils.get_cart(request, model_product)
+    cart_item = cart_ops.get_cart(request, model_product)
     cart_item.delete()
 
 
@@ -109,7 +115,7 @@ def __cart_add_to_favorites(request):
 
 
 def __cart_remove_from_favorites(request):
-    favorite_item = utils.get_favorite(
+    favorite_item = favorites_ops.get_favorite(
         request, models.ModelProduct.objects.get(
             pk=request.POST['remove_from_favorites']))
     if favorite_item:
@@ -120,12 +126,12 @@ def favorite(request):
     if not request.user.is_authenticated:
         return redirect('index')
 
-    profile = utils.get_user_profile(request)
+    profile = user_ops.get_user_profile(request)
     context = {
-        'store_profile': utils.get_store_profile(),
+        'store_profile': store_ops.get_store_profile(),
         'user_profile': profile,
-        'cart_list': utils.get_cart_list(request),  # nav
-        'favorite_list': utils.get_favorite_list(request)}
+        'cart_list': cart_ops.get_cart_list(request),  # nav
+        'favorite_list': favorites_ops.get_favorite_list(request)}
 
     if request.method != 'POST':
         return render(request, 'favorite.html', context)
@@ -136,7 +142,7 @@ def favorite(request):
 
 
 def __favorite_remove_from_favorites(request):
-    favorite_item = utils.get_favorite(
+    favorite_item = favorites_ops.get_favorite(
         request, models.ModelProduct.objects.get(
             pk=request.POST['remove_from_favorites']))
     if favorite_item:
@@ -148,9 +154,9 @@ def index(request):
         models.ModelProduct.objects.order_by('-publication_date')
         .filter(is_published=True))
     context = {
-        'store_profile': utils.get_store_profile(),
+        'store_profile': store_ops.get_store_profile(),
         'user_profile': None,
-        'cart_list': utils.get_cart_list(request),  # nav
+        'cart_list': cart_ops.get_cart_list(request),  # nav
         'products': [x for x in products],
         'highlight_posts': models.ModelProductHighlight.objects.all()}
 
@@ -158,7 +164,7 @@ def index(request):
         return render(request, 'index_for_visitors.html', context)
 
     if request.user.is_authenticated:
-        profile = utils.get_user_profile(request)
+        profile = user_ops.get_user_profile(request)
         context['user_profile'] = profile
 
         if not profile:
@@ -173,7 +179,7 @@ def index(request):
 
 def login(request):
     context = {
-        'store_profile': utils.get_store_profile(),
+        'store_profile': store_ops.get_store_profile(),
         'user_profile': None,
         'form': forms.FormLogin,
         'login_status': None}
@@ -218,7 +224,7 @@ def manage_products(request):
     if not request.user.is_authenticated:
         return redirect('index')
 
-    profile = utils.get_user_profile(request)
+    profile = user_ops.get_user_profile(request)
 
     if profile.is_admin:
         search_text = '' if 'q' not in request.GET else request.GET['q']
@@ -231,11 +237,11 @@ def manage_products(request):
                 models.ModelProduct.objects.order_by('-publication_date'))
 
         context = {
-            'store_profile': utils.get_store_profile(),
+            'store_profile': store_ops.get_store_profile(),
             'user_profile': profile,
             'products': products,
             'search_text': search_text,
-            'cart_list': utils.get_cart_list(request),
+            'cart_list': cart_ops.get_cart_list(request),
             'manage_url': True}
 
         return render(request, 'manage_products.html', context)
@@ -247,17 +253,17 @@ def manage_products_new(request):
     if not request.user.is_authenticated:
         return redirect('index')
 
-    profile = utils.get_user_profile(request)
+    profile = user_ops.get_user_profile(request)
     if profile.is_admin:
         context = {
-            'store_profile': utils.get_store_profile(),
+            'store_profile': store_ops.get_store_profile(),
             'user_profile': profile,
             'form': forms.FormProductNew,
             'new_product_status': None,
-            'cart_list': utils.get_cart_list(request)}
+            'cart_list': cart_ops.get_cart_list(request)}
 
         if request.method == 'POST':
-            status = validation.invalid_image(request.FILES['image_1'])
+            status = validation_ops.invalid_image(request.FILES['image_1'])
             if status:
                 context['new_product_status'] = status
                 return render(request, 'manage_products_new.html', context)
@@ -269,21 +275,21 @@ def manage_products_new(request):
             new_product = models.ModelProduct.objects.create(
                 user=request.user,
                 title=request.POST['title'],
-                title_for_card=utils.product_title_for_card(
+                title_for_card=product_obj_ops.product_title_for_card(
                     request.POST['title']),
-                title_for_url=utils.product_title_for_url(
+                title_for_url=product_obj_ops.product_title_for_url(
                     request.POST['title']),
                 price=float(
                     request.POST['price']),
-                price_pprint=utils.product_price_pprint(
+                price_pprint=product_obj_ops.product_price_pprint(
                     request.POST['price']),
                 price_old=float(
                     request.POST['price']),
-                price_old_pprint=utils.product_price_pprint(
+                price_old_pprint=product_obj_ops.product_price_pprint(
                     request.POST['price']),
-                price_off=utils.product_price_off(
+                price_off=product_obj_ops.product_price_off(
                     request.POST['price'], request.POST['price']),
-                price_off_pprint=utils.product_price_off_pprint(
+                price_off_pprint=product_obj_ops.product_price_off_pprint(
                     request.POST['price'], request.POST['price']),
                 price_off_display=(
                     True if 'price_off_display' in request.POST else False),
@@ -291,32 +297,33 @@ def manage_products_new(request):
                     request.POST['times_split_num']),
                 times_split_interest=int(
                     request.POST['times_split_interest']),
-                times_split_unit=utils.product_times_split_unit(
+                times_split_unit=product_obj_ops.product_times_split_unit(
                     request.POST['price'],
                     request.POST['times_split_num'],
                     request.POST['times_split_interest']),
-                times_split_pprint=utils.product_times_split_pprint(
+                times_split_pprint=product_obj_ops.product_times_split_pprint(
                     request.POST['price'],
                     request.POST['times_split_num'],
                     request.POST['times_split_interest']),
                 shipping_price=float(
                     request.POST['shipping_price']),
-                shipping_price_pprint=utils.product_shipping_price_pprint(
-                    request.POST['shipping_price']),
+                shipping_price_pprint=(
+                    product_obj_ops.product_shipping_price_pprint(
+                        request.POST['shipping_price'])),
                 available_quantity=int(
                     request.POST['available_quantity']),
                 available_quantity_display=(
                     True if 'available_quantity_display' in request.POST else
                     False),
-                max_quantity_per_sale=utils.product_max_quantity_per_sale(
-                    request.POST['available_quantity'],
-                    request.POST['max_quantity_per_sale']),
+                max_quantity_per_sale=(
+                    product_obj_ops.product_max_quantity_per_sale(
+                        request.POST['available_quantity'],
+                        request.POST['max_quantity_per_sale'])),
                 image_1=request.FILES['image_1'],
                 image_2=request.FILES.get('image_2', None),
                 image_3=request.FILES.get('image_3', None),
                 image_4=request.FILES.get('image_4', None),
                 image_5=request.FILES.get('image_5', None),
-                summary=request.POST['summary'],
                 content=content_text,
                 tags=request.POST['tags'],
                 publication_date=timezone.now(),
@@ -336,7 +343,7 @@ def manage_products_edit(request, product_url_title, product_id):
     if not request.user.is_authenticated:
         return redirect('index')
 
-    profile = utils.get_user_profile(request)
+    profile = user_ops.get_user_profile(request)
     if not profile.is_admin:
         return redirect('index')
 
@@ -352,17 +359,16 @@ def manage_products_edit(request, product_url_title, product_id):
             'available_quantity': post.available_quantity,
             'available_quantity_display': post.available_quantity_display,
             'max_quantity_per_sale': post.max_quantity_per_sale,
-            'summary': post.summary,
             'content': post.content,
             'tags': post.tags,
             'is_published': post.is_published})
     context = {
-        'store_profile': utils.get_store_profile(),
+        'store_profile': store_ops.get_store_profile(),
         'user_profile': profile,
         'form': form,
         'product': post,
         'warning': None,
-        'cart_list': utils.get_cart_list(request)}
+        'cart_list': cart_ops.get_cart_list(request)}
 
     if request.method != 'POST':
         return render(request, 'manage_products_edit.html', context)
@@ -378,7 +384,7 @@ def __manage_products_get_warning(request) -> str | None:
     warning = None
     for image in ['image_1', 'image_2', 'image_3', 'image_4', 'image_5']:
         if image in request.FILES:
-            warning = validation.invalid_image(request.FILES[image])
+            warning = validation_ops.invalid_image(request.FILES[image])
             if warning:
                 break
     return warning
@@ -388,18 +394,18 @@ def __manage_products_edit_save(request, product_id) -> None:
     editable = models.ModelProduct.objects.get(pk=product_id)
     if 'title' in request.POST:
         editable.title = request.POST['title']
-        editable.title_for_card = utils.product_title_for_card(
+        editable.title_for_card = product_obj_ops.product_title_for_card(
             request.POST['title'])
     if 'price' in request.POST:
         editable.price_old = editable.price
-        editable.price_old_pprint = utils.product_price_pprint(
+        editable.price_old_pprint = product_obj_ops.product_price_pprint(
             str(editable.price))
         editable.price = float(request.POST['price'])
-        editable.price_pprint = utils.product_price_pprint(
+        editable.price_pprint = product_obj_ops.product_price_pprint(
             request.POST['price'])
-        editable.price_off = utils.product_price_off(
+        editable.price_off = product_obj_ops.product_price_off(
             request.POST['price'], str(editable.price_old))
-        editable.price_off_pprint = utils.product_price_off_pprint(
+        editable.price_off_pprint = product_obj_ops.product_price_off_pprint(
             request.POST['price'], str(editable.price_old))
     if 'times_split_num' in request.POST:
         editable.times_split_num = int(request.POST['times_split_num'])
@@ -409,14 +415,14 @@ def __manage_products_edit_save(request, product_id) -> None:
     if 'shipping_price' in request.POST:
         editable.shipping_price = float(request.POST['shipping_price'])
         editable.shipping_price_pprint = (
-            utils.product_shipping_price_pprint(
+            product_obj_ops.product_shipping_price_pprint(
                 request.POST['shipping_price']))
     if 'available_quantity' in request.POST:
         editable.available_quantity = int(
             request.POST['available_quantity'])
     if 'max_quantity_per_sale' in request.POST:
         editable.max_quantity_per_sale = (
-            utils.product_max_quantity_per_sale(
+            product_obj_ops.product_max_quantity_per_sale(
                 request.POST['available_quantity'],
                 request.POST['max_quantity_per_sale']))
 
@@ -466,14 +472,15 @@ def __manage_products_edit_save(request, product_id) -> None:
             'times_split_interest' not in request.POST):
         context['product_status'] = 'há campos vazios'
     else:
-        editable.times_split_unit = utils.product_times_split_unit(
+        editable.times_split_unit = product_obj_ops.product_times_split_unit(
             request.POST['price'],
             request.POST['times_split_num'],
             request.POST['times_split_interest'])
-        editable.times_split_pprint = utils.product_times_split_pprint(
-            request.POST['price'],
-            request.POST['times_split_num'],
-            request.POST['times_split_interest'])
+        editable.times_split_pprint = (
+            product_obj_ops.product_times_split_pprint(
+                request.POST['price'],
+                request.POST['times_split_num'],
+                request.POST['times_split_interest']))
     editable.publication_date = timezone.now()
     editable.price_off_display = (
         True if 'price_off_display' in request.POST else False)
@@ -490,11 +497,11 @@ def manage_store(request):
     if not request.user.is_authenticated:
         return redirect('index')
 
-    profile = utils.get_user_profile(request)
+    profile = user_ops.get_user_profile(request)
     if not profile.is_admin:
         return redirect('index')
 
-    store_profile = utils.get_store_profile()
+    store_profile = store_ops.get_store_profile()
     form_store_profile = forms.FormStoreProfile(
         initial={
             'brand_name': store_profile.brand_name,
@@ -519,7 +526,7 @@ def manage_store(request):
         'store_profile': store_profile,
         'user_profile': profile,
         'warning': None,
-        'cart_list': utils.get_cart_list(request),
+        'cart_list': cart_ops.get_cart_list(request),
         'manage_url': True,
         'form': form_store_profile}
 
@@ -537,7 +544,7 @@ def __manage_store_get_warning(request) -> str | None:
     # HEX Color
     warning = None
     if 'brand_image' in request.FILES:
-        warning = validation.invalid_image(request.FILES['brand_image'])
+        warning = validation_ops.invalid_image(request.FILES['brand_image'])
     return warning
 
 
@@ -600,7 +607,7 @@ def manage_users(request):
     if not request.user.is_authenticated:
         return redirect('index')
 
-    profile = utils.get_user_profile(request)
+    profile = user_ops.get_user_profile(request)
     if profile.is_admin:
         search_text = '' if 'q' not in request.GET else request.GET['q']
         if search_text:
@@ -612,12 +619,12 @@ def manage_users(request):
             user_profiles = models.ModelUserProfile.objects.all()
 
         context = {
-            'store_profile': utils.get_store_profile(),
+            'store_profile': store_ops.get_store_profile(),
             'user_profile': profile,
             'users': user_profiles,
             'search_text': '',
             'status': '_',
-            'cart_list': utils.get_cart_list(request),
+            'cart_list': cart_ops.get_cart_list(request),
             'manage_url': True}
 
         return render(request, 'manage_users.html', context)
@@ -630,7 +637,7 @@ def manage_users_edit(request, user_username, user_profile_id):
     if not request.user.is_authenticated:
         return redirect('index')
 
-    profile = utils.get_user_profile(request)
+    profile = user_ops.get_user_profile(request)
     if not profile.is_admin:
         return redirect('index')
 
@@ -649,13 +656,13 @@ def manage_users_edit(request, user_username, user_profile_id):
         }
     )
     context = {
-        'store_profile': utils.get_store_profile(),
+        'store_profile': store_ops.get_store_profile(),
         'user_profile': profile,
         'edit_user_profile': edit_user_profile,
         'form_user': form_user,
         'form_user_profile': form_user_profile,
         'warning': None,
-        'cart_list': utils.get_cart_list(request)}
+        'cart_list': cart_ops.get_cart_list(request)}
 
     if request.method != 'POST':
         return render(request, 'manage_users_edit.html', context)
@@ -670,29 +677,29 @@ def manage_users_edit(request, user_username, user_profile_id):
 def __manage_users_get_warning(request, edit_user) -> str | None:
     warning = None
     if 'profile_image' in request.FILES:
-        warning = validation.invalid_image(request.FILES['profile_image'])
+        warning = validation_ops.invalid_image(request.FILES['profile_image'])
 
     if 'username' in request.POST:
         username = request.POST['username']
         if username != edit_user.username:
-            if not validation.available_username(edit_user, username):
+            if not validation_ops.available_username(edit_user, username):
                 warning = 'O nome de usuário fornecido já está sendo usado'
             if not warning:
-                warning = validation.invalid_username(username)
+                warning = validation_ops.invalid_username(username)
 
     if 'email' in request.POST:
         email = request.POST['email']
         if email != edit_user.email:
-            if not validation.available_email(edit_user, email):
+            if not validation_ops.available_email(edit_user, email):
                 warning = 'O email fornecido já está sendo usado'
             if not warning:
-                warning = validation.invalid_email(email)
+                warning = validation_ops.invalid_email(email)
 
     if 'password_confirm' in request.POST:
         password = request.POST['password_confirm']
         password = None if not password else password
         if password:
-            warning = validation.invalid_password(password, password)
+            warning = validation_ops.invalid_password(password, password)
 
     return warning
 
@@ -727,14 +734,14 @@ def manage_users_new(request):
     if not request.user.is_authenticated:
         return redirect('index')
 
-    profile = utils.get_user_profile(request)
+    profile = user_ops.get_user_profile(request)
     if profile.is_admin:
         context = {
-            'store_profile': utils.get_store_profile(),
+            'store_profile': store_ops.get_store_profile(),
             'user_profile': profile,
             'form': forms.FormSignup,
             'status': None,
-            'cart_list': utils.get_cart_list(request)}
+            'cart_list': cart_ops.get_cart_list(request)}
 
         if request.method != 'POST':
             return render(request, 'manage_users_new.html', context)
@@ -753,19 +760,19 @@ def product(request, product_url_title, product_id):
 
     model_product = models.ModelProduct.objects.get(pk=product_id)
     context = {
-        'store_profile': utils.get_store_profile(),
+        'store_profile': store_ops.get_store_profile(),
         'product': model_product,
         'tags': model_product.tags.split(','),
         'favorite': None,
         'cart': None,
-        'cart_list': utils.get_cart_list(request),  # nav
+        'cart_list': cart_ops.get_cart_list(request),  # nav
         'user_profile': None}
 
     if not request.user.is_authenticated:
         return render(request, 'product_for_visitors.html', context)
 
     if request.method == 'POST':
-        cart_item = utils.get_cart(request, model_product)
+        cart_item = cart_ops.get_cart(request, model_product)
         if 'buy' in request.POST:
             if not cart_item:
                 __create_cart_item(request.user.id, model_product)
@@ -774,7 +781,7 @@ def product(request, product_url_title, product_id):
         if 'add_favorite' in request.POST:
             __create_favorite_item(request.user.id, model_product)
         elif 'remove_favorite' in request.POST:
-            fav_item = utils.get_favorite(request, model_product)
+            fav_item = favorites_ops.get_favorite(request, model_product)
             fav_item.delete()
 
         elif 'add_cart' in request.POST:
@@ -782,10 +789,10 @@ def product(request, product_url_title, product_id):
         elif 'remove_cart' in request.POST:
             cart_item.delete()
 
-    profile = utils.get_user_profile(request)
+    profile = user_ops.get_user_profile(request)
     context['user_profile'] = profile
-    context['favorite'] = utils.get_favorite(request, model_product)
-    context['cart'] = utils.get_cart(request, model_product)
+    context['favorite'] = favorites_ops.get_favorite(request, model_product)
+    context['cart'] = cart_ops.get_cart(request, model_product)
 
     if not profile.is_admin and not profile.is_superuser:
         return render(request, 'product_for_users.html', context)
@@ -800,14 +807,14 @@ def search(request):
         title__icontains=search_text) if search_text else [])
 
     context = {
-        'store_profile': utils.get_store_profile(),
+        'store_profile': store_ops.get_store_profile(),
         'user_profile': None,
-        'cart_list': utils.get_cart_list(request),  # nav
+        'cart_list': cart_ops.get_cart_list(request),  # nav
         'search_text': search_text,
         'products': [x for x in products]}
 
     if request.user.is_authenticated:
-        context['user_profile'] = utils.get_user_profile(request)
+        context['user_profile'] = user_ops.get_user_profile(request)
 
     return render(request, 'search.html', context)
 
@@ -819,14 +826,14 @@ def search_tag(request):
         tags__icontains=search_text) if search_text else [])
 
     context = {
-        'store_profile': utils.get_store_profile(),
+        'store_profile': store_ops.get_store_profile(),
         'user_profile': None,
-        'cart_list': utils.get_cart_list(request),  # nav
+        'cart_list': cart_ops.get_cart_list(request),  # nav
         'search_text': search_text,
         'products': [x for x in products]}
 
     if request.user.is_authenticated:
-        context['user_profile'] = utils.get_user_profile(request)
+        context['user_profile'] = user_ops.get_user_profile(request)
 
     return render(request, 'search_tag.html', context)
 
@@ -836,7 +843,7 @@ def signup(request):
         return redirect('index')
 
     context = {
-        'store_profile': utils.get_store_profile(),
+        'store_profile': store_ops.get_store_profile(),
         'user_profile': None,
         'form': forms.FormSignup,
         'signup_status': None}
@@ -859,7 +866,7 @@ def user_dashboard(request, username):
     if request.user.username != username:
         return redirect('index')
 
-    profile = utils.get_user_profile(request)
+    profile = user_ops.get_user_profile(request)
     if profile.is_admin:
         return redirect('index')
 
@@ -875,12 +882,12 @@ def user_dashboard(request, username):
             # 'profile_image': profile.profile_image,
             'is_blocked': profile.is_blocked})
     context = {
-        'store_profile': utils.get_store_profile(),
+        'store_profile': store_ops.get_store_profile(),
         'user_profile': profile,
         'form_user': form_user,
         'form_user_profile': form_user_profile,
         'warning': None,
-        'cart_list': utils.get_cart_list(request)}
+        'cart_list': cart_ops.get_cart_list(request)}
 
     if request.method != 'POST':
         return render(request, 'user_dashboard.html', context)
@@ -896,23 +903,23 @@ def user_dashboard(request, username):
 def __manage_user_dashboard_warning(request) -> str | None:
     warning = None
     if 'profile_image' in request.FILES:
-        warning = validation.invalid_image(request.FILES['profile_image'])
+        warning = validation_ops.invalid_image(request.FILES['profile_image'])
 
     if 'username' in request.POST:
         username = request.POST['username']
         if username != request.user.username:
-            if not validation.available_username(request.user, username):
+            if not validation_ops.available_username(request.user, username):
                 warning = 'O nome de usuário fornecido já está sendo usado'
             if not warning:
-                warning = validation.invalid_username(username)
+                warning = validation_ops.invalid_username(username)
 
     if 'email' in request.POST:
         email = request.POST['email']
         if email != request.user.email:
-            if not validation.available_email(request.user, email):
+            if not validation_ops.available_email(request.user, email):
                 warning = 'O email fornecido já está sendo usado'
             if not warning:
-                warning = validation.invalid_email(email)
+                warning = validation_ops.invalid_email(email)
 
     if 'password' in request.POST and 'password_confirm' in request.POST:
         password = request.POST['password']
@@ -922,7 +929,8 @@ def __manage_user_dashboard_warning(request) -> str | None:
         password_confirm = None if not password_confirm else password_confirm
 
         if password and password_confirm:
-            warning = validation.invalid_password(password, password_confirm)
+            warning = validation_ops.invalid_password(
+                password, password_confirm)
         elif password_confirm and not password:
             warning = 'Coloque a senha atual'
 
@@ -970,20 +978,20 @@ def __create_new_user(request) -> str:
     password = request.POST['password']
     password_confirm = request.POST['password_confirm']
 
-    space_err = validation.invalid_whitespace(
+    space_err = validation_ops.invalid_whitespace(
         [name, username, email, password, password_confirm])
     if space_err:
         return space_err
 
-    username_err = validation.invalid_username(username)
+    username_err = validation_ops.invalid_username(username)
     if username_err:
         return username_err
 
-    email_err = validation.invalid_email(email)
+    email_err = validation_ops.invalid_email(email)
     if email_err:
         return email_err
 
-    pass_err = validation.invalid_password(password, password_confirm)
+    pass_err = validation_ops.invalid_password(password, password_confirm)
     if pass_err:
         return pass_err
 

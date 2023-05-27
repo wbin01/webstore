@@ -1,12 +1,3 @@
-# import datetime
-# import string
-# import logging
-#
-# from django.shortcuts import get_object_or_404
-#
-# import store.models as models
-
-
 def money_pprint(value: float, hide_sign: bool = False) -> str:
     """Money in pprint format
 

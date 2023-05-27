@@ -1,12 +1,4 @@
-# import datetime
-# import string
-# import logging
-#
-# from django.shortcuts import get_object_or_404
-#
-# import store.models as models
-
-from pprint_format_money import money_pprint
+from store.modules.pprint_format_money import money_pprint
 
 
 def total_shipping_price(cart_list):
