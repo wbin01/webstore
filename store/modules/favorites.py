@@ -21,3 +21,11 @@ def get_favorite_list(request) -> list:
         logging.error(err)
         favs = []
     return favs
+
+
+def remove_from_favorites(request):
+    favorite_item = get_favorite(
+        request, models.ModelProduct.objects.get(
+            pk=request.POST['remove_from_favorites']))
+    if favorite_item:
+        favorite_item.delete()

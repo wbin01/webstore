@@ -1,6 +1,6 @@
 import logging
-import string
 import json
+import string
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
@@ -10,37 +10,36 @@ from django.utils import timezone
 import users.models as user_models
 import store.models as models
 import store.forms as forms
-
-import store.modules.cart as cart_ops
-import store.modules.favorites as favorites_ops
-import store.modules.login_validation as validation_ops
-import store.modules.pprint_format_money as pprint_format_money_ops
-import store.modules.product_obj as product_obj_ops
-import store.modules.store as store_ops
-import store.modules.total_price as total_price_ops
-import store.modules.user as user_ops
+import store.modules.cart as mdl_cart
+import store.modules.favorites as mdl_favorites
+import store.modules.pprint_values as mdl_pprint_values
+import store.modules.product as mdl_product
+import store.modules.store as mdl_store
+import store.modules.total_price as mdl_total_price
+import store.modules.user as mdl_user
+import store.modules.validations as mdl_validations
 
 
 def cart(request):
     if not request.user.is_authenticated:
         return redirect('index')
 
-    profile = user_ops.get_user_profile(request)
-    cart_list = cart_ops.get_cart_list(request)
-    shipping = total_price_ops.total_shipping_price(cart_list)
-    shipping_pprint = total_price_ops.total_shipping_price_pprint(shipping)
-    total_price = cart_ops.cart_total_price(cart_list)
-    total_price_pprint = cart_ops.cart_total_price_pprint(total_price)
-    total_price_split_list = cart_ops.cart_total_price_split_list(cart_list)
+    profile = mdl_user.get_user_profile(request)
+    cart_list = mdl_cart.get_cart_list(request)
+    shipping = mdl_total_price.total_shipping_price(cart_list)
+    shipping_pprint = mdl_total_price.total_shipping_price_pprint(shipping)
+    total_price = mdl_cart.cart_total_price(cart_list)
+    total_price_pprint = mdl_cart.cart_total_price_pprint(total_price)
+    total_price_split_list = mdl_cart.cart_total_price_split_list(cart_list)
     total_price_split_list_pprint = (
-        cart_ops.cart_total_price_split_list_pprint(total_price_split_list))
+        mdl_cart.cart_total_price_split_list_pprint(total_price_split_list))
 
     context = {
-        'store_profile': store_ops.get_store_profile(),
+        'store_profile': mdl_store.get_store_profile(),
         'user_profile': profile,
         'cart_list': cart_list,
         'favorite_product_id_list': [
-            x.product_id for x in favorites_ops.get_favorite_list(request)],
+            x.product_id for x in mdl_favorites.get_favorite_list(request)],
         'cart_url': True,
         'shipping_price': shipping,
         'shipping_price_pprint': shipping_pprint,
@@ -54,99 +53,34 @@ def cart(request):
         return render(request, 'cart.html', context)
 
     if 'edit_item' in request.POST:
-        __cart_edit_item(request)
+        mdl_cart.edit_item(request)
     elif 'remove_item' in request.POST:
-        __cart_remove_item(request)
+        mdl_cart.remove_item(request)
     elif 'add_to_favorites' in request.POST:
-        __cart_add_to_favorites(request)
+        mdl_cart.add_to_favorites(request)
     elif 'remove_from_favorites' in request.POST:
-        __cart_remove_from_favorites(request)
+        mdl_cart.remove_from_favorites(request)
 
     return redirect('cart')
-
-
-def __cart_edit_item(request):
-    cart_item = models.ModelCart.objects.get(pk=request.POST['edit_item'])
-    cart_product = models.ModelProduct.objects.get(pk=cart_item.product.id)
-
-    quantity = int(request.POST['quantity'])
-    cart_item.quantity = quantity
-
-    times_split_num = int(request.POST['times_split_num'])
-    cart_item.times_split_num = times_split_num
-
-    times_split_unit = cart_ops.cart_edit_times_split_unit(
-        cart_product.price,
-        quantity,
-        times_split_num,
-        cart_product.times_split_interest)
-    cart_item.times_split_unit = times_split_unit
-
-    cart_item.times_split_pprint = cart_ops.cart_edit_times_split_pprint(
-        times_split_num,
-        times_split_unit)
-
-    total_price = cart_ops.cart_edit_total_price(
-        cart_product.price,
-        quantity,
-        cart_product.times_split_interest,
-        times_split_num)
-    cart_item.total_price = total_price
-
-    cart_item.total_price_pprint = cart_ops.cart_edit_total_price_pprint(
-        total_price)
-
-    cart_item.save()
-
-
-def __cart_remove_item(request):
-    model_product = models.ModelProduct.objects.get(
-        pk=request.POST['remove_item'])
-    cart_item = cart_ops.get_cart(request, model_product)
-    cart_item.delete()
-
-
-def __cart_add_to_favorites(request):
-    favorite_item = models.ModelFavorite.objects.create(
-        user=get_object_or_404(User, pk=request.user.id),
-        product=models.ModelProduct.objects.get(
-            pk=request.POST['add_to_favorites']))
-    favorite_item.save()
-
-
-def __cart_remove_from_favorites(request):
-    favorite_item = favorites_ops.get_favorite(
-        request, models.ModelProduct.objects.get(
-            pk=request.POST['remove_from_favorites']))
-    if favorite_item:
-        favorite_item.delete()
 
 
 def favorite(request):
     if not request.user.is_authenticated:
         return redirect('index')
 
-    profile = user_ops.get_user_profile(request)
+    profile = mdl_user.get_user_profile(request)
     context = {
-        'store_profile': store_ops.get_store_profile(),
+        'store_profile': mdl_store.get_store_profile(),
         'user_profile': profile,
-        'cart_list': cart_ops.get_cart_list(request),  # nav
-        'favorite_list': favorites_ops.get_favorite_list(request)}
+        'cart_list': mdl_cart.get_cart_list(request),  # nav
+        'favorite_list': mdl_favorites.get_favorite_list(request)}
 
     if request.method != 'POST':
         return render(request, 'favorite.html', context)
 
     if 'remove_from_favorites' in request.POST:
-        __favorite_remove_from_favorites(request)
+        mdl_favorites.remove_from_favorites(request)
     return redirect('favorite')
-
-
-def __favorite_remove_from_favorites(request):
-    favorite_item = favorites_ops.get_favorite(
-        request, models.ModelProduct.objects.get(
-            pk=request.POST['remove_from_favorites']))
-    if favorite_item:
-        favorite_item.delete()
 
 
 def index(request):
@@ -154,9 +88,9 @@ def index(request):
         models.ModelProduct.objects.order_by('-publication_date')
         .filter(is_published=True))
     context = {
-        'store_profile': store_ops.get_store_profile(),
+        'store_profile': mdl_store.get_store_profile(),
         'user_profile': None,
-        'cart_list': cart_ops.get_cart_list(request),  # nav
+        'cart_list': mdl_cart.get_cart_list(request),  # nav
         'products': [x for x in products],
         'highlight_posts': models.ModelProductHighlight.objects.all()}
 
@@ -164,7 +98,7 @@ def index(request):
         return render(request, 'index_for_visitors.html', context)
 
     if request.user.is_authenticated:
-        profile = user_ops.get_user_profile(request)
+        profile = mdl_user.get_user_profile(request)
         context['user_profile'] = profile
 
         if not profile:
@@ -179,7 +113,7 @@ def index(request):
 
 def login(request):
     context = {
-        'store_profile': store_ops.get_store_profile(),
+        'store_profile': mdl_store.get_store_profile(),
         'user_profile': None,
         'form': forms.FormLogin,
         'login_status': None}
@@ -224,7 +158,7 @@ def manage_products(request):
     if not request.user.is_authenticated:
         return redirect('index')
 
-    profile = user_ops.get_user_profile(request)
+    profile = mdl_user.get_user_profile(request)
 
     if profile.is_admin:
         search_text = '' if 'q' not in request.GET else request.GET['q']
@@ -237,11 +171,11 @@ def manage_products(request):
                 models.ModelProduct.objects.order_by('-publication_date'))
 
         context = {
-            'store_profile': store_ops.get_store_profile(),
+            'store_profile': mdl_store.get_store_profile(),
             'user_profile': profile,
             'products': products,
             'search_text': search_text,
-            'cart_list': cart_ops.get_cart_list(request),
+            'cart_list': mdl_cart.get_cart_list(request),
             'manage_url': True}
 
         return render(request, 'manage_products.html', context)
@@ -253,17 +187,17 @@ def manage_products_new(request):
     if not request.user.is_authenticated:
         return redirect('index')
 
-    profile = user_ops.get_user_profile(request)
+    profile = mdl_user.get_user_profile(request)
     if profile.is_admin:
         context = {
-            'store_profile': store_ops.get_store_profile(),
+            'store_profile': mdl_store.get_store_profile(),
             'user_profile': profile,
             'form': forms.FormProductNew,
             'new_product_status': None,
-            'cart_list': cart_ops.get_cart_list(request)}
+            'cart_list': mdl_cart.get_cart_list(request)}
 
         if request.method == 'POST':
-            status = validation_ops.invalid_image(request.FILES['image_1'])
+            status = mdl_validations.invalid_image(request.FILES['image_1'])
             if status:
                 context['new_product_status'] = status
                 return render(request, 'manage_products_new.html', context)
@@ -275,21 +209,21 @@ def manage_products_new(request):
             new_product = models.ModelProduct.objects.create(
                 user=request.user,
                 title=request.POST['title'],
-                title_for_card=product_obj_ops.product_title_for_card(
+                title_for_card=mdl_product.product_title_for_card(
                     request.POST['title']),
-                title_for_url=product_obj_ops.product_title_for_url(
+                title_for_url=mdl_product.product_title_for_url(
                     request.POST['title']),
                 price=float(
                     request.POST['price']),
-                price_pprint=product_obj_ops.product_price_pprint(
+                price_pprint=mdl_product.product_price_pprint(
                     request.POST['price']),
                 price_old=float(
                     request.POST['price']),
-                price_old_pprint=product_obj_ops.product_price_pprint(
+                price_old_pprint=mdl_product.product_price_pprint(
                     request.POST['price']),
-                price_off=product_obj_ops.product_price_off(
+                price_off=mdl_product.product_price_off(
                     request.POST['price'], request.POST['price']),
-                price_off_pprint=product_obj_ops.product_price_off_pprint(
+                price_off_pprint=mdl_product.product_price_off_pprint(
                     request.POST['price'], request.POST['price']),
                 price_off_display=(
                     True if 'price_off_display' in request.POST else False),
@@ -297,18 +231,18 @@ def manage_products_new(request):
                     request.POST['times_split_num']),
                 times_split_interest=int(
                     request.POST['times_split_interest']),
-                times_split_unit=product_obj_ops.product_times_split_unit(
+                times_split_unit=mdl_product.product_times_split_unit(
                     request.POST['price'],
                     request.POST['times_split_num'],
                     request.POST['times_split_interest']),
-                times_split_pprint=product_obj_ops.product_times_split_pprint(
+                times_split_pprint=mdl_product.product_times_split_pprint(
                     request.POST['price'],
                     request.POST['times_split_num'],
                     request.POST['times_split_interest']),
                 shipping_price=float(
                     request.POST['shipping_price']),
                 shipping_price_pprint=(
-                    product_obj_ops.product_shipping_price_pprint(
+                    mdl_product.product_shipping_price_pprint(
                         request.POST['shipping_price'])),
                 available_quantity=int(
                     request.POST['available_quantity']),
@@ -316,7 +250,7 @@ def manage_products_new(request):
                     True if 'available_quantity_display' in request.POST else
                     False),
                 max_quantity_per_sale=(
-                    product_obj_ops.product_max_quantity_per_sale(
+                    mdl_product.product_max_quantity_per_sale(
                         request.POST['available_quantity'],
                         request.POST['max_quantity_per_sale'])),
                 image_1=request.FILES['image_1'],
@@ -343,7 +277,7 @@ def manage_products_edit(request, product_url_title, product_id):
     if not request.user.is_authenticated:
         return redirect('index')
 
-    profile = user_ops.get_user_profile(request)
+    profile = mdl_user.get_user_profile(request)
     if not profile.is_admin:
         return redirect('index')
 
@@ -363,145 +297,32 @@ def manage_products_edit(request, product_url_title, product_id):
             'tags': post.tags,
             'is_published': post.is_published})
     context = {
-        'store_profile': store_ops.get_store_profile(),
+        'store_profile': mdl_store.get_store_profile(),
         'user_profile': profile,
         'form': form,
         'product': post,
         'warning': None,
-        'cart_list': cart_ops.get_cart_list(request)}
+        'cart_list': mdl_cart.get_cart_list(request)}
 
     if request.method != 'POST':
         return render(request, 'manage_products_edit.html', context)
 
-    context['warning'] = __manage_products_get_warning(request)
+    context['warning'] = mdl_product.edition_warnings(request)
     if context['warning']:
         return render(request, 'manage_products_edit.html', context)
-    __manage_products_edit_save(request, product_id)
+    mdl_product.save_edition(request, product_id)
     return redirect('manage_products')
-
-
-def __manage_products_get_warning(request) -> str | None:
-    warning = None
-    for image in ['image_1', 'image_2', 'image_3', 'image_4', 'image_5']:
-        if image in request.FILES:
-            warning = validation_ops.invalid_image(request.FILES[image])
-            if warning:
-                break
-    return warning
-
-
-def __manage_products_edit_save(request, product_id) -> None:
-    editable = models.ModelProduct.objects.get(pk=product_id)
-    if 'title' in request.POST:
-        editable.title = request.POST['title']
-        editable.title_for_card = product_obj_ops.product_title_for_card(
-            request.POST['title'])
-    if 'price' in request.POST:
-        editable.price_old = editable.price
-        editable.price_old_pprint = product_obj_ops.product_price_pprint(
-            str(editable.price))
-        editable.price = float(request.POST['price'])
-        editable.price_pprint = product_obj_ops.product_price_pprint(
-            request.POST['price'])
-        editable.price_off = product_obj_ops.product_price_off(
-            request.POST['price'], str(editable.price_old))
-        editable.price_off_pprint = product_obj_ops.product_price_off_pprint(
-            request.POST['price'], str(editable.price_old))
-    if 'times_split_num' in request.POST:
-        editable.times_split_num = int(request.POST['times_split_num'])
-    if 'times_split_interest' in request.POST:
-        editable.times_split_interest = int(
-            request.POST['times_split_interest'])
-    if 'shipping_price' in request.POST:
-        editable.shipping_price = float(request.POST['shipping_price'])
-        editable.shipping_price_pprint = (
-            product_obj_ops.product_shipping_price_pprint(
-                request.POST['shipping_price']))
-    if 'available_quantity' in request.POST:
-        editable.available_quantity = int(
-            request.POST['available_quantity'])
-    if 'max_quantity_per_sale' in request.POST:
-        editable.max_quantity_per_sale = (
-            product_obj_ops.product_max_quantity_per_sale(
-                request.POST['available_quantity'],
-                request.POST['max_quantity_per_sale']))
-
-    if 'image_1' in request.FILES:
-        editable.image_1 = request.FILES['image_1']
-
-    remove_image_2 = True if 'remove_image_2' in request.POST else False
-    if remove_image_2:
-        editable.image_2 = None
-    else:
-        if 'image_2' in request.FILES:
-            editable.image_2 = request.FILES['image_2']
-
-    remove_image_3 = True if 'remove_image_3' in request.POST else False
-    if remove_image_3:
-        editable.image_3 = None
-    else:
-        if 'image_3' in request.FILES:
-            editable.image_3 = request.FILES['image_3']
-
-    remove_image_4 = True if 'remove_image_4' in request.POST else False
-    if remove_image_4:
-        editable.image_4 = None
-    else:
-        if 'image_4' in request.FILES:
-            editable.image_4 = request.FILES['image_4']
-
-    remove_image_5 = True if 'remove_image_5' in request.POST else False
-    if remove_image_5:
-        editable.image_5 = None
-    else:
-        if 'image_5' in request.FILES:
-            editable.image_5 = request.FILES['image_5']
-
-    if 'summary' in request.POST:
-        editable.summary = request.POST['summary']
-
-    if 'content' in request.POST:
-        content_text = request.POST['content']
-        content_text = json.loads(content_text)['html'] if content_text else ''
-        editable.content = content_text
-
-    if 'tags' in request.POST:
-        editable.tags = request.POST['tags']
-    if ('price' not in request.POST or
-            'times_split_num' not in request.POST or
-            'times_split_interest' not in request.POST):
-        context['product_status'] = 'há campos vazios'
-    else:
-        editable.times_split_unit = product_obj_ops.product_times_split_unit(
-            request.POST['price'],
-            request.POST['times_split_num'],
-            request.POST['times_split_interest'])
-        editable.times_split_pprint = (
-            product_obj_ops.product_times_split_pprint(
-                request.POST['price'],
-                request.POST['times_split_num'],
-                request.POST['times_split_interest']))
-    editable.publication_date = timezone.now()
-    editable.price_off_display = (
-        True if 'price_off_display' in request.POST else False)
-    editable.available_quantity_display = (
-        True if 'available_quantity_display' in request.POST else
-        False)
-    editable.is_published = (
-        True if 'is_published' in request.POST else False)
-
-    editable.save()
 
 
 def manage_store(request):
     if not request.user.is_authenticated:
         return redirect('index')
 
-    profile = user_ops.get_user_profile(request)
+    profile = mdl_user.get_user_profile(request)
     if not profile.is_admin:
         return redirect('index')
 
-    store_profile = store_ops.get_store_profile()
+    store_profile = mdl_store.get_store_profile()
     form_store_profile = forms.FormStoreProfile(
         initial={
             'brand_name': store_profile.brand_name,
@@ -526,88 +347,26 @@ def manage_store(request):
         'store_profile': store_profile,
         'user_profile': profile,
         'warning': None,
-        'cart_list': cart_ops.get_cart_list(request),
+        'cart_list': mdl_cart.get_cart_list(request),
         'manage_url': True,
         'form': form_store_profile}
 
     if request.method != 'POST':
         return render(request, 'manage_store.html', context)
 
-    context['warning'] = __manage_store_get_warning(request)
+    context['warning'] = mdl_store.edition_warnings(request)
     if context['warning']:
         return render(request, 'manage_store.html', context)
-    __manage_store_save(request, store_profile)
+    mdl_store.save_edition(request, store_profile)
     return redirect('manage_store')
 
 
-def __manage_store_get_warning(request) -> str | None:
-    # HEX Color
-    warning = None
-    if 'brand_image' in request.FILES:
-        warning = validation_ops.invalid_image(request.FILES['brand_image'])
-    return warning
-
-
-def __manage_store_save(request, store_profile):
-    if 'brand_name' in request.POST:
-        store_profile.brand_name = request.POST['brand_name']
-    store_profile.show_brand_name_on_nav = (
-        True if 'show_brand_name_on_nav' in request.POST else False)
-
-    remove_image = True if 'remove_brand_image' in request.POST else False
-    if remove_image:
-        store_profile.brand_image = None
-    else:
-        if 'brand_image' in request.FILES:
-            store_profile.brand_image = request.FILES['brand_image']
-
-    store_profile.show_brand_image_on_nav = (
-        True if 'show_brand_image_on_nav' in request.POST else False)
-
-    if 'theme_color' in request.POST:
-        store_profile.theme_color = request.POST['theme_color']
-
-    if 'theme_color_text' in request.POST:
-        store_profile.theme_color_text = request.POST['theme_color_text']
-
-    if 'social_media_facebook' in request.POST:
-        store_profile.social_media_facebook = (
-            request.POST['social_media_facebook'])
-    if 'social_media_whatsapp' in request.POST:
-        store_profile.social_media_whatsapp = (
-            request.POST['social_media_whatsapp'])
-    if 'social_media_twitter' in request.POST:
-        store_profile.social_media_twitter = (
-            request.POST['social_media_twitter'])
-    if 'social_media_youtube' in request.POST:
-        store_profile.social_media_youtube = (
-            request.POST['social_media_youtube'])
-    if 'social_media_instagram' in request.POST:
-        store_profile.social_media_instagram = (
-            request.POST['social_media_instagram'])
-    if 'social_media_twitch' in request.POST:
-        store_profile.social_media_twitch = (
-            request.POST['social_media_twitch'])
-    if 'social_media_discord' in request.POST:
-        store_profile.social_media_discord = (
-            request.POST['social_media_discord'])
-    if 'social_media_linkedin' in request.POST:
-        store_profile.social_media_linkedin = (
-            request.POST['social_media_linkedin'])
-    if 'social_media_github' in request.POST:
-        store_profile.social_media_github = (
-            request.POST['social_media_github'])
-    if 'social_media_other' in request.POST:
-        store_profile.social_media_other = (
-            request.POST['social_media_other'])
-    store_profile.save()
-
-
+# >>>
 def manage_users(request):
     if not request.user.is_authenticated:
         return redirect('index')
 
-    profile = user_ops.get_user_profile(request)
+    profile = mdl_user.get_user_profile(request)
     if profile.is_admin:
         search_text = '' if 'q' not in request.GET else request.GET['q']
         if search_text:
@@ -619,12 +378,12 @@ def manage_users(request):
             user_profiles = models.ModelUserProfile.objects.all()
 
         context = {
-            'store_profile': store_ops.get_store_profile(),
+            'store_profile': mdl_store.get_store_profile(),
             'user_profile': profile,
             'users': user_profiles,
             'search_text': '',
             'status': '_',
-            'cart_list': cart_ops.get_cart_list(request),
+            'cart_list': mdl_cart.get_cart_list(request),
             'manage_url': True}
 
         return render(request, 'manage_users.html', context)
@@ -637,7 +396,7 @@ def manage_users_edit(request, user_username, user_profile_id):
     if not request.user.is_authenticated:
         return redirect('index')
 
-    profile = user_ops.get_user_profile(request)
+    profile = mdl_user.get_user_profile(request)
     if not profile.is_admin:
         return redirect('index')
 
@@ -656,13 +415,13 @@ def manage_users_edit(request, user_username, user_profile_id):
         }
     )
     context = {
-        'store_profile': store_ops.get_store_profile(),
+        'store_profile': mdl_store.get_store_profile(),
         'user_profile': profile,
         'edit_user_profile': edit_user_profile,
         'form_user': form_user,
         'form_user_profile': form_user_profile,
         'warning': None,
-        'cart_list': cart_ops.get_cart_list(request)}
+        'cart_list': mdl_cart.get_cart_list(request)}
 
     if request.method != 'POST':
         return render(request, 'manage_users_edit.html', context)
@@ -677,29 +436,29 @@ def manage_users_edit(request, user_username, user_profile_id):
 def __manage_users_get_warning(request, edit_user) -> str | None:
     warning = None
     if 'profile_image' in request.FILES:
-        warning = validation_ops.invalid_image(request.FILES['profile_image'])
+        warning = mdl_validations.invalid_image(request.FILES['profile_image'])
 
     if 'username' in request.POST:
         username = request.POST['username']
         if username != edit_user.username:
-            if not validation_ops.available_username(edit_user, username):
+            if not mdl_validations.available_username(edit_user, username):
                 warning = 'O nome de usuário fornecido já está sendo usado'
             if not warning:
-                warning = validation_ops.invalid_username(username)
+                warning = mdl_validations.invalid_username(username)
 
     if 'email' in request.POST:
         email = request.POST['email']
         if email != edit_user.email:
-            if not validation_ops.available_email(edit_user, email):
+            if not mdl_validations.available_email(edit_user, email):
                 warning = 'O email fornecido já está sendo usado'
             if not warning:
-                warning = validation_ops.invalid_email(email)
+                warning = mdl_validations.invalid_email(email)
 
     if 'password_confirm' in request.POST:
         password = request.POST['password_confirm']
         password = None if not password else password
         if password:
-            warning = validation_ops.invalid_password(password, password)
+            warning = mdl_validations.invalid_password(password, password)
 
     return warning
 
@@ -734,14 +493,14 @@ def manage_users_new(request):
     if not request.user.is_authenticated:
         return redirect('index')
 
-    profile = user_ops.get_user_profile(request)
+    profile = mdl_user.get_user_profile(request)
     if profile.is_admin:
         context = {
-            'store_profile': store_ops.get_store_profile(),
+            'store_profile': mdl_store.get_store_profile(),
             'user_profile': profile,
             'form': forms.FormSignup,
             'status': None,
-            'cart_list': cart_ops.get_cart_list(request)}
+            'cart_list': mdl_cart.get_cart_list(request)}
 
         if request.method != 'POST':
             return render(request, 'manage_users_new.html', context)
@@ -760,19 +519,19 @@ def product(request, product_url_title, product_id):
 
     model_product = models.ModelProduct.objects.get(pk=product_id)
     context = {
-        'store_profile': store_ops.get_store_profile(),
+        'store_profile': mdl_store.get_store_profile(),
         'product': model_product,
         'tags': model_product.tags.split(','),
         'favorite': None,
         'cart': None,
-        'cart_list': cart_ops.get_cart_list(request),  # nav
+        'cart_list': mdl_cart.get_cart_list(request),  # nav
         'user_profile': None}
 
     if not request.user.is_authenticated:
         return render(request, 'product_for_visitors.html', context)
 
     if request.method == 'POST':
-        cart_item = cart_ops.get_cart(request, model_product)
+        cart_item = mdl_cart.get_cart(request, model_product)
         if 'buy' in request.POST:
             if not cart_item:
                 __create_cart_item(request.user.id, model_product)
@@ -781,7 +540,7 @@ def product(request, product_url_title, product_id):
         if 'add_favorite' in request.POST:
             __create_favorite_item(request.user.id, model_product)
         elif 'remove_favorite' in request.POST:
-            fav_item = favorites_ops.get_favorite(request, model_product)
+            fav_item = mdl_favorites.get_favorite(request, model_product)
             fav_item.delete()
 
         elif 'add_cart' in request.POST:
@@ -789,10 +548,10 @@ def product(request, product_url_title, product_id):
         elif 'remove_cart' in request.POST:
             cart_item.delete()
 
-    profile = user_ops.get_user_profile(request)
+    profile = mdl_user.get_user_profile(request)
     context['user_profile'] = profile
-    context['favorite'] = favorites_ops.get_favorite(request, model_product)
-    context['cart'] = cart_ops.get_cart(request, model_product)
+    context['favorite'] = mdl_favorites.get_favorite(request, model_product)
+    context['cart'] = mdl_cart.get_cart(request, model_product)
 
     if not profile.is_admin and not profile.is_superuser:
         return render(request, 'product_for_users.html', context)
@@ -807,14 +566,14 @@ def search(request):
         title__icontains=search_text) if search_text else [])
 
     context = {
-        'store_profile': store_ops.get_store_profile(),
+        'store_profile': mdl_store.get_store_profile(),
         'user_profile': None,
-        'cart_list': cart_ops.get_cart_list(request),  # nav
+        'cart_list': mdl_cart.get_cart_list(request),  # nav
         'search_text': search_text,
         'products': [x for x in products]}
 
     if request.user.is_authenticated:
-        context['user_profile'] = user_ops.get_user_profile(request)
+        context['user_profile'] = mdl_user.get_user_profile(request)
 
     return render(request, 'search.html', context)
 
@@ -826,14 +585,14 @@ def search_tag(request):
         tags__icontains=search_text) if search_text else [])
 
     context = {
-        'store_profile': store_ops.get_store_profile(),
+        'store_profile': mdl_store.get_store_profile(),
         'user_profile': None,
-        'cart_list': cart_ops.get_cart_list(request),  # nav
+        'cart_list': mdl_cart.get_cart_list(request),  # nav
         'search_text': search_text,
         'products': [x for x in products]}
 
     if request.user.is_authenticated:
-        context['user_profile'] = user_ops.get_user_profile(request)
+        context['user_profile'] = mdl_user.get_user_profile(request)
 
     return render(request, 'search_tag.html', context)
 
@@ -843,7 +602,7 @@ def signup(request):
         return redirect('index')
 
     context = {
-        'store_profile': store_ops.get_store_profile(),
+        'store_profile': mdl_store.get_store_profile(),
         'user_profile': None,
         'form': forms.FormSignup,
         'signup_status': None}
@@ -866,7 +625,7 @@ def user_dashboard(request, username):
     if request.user.username != username:
         return redirect('index')
 
-    profile = user_ops.get_user_profile(request)
+    profile = mdl_user.get_user_profile(request)
     if profile.is_admin:
         return redirect('index')
 
@@ -882,12 +641,12 @@ def user_dashboard(request, username):
             # 'profile_image': profile.profile_image,
             'is_blocked': profile.is_blocked})
     context = {
-        'store_profile': store_ops.get_store_profile(),
+        'store_profile': mdl_store.get_store_profile(),
         'user_profile': profile,
         'form_user': form_user,
         'form_user_profile': form_user_profile,
         'warning': None,
-        'cart_list': cart_ops.get_cart_list(request)}
+        'cart_list': mdl_cart.get_cart_list(request)}
 
     if request.method != 'POST':
         return render(request, 'user_dashboard.html', context)
@@ -903,23 +662,23 @@ def user_dashboard(request, username):
 def __manage_user_dashboard_warning(request) -> str | None:
     warning = None
     if 'profile_image' in request.FILES:
-        warning = validation_ops.invalid_image(request.FILES['profile_image'])
+        warning = mdl_validations.invalid_image(request.FILES['profile_image'])
 
     if 'username' in request.POST:
         username = request.POST['username']
         if username != request.user.username:
-            if not validation_ops.available_username(request.user, username):
+            if not mdl_validations.available_username(request.user, username):
                 warning = 'O nome de usuário fornecido já está sendo usado'
             if not warning:
-                warning = validation_ops.invalid_username(username)
+                warning = mdl_validations.invalid_username(username)
 
     if 'email' in request.POST:
         email = request.POST['email']
         if email != request.user.email:
-            if not validation_ops.available_email(request.user, email):
+            if not mdl_validations.available_email(request.user, email):
                 warning = 'O email fornecido já está sendo usado'
             if not warning:
-                warning = validation_ops.invalid_email(email)
+                warning = mdl_validations.invalid_email(email)
 
     if 'password' in request.POST and 'password_confirm' in request.POST:
         password = request.POST['password']
@@ -929,7 +688,7 @@ def __manage_user_dashboard_warning(request) -> str | None:
         password_confirm = None if not password_confirm else password_confirm
 
         if password and password_confirm:
-            warning = validation_ops.invalid_password(
+            warning = mdl_validations.invalid_password(
                 password, password_confirm)
         elif password_confirm and not password:
             warning = 'Coloque a senha atual'
@@ -978,20 +737,20 @@ def __create_new_user(request) -> str:
     password = request.POST['password']
     password_confirm = request.POST['password_confirm']
 
-    space_err = validation_ops.invalid_whitespace(
+    space_err = mdl_validations.invalid_whitespace(
         [name, username, email, password, password_confirm])
     if space_err:
         return space_err
 
-    username_err = validation_ops.invalid_username(username)
+    username_err = mdl_validations.invalid_username(username)
     if username_err:
         return username_err
 
-    email_err = validation_ops.invalid_email(email)
+    email_err = mdl_validations.invalid_email(email)
     if email_err:
         return email_err
 
-    pass_err = validation_ops.invalid_password(password, password_confirm)
+    pass_err = mdl_validations.invalid_password(password, password_confirm)
     if pass_err:
         return pass_err
 

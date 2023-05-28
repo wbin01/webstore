@@ -1,4 +1,4 @@
-from store.modules.pprint_format_money import money_pprint
+from store.modules.pprint_values import money_pprint
 
 
 def total_shipping_price(cart_list):
