@@ -4,16 +4,24 @@ import store.models as models
 import store.modules.validations as mdl_validations
 
 
-def get_store_profile() -> models.ModelStoreProfile:
+def edition_warnings(request) -> str | None:
+    # HEX Color
+    warning = None
+    if 'brand_image' in request.FILES:
+        warning = mdl_validations.invalid_image(request.FILES['brand_image'])
+    return warning
+
+
+def profile() -> models.ModelStoreProfile:
     """..."""
     try:
-        profile = models.ModelStoreProfile.objects.all()
+        store_profile = models.ModelStoreProfile.objects.all()
     except Exception as err:
         logging.error(err)
-        profile = None
+        store_profile = None
 
-    if not profile:
-        profile = models.ModelStoreProfile.objects.create(
+    if not store_profile:
+        store_profile = models.ModelStoreProfile.objects.create(
             brand_name='Brand',
             show_brand_name_on_nav=True,
             brand_image=None,
@@ -32,18 +40,10 @@ def get_store_profile() -> models.ModelStoreProfile:
             social_media_linkedin=None,
             social_media_github=None,
             social_media_other=None)
-        profile.save()
+        store_profile.save()
 
-    profile = models.ModelStoreProfile.objects.all()
-    return profile[0]
-
-
-def edition_warnings(request) -> str | None:
-    # HEX Color
-    warning = None
-    if 'brand_image' in request.FILES:
-        warning = mdl_validations.invalid_image(request.FILES['brand_image'])
-    return warning
+    store_profile = models.ModelStoreProfile.objects.all()
+    return store_profile[0]
 
 
 def save_edition(request, store_profile):

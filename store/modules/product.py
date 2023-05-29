@@ -5,34 +5,37 @@ import string
 from django.utils import timezone
 
 import store.models as models
-from store.modules.pprint_values import money_pprint
+from store.modules.value_convert import value_pprint
 import store.modules.validations as mdl_validations
 
 
-def product_title_for_url(title: str) -> str:
-    """the-title"""
-    new_title = ''
-    for char in title:
-        char = char.lower()
-        if char == ' ' or char in string.ascii_lowercase:
-            new_title += char.replace(' ', '-')
-    new_title = new_title.replace('--', '-')
-    return new_title + datetime.datetime.now().strftime("%d-%m-%Y--%I-%M%p")
-
-
-def product_title_for_card(title: str) -> str:
+def card_title(title: str) -> str:
     """Short product title"""
     if len(title) > 50:
         return title[:50] + '...'
     return title
 
 
-def product_price_pprint(price: str) -> str:
-    """R$ 0,00"""
-    return money_pprint(float(price))
+def edition_warnings(request) -> str | None:
+    warning = None
+    for image in ['image_1', 'image_2', 'image_3', 'image_4', 'image_5']:
+        if image in request.FILES:
+            warning = mdl_validations.invalid_image(request.FILES[image])
+            if warning:
+                break
+    return warning
 
 
-def product_price_off(price: str, price_old: str) -> float:
+def max_quantity_per_sale(available_quantity: str, max_quantity: str) -> int:
+    """..."""
+    available_quantity = int(available_quantity)
+    max_quantity = int(max_quantity)
+    if available_quantity < max_quantity:
+        return available_quantity
+    return max_quantity
+
+
+def price_off(price: str, price_old: str) -> float:
     """10 -> 10% OFF"""
     price, price_old = float(price), float(price_old)
     off = 0
@@ -46,7 +49,7 @@ def product_price_off(price: str, price_old: str) -> float:
     return 0.0
 
 
-def product_price_off_pprint(price: str, price_old: str) -> str:
+def price_off_pprint(price: str, price_old: str) -> str:
     """10% OFF"""
     price, price_old = float(price), float(price_old)
     off = 0
@@ -60,86 +63,24 @@ def product_price_off_pprint(price: str, price_old: str) -> str:
     return 'R$ 0.00% OFF'
 
 
-def product_times_split_unit(
-        price, times_split_num, times_split_interest) -> float:
-    """5.00
-
-    One unit extracted. If it is 10 times of 5.0, then it returns 5.0
-    """
-    preco = float(price)
-    vezes = int(times_split_num)
-    juros = int(times_split_interest)
-    if preco > 0.0:
-        if vezes == 1:
-            return preco
-        if vezes > 1 and juros == 0:
-            preco = round((preco / vezes), 2)
-            return preco
-        if vezes > 1 and juros > 1:
-            preco_real_com_juros = (preco / 100) * juros + preco
-            preco = round((preco_real_com_juros / vezes), 2)
-            return preco
-    return 0.0
-
-
-def product_times_split_pprint(
-        price, times_split_num, times_split_interest) -> str:
-    """1x R$ 0,00"""
-
-    if float(price) > 0.0:
-        if int(times_split_num) and int(times_split_num) > 1:
-            preco = product_times_split_unit(
-                price, times_split_num, times_split_interest)
-            return '{}x {}'.format(times_split_num, money_pprint(float(preco)))
-
-    return ''
-
-
-def product_shipping_price_pprint(shipping_price) -> str:
-    """Frete grátis"""
-    if not shipping_price:
-        return ''
-    return money_pprint(float(shipping_price))
-
-
-def product_max_quantity_per_sale(
-        available_quantity: str, max_quantity_per_sale: str) -> int:
-    """..."""
-    available_quantity = int(available_quantity)
-    max_quantity_per_sale = int(max_quantity_per_sale)
-    if available_quantity < max_quantity_per_sale:
-        return available_quantity
-    return max_quantity_per_sale
-
-
-def product_tags(tags: str) -> list:
-    """[tag1, tag2, tag3]"""
-    return [x.strip() for x in tags.split(',')]
-
-
-def edition_warnings(request) -> str | None:
-    warning = None
-    for image in ['image_1', 'image_2', 'image_3', 'image_4', 'image_5']:
-        if image in request.FILES:
-            warning = mdl_validations.invalid_image(request.FILES[image])
-            if warning:
-                break
-    return warning
+def price_pprint(price: str) -> str:
+    """R$ 0,00"""
+    return value_pprint(float(price))
 
 
 def save_edition(request, product_id) -> None:
     editable = models.ModelProduct.objects.get(pk=product_id)
     if 'title' in request.POST:
         editable.title = request.POST['title']
-        editable.title_for_card = product_title_for_card(request.POST['title'])
+        editable.title_for_card = card_title(request.POST['title'])
     if 'price' in request.POST:
         editable.price_old = editable.price
-        editable.price_old_pprint = product_price_pprint(str(editable.price))
+        editable.price_old_pprint = price_pprint(str(editable.price))
         editable.price = float(request.POST['price'])
-        editable.price_pprint = product_price_pprint(request.POST['price'])
-        editable.price_off = product_price_off(
+        editable.price_pprint = price_pprint(request.POST['price'])
+        editable.price_off = price_off(
             request.POST['price'], str(editable.price_old))
-        editable.price_off_pprint = product_price_off_pprint(
+        editable.price_off_pprint = price_off_pprint(
             request.POST['price'], str(editable.price_old))
     if 'times_split_num' in request.POST:
         editable.times_split_num = int(request.POST['times_split_num'])
@@ -149,11 +90,11 @@ def save_edition(request, product_id) -> None:
     if 'shipping_price' in request.POST:
         editable.shipping_price = float(request.POST['shipping_price'])
         editable.shipping_price_pprint = (
-            product_shipping_price_pprint(request.POST['shipping_price']))
+            shipping_price_pprint(request.POST['shipping_price']))
     if 'available_quantity' in request.POST:
         editable.available_quantity = int(request.POST['available_quantity'])
     if 'max_quantity_per_sale' in request.POST:
-        editable.max_quantity_per_sale = product_max_quantity_per_sale(
+        editable.max_quantity_per_sale = max_quantity_per_sale(
             request.POST['available_quantity'],
             request.POST['max_quantity_per_sale'])
 
@@ -203,11 +144,11 @@ def save_edition(request, product_id) -> None:
             'times_split_interest' not in request.POST):
         context['product_status'] = 'há campos vazios'
     else:
-        editable.times_split_unit = product_times_split_unit(
+        editable.times_split_unit = split_unit(
             request.POST['price'],
             request.POST['times_split_num'],
             request.POST['times_split_interest'])
-        editable.times_split_pprint = product_times_split_pprint(
+        editable.times_split_pprint = split_pprint(
             request.POST['price'],
             request.POST['times_split_num'],
             request.POST['times_split_interest'])
@@ -220,3 +161,56 @@ def save_edition(request, product_id) -> None:
         True if 'is_published' in request.POST else False)
 
     editable.save()
+
+
+def shipping_price_pprint(shipping_price) -> str:
+    """Frete grátis"""
+    if not shipping_price:
+        return ''
+    return value_pprint(float(shipping_price))
+
+
+def split_unit(price, split_num, split_gain) -> float:
+    """5.00
+
+    One unit extracted. If it is 10 times of 5.0, then it returns 5.0
+    """
+    preco = float(price)
+    vezes = int(split_num)
+    juros = int(split_gain)
+    if preco > 0.0:
+        if vezes == 1:
+            return preco
+        if vezes > 1 and juros == 0:
+            preco = round((preco / vezes), 2)
+            return preco
+        if vezes > 1 and juros > 1:
+            preco_real_com_juros = (preco / 100) * juros + preco
+            preco = round((preco_real_com_juros / vezes), 2)
+            return preco
+    return 0.0
+
+
+def split_pprint(price, split_num, split_gain) -> str:
+    """1x R$ 0,00"""
+    if float(price) > 0.0:
+        if int(split_num) and int(split_num) > 1:
+            preco = split_unit(price, split_num, split_gain)
+            return '{}x {}'.format(split_num, value_pprint(float(preco)))
+    return ''
+
+
+def tags(tag: str) -> list:
+    """[tag1, tag2, tag3]"""
+    return [x.strip() for x in tag.split(',')]
+
+
+def url_title(title: str) -> str:
+    """the-title"""
+    new_title = ''
+    for char in title:
+        char = char.lower()
+        if char == ' ' or char in string.ascii_lowercase:
+            new_title += char.replace(' ', '-')
+    new_title = new_title.replace('--', '-')
+    return new_title + datetime.datetime.now().strftime("%d-%m-%Y--%I-%M%p")

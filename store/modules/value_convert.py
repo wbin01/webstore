@@ -1,4 +1,4 @@
-def money_pprint(value: float, hide_sign: bool = False) -> str:
+def value_pprint(value: float, hide_sign: bool = False) -> str:
     """Money in pprint format
 
     10,00
@@ -8,17 +8,17 @@ def money_pprint(value: float, hide_sign: bool = False) -> str:
     dollar, cents = str(value).split('.')
     return '{}{},{}'.format(
         '' if hide_sign else 'R$ ',
-        money_dollar_pprint(dollar), money_cents_pprint(cents))
+        reais_pprint(dollar), cents_pprint(cents))
 
 
-def money_dollar_pprint(real: str) -> str:
+def reais_pprint(real: str) -> str:
     """..."""
     if len(real) > 3:
         real = '{}.{}'.format(real[:-3], real[-3:])
     return real
 
 
-def money_cents_pprint(cent: str) -> str:
+def cents_pprint(cent: str) -> str:
     """..."""
     if len(cent) == 1:
         cent = f'{cent}0'
